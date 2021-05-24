@@ -18,37 +18,34 @@ abstract contract OhCurve3PoolHelper {
     /// @param underlying The underlying we want to deposit
     /// @param index The index of the underlying
     /// @param amount The amount of underlying to deposit
-    // TODO: Add balance check
+    /// @param minMint The min LP tokens to mint before tx reverts (slippage)
     function addLiquidity(
         address pool,
         address underlying,
         uint256 index,
-        uint256 amount
+        uint256 amount,
+        uint256 minMint
     ) internal {
         uint256[3] memory amounts = [uint256(0), uint256(0), uint256(0)];
         amounts[index] = amount;
         IERC20(underlying).safeIncreaseAllowance(pool, amount);
-        ICurve3Pool(pool).add_liquidity(amounts, 0);
-        // uint256 balance = crvUnderlyingBalance();
-        // require(balance > 0, "Curve: Add failed");
+        ICurve3Pool(pool).add_liquidity(amounts, minMint);
     }
 
     /// @notice Remove liquidity from Curve 3Pool, receiving a single underlying
     /// @param pool The Curve 3Pool
     /// @param index The index of underlying we want to withdraw
     /// @param amount The amount to withdraw
-    // TODO: test remove_liquidity_imbalance args[1]
-    // TODO: Add balance check
+    /// @param maxBurn The max LP tokens to burn before the tx reverts (slippage)
     function removeLiquidity(
         address pool,
         uint256 index,
-        uint256 amount
+        uint256 amount,
+        uint256 maxBurn
     ) internal {
         uint256[3] memory amounts = [uint256(0), uint256(0), uint256(0)];
         amounts[index] = amount;
-        ICurve3Pool(pool).remove_liquidity_imbalance(amounts, amount);
-        // uint256 balance = underlyingBalance();
-        // require(balance > 0, "Curve: Remove failed");
+        ICurve3Pool(pool).remove_liquidity_imbalance(amounts, maxBurn);
     }
 
     /// @notice Claim CRV rewards from the Mintr for a given Gauge

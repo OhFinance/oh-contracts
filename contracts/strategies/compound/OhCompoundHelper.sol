@@ -68,14 +68,17 @@ abstract contract OhCompoundHelper {
     }
 
     /// @notice Repay loan with weth
+    /// @param weth WETH address
+    /// @param cToken The cToken for the underlying
+    /// @param amount The amount of underlying to repay
     /// @dev Convert to ETH, then repay
     function repayInWETH(
         address weth,
         address cToken,
-        uint256 amountUnderlying
+        uint256 amount
     ) internal {
-        IWETH(weth).withdraw(amountUnderlying); // Unwrapping
-        ICEther(cToken).repayBorrow{value: amountUnderlying}();
+        IWETH(weth).withdraw(amount); // Unwrapping
+        ICEther(cToken).repayBorrow{value: amount}();
     }
 
     /// @notice Redeem cTokens for underlying
@@ -103,20 +106,24 @@ abstract contract OhCompoundHelper {
     }
 
     /// @notice Redeem cTokens for weth
+    /// @param weth WETH Address
+    /// @param cToken The cToken to redeem
+    /// @param amount The amount of underlying to receive
     /// @dev Redeem in ETH, then convert to weth
     function redeemUnderlyingInWeth(
         address weth,
         address cToken,
-        uint256 amountUnderlying
+        uint256 amount
     ) internal {
-        if (amountUnderlying > 0) {
-            redeemUnderlying(cToken, amountUnderlying);
+        if (amount > 0) {
+            redeemUnderlying(cToken, amount);
             IWETH(weth).deposit{value: address(this).balance}();
         }
     }
 
     /// @notice Claim COMP rewards from Comptroller for this address
-    function claim(address cComptroller) internal {
-        IComptroller(cComptroller).claimComp(address(this));
+    /// @param comptroller The Compound Comptroller, Reward Contract
+    function claim(address comptroller) internal {
+        IComptroller(comptroller).claimComp(address(this));
     }
 }

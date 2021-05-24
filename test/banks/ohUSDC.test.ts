@@ -3,6 +3,7 @@ import {addresses, execute, getDecimalString} from 'utils';
 import {ohUsdcFixture, OhUsdcFixture} from 'fixture';
 import {getErc20At, swapEthForTokens} from 'lib';
 import {ERC20} from 'types';
+import {formatUnits} from '@ethersproject/units';
 
 describe('ohUSDC', () => {
   let fixture: OhUsdcFixture;
@@ -79,6 +80,7 @@ describe('ohUSDC', () => {
     bankProxy = bankProxy.connect(fixture.worker);
 
     const balance = await usdc.balanceOf(worker.address);
+    console.log('Starting Balance is:', formatUnits(balance.toString(), 6));
     await execute(usdc.approve(bankProxy.address, balance));
 
     const amount = balance.div(3);
@@ -86,13 +88,29 @@ describe('ohUSDC', () => {
       await execute(bankProxy.deposit(amount));
 
       const bankBalance = await bankProxy.underlyingBalance();
-      const bankShares = await bankProxy.balanceOf(worker.address);
 
       expect(bankBalance.toString()).eq(amount.toString());
       await execute(manager.finance(bankProxy.address));
 
       const strategyBalance = await bankProxy.strategyBalance(i);
       console.log(strategyBalance.toString());
+
+      expect(strategyBalance.gt(0)).true;
     }
+
+    const virtualBalance = await bankProxy.virtualBalance();
+    const virtualPrice = await bankProxy.virtualPrice();
+
+    console.log(
+      'Virtual Balance is:',
+      formatUnits(virtualBalance.toString(), 6)
+    );
+    console.log('Virtual Price is:', formatUnits(virtualPrice.toString(), 6));
+
+    const shares = await bankProxy.balanceOf(worker.address);
+    await execute(bankProxy.withdraw(shares.toString()));
+
+    const endBalance = await usdc.balanceOf(worker.address);
+    console.log('Ending Balance is:', formatUnits(endBalance.toString(), 6));
   });
 });

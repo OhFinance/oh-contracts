@@ -6,7 +6,6 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {IStrategy} from "../../interfaces/IStrategy.sol";
-import {OhConstants} from "../../libraries/OhConstants.sol";
 import {OhTransferHelper} from "../../libraries/OhTransferHelper.sol";
 import {OhStrategy} from "../OhStrategy.sol";
 import {OhCompoundHelper} from "./OhCompoundHelper.sol";
@@ -37,7 +36,8 @@ contract OhCompoundStrategy is IStrategy, OhCompoundHelper, OhStrategy, OhCompou
     ) public initializer onlyGovernancePost {
         initializeStrategy(registry_, bank_, underlying_, derivative_, reward_);
         initializeCompoundStorage(comptroller_);
-        IERC20(derivative_).safeApprove(underlying_, OhConstants.MAX_UINT);
+
+        IERC20(derivative_).safeApprove(underlying_, type(uint256).max);
     }
 
     function bank() public view override returns (address) {

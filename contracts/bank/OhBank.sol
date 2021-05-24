@@ -181,6 +181,30 @@ contract OhBank is ERC20Upgradeable, IBank, OhSubscriberUpgradeable, OhBankStora
         emit Deposit(recipient, amount);
     }
 
+    /// @dev Withdraw shares for underlying
+    /// @dev 3 scenarios can occur
+    /// @dev   1. If we have enough underlying on the Bank to cover the withdrawal, transfer from Bank
+    /// @dev   2. Else if we are withdrawing all shares, withdraw all underlying tokens
+    /// @dev   3. Else, transfer from each Strategy until the withdrawal is satisfied
+    function _withdraw(address user, uint256 shares) internal {
+        require(shares > 0, "Bank: Invalid withdrawal");
+        uint256 totalSupply = totalSupply();
+        _burn(user, shares);
+
+        uint256 balance = underlyingBalance();
+        uint256 withdrawAmount = virtualBalance().mul(shares).div(totalSupply);
+        if (withdrawAmount > balance) {
+            if (shares == totalSupply) {
+                _withdrawAll();
+            } else {
+                _withdrawRemaining(withdrawAmount.sub(balance));
+            }
+        }
+
+        OhTransferHelper.safeTokenTransfer(user, underlying(), withdrawAmount);
+        emit Withdraw(user, shares);
+    }
+
     // withdraw all underlying to the bank
     function _withdrawAll() internal {
         uint256 length = totalStrategies();
@@ -200,29 +224,5 @@ contract OhBank is ERC20Upgradeable, IBank, OhSubscriberUpgradeable, OhBankStora
                 return;
             }
         }
-    }
-
-    // Withdraw shares for underlying
-    // 3 scenarios can occur
-    //   1. If we have enough underlying on the Bank to cover the withdrawal, transfer from Bank
-    //   2. Else if we are withdrawing all shares, withdraw all underlying tokens
-    //   3. Else, transfer from each Strategy until the withdrawal is satisfied
-    function _withdraw(address user, uint256 shares) internal {
-        require(shares > 0, "Bank: Invalid withdrawal");
-        uint256 totalSupply = totalSupply();
-        _burn(user, shares);
-
-        uint256 balance = underlyingBalance();
-        uint256 withdrawAmount = virtualBalance().mul(shares).div(totalSupply);
-        if (withdrawAmount > balance) {
-            if (shares == totalSupply) {
-                _withdrawAll();
-            } else {
-                _withdrawRemaining(withdrawAmount.sub(balance));
-            }
-        }
-
-        OhTransferHelper.safeTokenTransfer(user, underlying(), withdrawAmount);
-        emit Withdraw(user, shares);
     }
 }

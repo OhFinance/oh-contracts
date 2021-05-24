@@ -42,43 +42,53 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
         initializeAaveV2Storage(lendingPool_, incentiveController_);
     }
 
+    /// @notice The Bank that the Strategy is associated with
     function bank() public view override returns (address) {
         return _bank();
     }
 
-    function derivative() public view override returns (address) {
-        return _derivative();
-    }
-
-    function reward() public view override returns (address) {
-        return _reward();
-    }
-
+    /// @notice The underlying token the Strategy invests in AaveV2
     function underlying() public view override returns (address) {
         return _underlying();
     }
 
-    function derivativeBalance() public view override returns (uint256) {
-        return _derivativeBalance();
+    /// @notice The derivative token received from AaveV2 (aToken)
+    function derivative() public view override returns (address) {
+        return _derivative();
     }
 
-    function rewardBalance() public view override returns (uint256) {
-        return _rewardBalance();
+    /// @notice The reward token received from AaveV2 (stkAave)
+    function reward() public view override returns (address) {
+        return _reward();
     }
 
+    /// @notice Balance of underlying tokens on the Strategy
     function underlyingBalance() public view override returns (uint256) {
         return _underlyingBalance();
     }
 
-    // aTokens are 1:1 with underlying, they are continuously distributed to users
+    /// @notice Balance of derivative tokens on the Strategy (aTokens)
+    function derivativeBalance() public view override returns (uint256) {
+        return _derivativeBalance();
+    }
+
+    /// @notice Balance of reward tokens on the Strategy (stkAave)
+    function rewardBalance() public view override returns (uint256) {
+        return _rewardBalance();
+    }
+
+    /// @notice Balance of underlying invested in AaveV2
+    /// @dev aTokens are 1:1 with underlying, they are continuously distributed to users
     function investedBalance() public view override returns (uint256) {
         return _derivativeBalance();
     }
 
+    /// @notice AaveV2 Lending Pool
     function lendingPool() public view returns (address) {
         return _lendingPool();
     }
 
+    /// @notice AaveV2 Incentive Controller, Reward Contract
     function incentiveController() public view returns (address) {
         return _incentiveController();
     }
@@ -119,7 +129,7 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
         if (amount == 0) {
             return 0;
         }
-        uint256 reclaimed = reclaim(lendingPool(), derivative(), amount);
+        uint256 reclaimed = reclaim(lendingPool(), underlying(), amount);
         uint256 withdrawn = OhTransferHelper.safeTokenTransfer(recipient, underlying(), reclaimed);
         return withdrawn;
     }

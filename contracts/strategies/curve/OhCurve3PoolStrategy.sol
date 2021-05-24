@@ -5,11 +5,13 @@ pragma solidity 0.7.6;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {Math} from "@openzeppelin/contracts/math/Math.sol";
 import {IStrategy} from "../../interfaces/IStrategy.sol";
 import {OhTransferHelper} from "../../libraries/OhTransferHelper.sol";
 import {OhStrategy} from "../OhStrategy.sol";
 import {OhCurve3PoolHelper} from "./OhCurve3PoolHelper.sol";
 import {OhCurve3PoolStrategyStorage} from "./OhCurve3PoolStrategyStorage.sol";
+import "hardhat/console.sol";
 
 /// @title Oh! Finance Curve 3Pool Strategy
 /// @notice Standard Curve 3Pool LP + Gauge Single Underlying Strategy
@@ -52,6 +54,10 @@ contract OhCurve3PoolStrategy is
         return _bank();
     }
 
+    function underlying() public view override returns (address) {
+        return _underlying();
+    }
+
     function derivative() public view override returns (address) {
         return _derivative();
     }
@@ -60,8 +66,8 @@ contract OhCurve3PoolStrategy is
         return _reward();
     }
 
-    function underlying() public view override returns (address) {
-        return _underlying();
+    function underlyingBalance() public view override returns (uint256) {
+        return _underlyingBalance();
     }
 
     function derivativeBalance() public view override returns (uint256) {
@@ -70,10 +76,6 @@ contract OhCurve3PoolStrategy is
 
     function rewardBalance() public view override returns (uint256) {
         return _rewardBalance();
-    }
-
-    function underlyingBalance() public view override returns (uint256) {
-        return _underlyingBalance();
     }
 
     function pool() public view returns (address) {
@@ -102,13 +104,30 @@ contract OhCurve3PoolStrategy is
         return staked(gauge());
     }
 
-    // execute the 3Pool strategy
+    /// @notice Execute the Curve 3Pool Strategy
+    /// @dev Compound CRV Yield, Add Liquidity, Stake into Gauge
     function invest() external override onlyBank {
         _compound();
         _deposit();
     }
 
-    // compound rewards into underlying through liquidation
+    /// @notice Withdraw all underlying from Curve 3Pool Strategy
+    /// @dev Unstake from Gauge, Remove Liquidity
+    function withdrawAll() external override onlyBank {
+        uint256 invested = investedBalance();
+        _withdraw(msg.sender, invested);
+    }
+
+    /// @notice Withdraw an amount of underlying from Curve 3Pool Strategy
+    /// @param amount Amount of Underlying tokens to withdraw
+    /// @dev Unstake from Gauge, Remove Liquidity
+    function withdraw(uint256 amount) external override onlyBank returns (uint256) {
+        uint256 withdrawn = _withdraw(msg.sender, amount);
+        return withdrawn;
+    }
+
+    /// @dev Compound rewards into underlying through liquidation
+    /// @dev Claim Rewards from Mintr, sell CRV for USDC
     function _compound() internal {
         // claim available CRV rewards
         claim(mintr(), gauge());
@@ -123,20 +142,10 @@ contract OhCurve3PoolStrategy is
         uint256 amount = _underlyingBalance();
         if (amount > 0) {
             // add liquidity to 3Pool to receive 3CRV
-            addLiquidity(pool(), underlying(), index(), amount);
+            addLiquidity(pool(), underlying(), index(), amount, 1);
             // stake all received in the 3CRV gauge
             stake(gauge(), derivative(), derivativeBalance());
         }
-    }
-
-    function withdrawAll() external override onlyBank {
-        uint256 invested = investedBalance();
-        _withdraw(msg.sender, invested);
-    }
-
-    function withdraw(uint256 amount) external override onlyBank returns (uint256) {
-        uint256 withdrawn = _withdraw(msg.sender, amount);
-        return withdrawn;
     }
 
     // withdraw underlying tokens from the protocol
@@ -146,17 +155,21 @@ contract OhCurve3PoolStrategy is
             return 0;
         }
 
-        // calculate amount of shares to redeem
         uint256 invested = investedBalance();
-        uint256 supplyShare = amount.mul(1e18).div(invested);
-        uint256 redeemAmount = supplyShare.mul(invested).div(1e18);
+        uint256 staked = stakedBalance();
 
-        // safely withdraw from Curve
-        if (redeemAmount > invested) {
-            removeLiquidity(pool(), index(), invested);
-        } else {
-            removeLiquidity(pool(), index(), redeemAmount);
-        }
+        // calculate % of supply ownership
+        uint256 supplyShare = amount.mul(1e18).div(invested);
+
+        // find amount to unstake in 3CRV
+        uint256 unstakeAmount = Math.min(staked, supplyShare.mul(staked).div(1e18));
+
+        // find amount to redeem in underlying
+        uint256 redeemAmount = Math.min(invested, supplyShare.mul(invested).div(1e18));
+
+        // unstake from Gauge & remove liquidity from Pool
+        unstake(gauge(), unstakeAmount);
+        removeLiquidity(pool(), index(), redeemAmount, unstakeAmount);
 
         // withdraw to bank
         uint256 withdrawn = OhTransferHelper.safeTokenTransfer(recipient, underlying(), amount);

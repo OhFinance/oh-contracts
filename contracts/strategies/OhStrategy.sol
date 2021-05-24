@@ -7,7 +7,6 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {IBank} from "../interfaces/IBank.sol";
 import {ILiquidator} from "../interfaces/ILiquidator.sol";
 import {IManager} from "../interfaces/IManager.sol";
-import {OhConstants} from "../libraries/OhConstants.sol";
 import {OhSwapHelper} from "../libraries/OhSwapHelper.sol";
 import {OhTransferHelper} from "../libraries/OhTransferHelper.sol";
 import {OhSubscriberUpgradeable} from "../registry/OhSubscriberUpgradeable.sol";
