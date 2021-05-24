@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "rootDir": ".",
+    "baseUrl": "src",
+    "paths": {
+      "abi/*": ["../abi/*"], // imports are relative to baseUrl
+      "types": ["../types"]
+    }
+  },
+  "files": [
+    "hardhat.config.ts"
+  ],
+  "include": [
+    "src",
+    "test"
+  ],
+  "exclude": ["node_modules"]
+}
