@@ -1,30 +1,16 @@
-import {BigNumber, Signer} from 'ethers';
-import {
-  deployForum,
-  deployGovernor,
-  deployManager,
-  deployProxyAdmin,
-  setGovernance,
-  setManager,
-} from 'lib';
-import {getDecimalNumber} from 'utils';
+import {Signer} from 'ethers';
+import {deployForum, deployGovernor, deployProxyAdmin} from 'lib';
+import {getDecimalString} from 'utils';
 
-export const deploy = async (
-  deployer: Signer,
-  registry: string,
-  token: string
-) => {
+export const deploy = async (deployer: Signer, registry: string, token: string) => {
   const forum = await deployForum(
     deployer,
     registry,
     token,
     1, // 1 block review
     17280, // 3 days (in blocks) voting
-    getDecimalNumber(1000000).toString() // 1m to propose
+    getDecimalString(1000000) // 1m to propose
   );
-
-  const manager = await deployManager(deployer, registry);
-  await setManager(deployer, registry, manager.address);
 
   const governor = await deployGovernor(
     deployer,
@@ -42,7 +28,7 @@ export const deploy = async (
 
   return {
     forum,
-    manager,
+    // manager,
     governor,
     proxyAdmin,
   };

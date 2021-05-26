@@ -6,6 +6,7 @@ import {
   OhCurve3PoolStrategy,
   OhForum,
   OhGovernor,
+  OhLiquidator,
   OhManager,
   OhProxyAdmin,
   OhRegistry,
@@ -20,7 +21,12 @@ export interface CoreFixture {
   token: OhToken;
 }
 
-export interface GovernanceFixture extends CoreFixture {
+export interface ManagerFixture extends CoreFixture {
+  manager: OhManager;
+  liquidator: OhLiquidator;
+}
+
+export interface GovernanceFixture extends ManagerFixture {
   forum: OhForum;
   manager: OhManager;
   governor: OhGovernor;

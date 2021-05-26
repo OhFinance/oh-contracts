@@ -13,7 +13,8 @@ export const addresses = {
   crv3Token: '0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490', // 3CRV
   crvMintr: '0xd061D61a4d941c39E5453435B6345Dc261C2fcE0', // reward contract
   usdc: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // USDC
-  uniswapV2: '0x7a250d5630b4cf539739df2c5dacb4c659f2488d',
+  sushiswapV2: '0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F', // sushi router
+  uniswapV2: '0x7a250d5630b4cf539739df2c5dacb4c659f2488d', /// uni router
   weth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   zero: '0x0000000000000000000000000000000000000000',
 };

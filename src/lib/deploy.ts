@@ -5,13 +5,14 @@ import {
   OhCurve3PoolStrategy,
   OhForum,
   OhGovernor,
+  OhLiquidator,
   OhManager,
   OhProxyAdmin,
   OhRegistry,
   OhToken,
 } from 'types';
 import {Signer} from 'ethers';
-import {deployContract} from 'utils';
+import {addresses, deployContract} from 'utils';
 
 export const deployRegistry = async (deployer: Signer) => {
   const registry = (await deployContract(deployer, 'OhRegistry')) as OhRegistry;
@@ -25,6 +26,17 @@ export const deployToken = async (deployer: Signer, registry: string) => {
     registry
   )) as OhToken;
   return token;
+};
+
+export const deployLiquidator = async (deployer: Signer, registry: string) => {
+  const liquidiator = (await deployContract(
+    deployer,
+    'OhLiquidator',
+    registry,
+    addresses.uniswapV2,
+    addresses.sushiswapV2
+  )) as OhLiquidator;
+  return liquidiator;
 };
 
 export const deployForum = async (

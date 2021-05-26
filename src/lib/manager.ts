@@ -2,7 +2,7 @@ import {Signer} from 'ethers';
 import {execute} from 'utils';
 import {getManagerAt} from './contract';
 
-export const addBank = async (
+export const setBank = async (
   deployer: Signer,
   manager: string,
   bank: string
