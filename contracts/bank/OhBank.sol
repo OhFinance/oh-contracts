@@ -5,7 +5,11 @@ pragma solidity 0.7.6;
 import {
     ERC20Upgradeable
 } from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {
+    ERC20PermitUpgradeable
+} from "@openzeppelin/contracts-upgradeable/drafts/ERC20PermitUpgradeable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC20Permit} from "@openzeppelin/contracts/drafts/IERC20Permit.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {IBank} from "../interfaces/IBank.sol";
@@ -19,7 +23,13 @@ import {OhBankStorage} from "./OhBankStorage.sol";
 /// @title Oh! Finance Bank
 /// @notice Base Upgradeable Bank Contract
 /// @notice ERC-20 Token that represents user share ownership
-contract OhBank is ERC20Upgradeable, IBank, OhSubscriberUpgradeable, OhBankStorage {
+contract OhBank is
+    ERC20Upgradeable,
+    ERC20PermitUpgradeable,
+    IBank,
+    OhSubscriberUpgradeable,
+    OhBankStorage
+{
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
@@ -35,48 +45,46 @@ contract OhBank is ERC20Upgradeable, IBank, OhSubscriberUpgradeable, OhBankStora
         _;
     }
 
+    /// @notice Initialize the Bank Logic
+    constructor() initializer {
+        assert(registry() == address(0));
+        assert(underlying() == address(0));
+    }
+
     /// @notice Initialize the Bank Proxy
-    /// @param registry_ the address of the registry
-    /// @param underlying_ the address of the underlying token that is deposited
+    /// @param name_ The name of the Bank Token
+    /// @param symbol_ The symbol of the Bank Token
+    /// @param registry_ Rhe address of the registry
+    /// @param underlying_ Rhe address of the underlying token that is deposited
     /// @dev Should be called when deploying the proxy contract
     function initializeBank(
         string memory name_,
         string memory symbol_,
         address registry_,
         address underlying_
-    ) public initializer onlyGovernancePost {
-        // setup token + subscriber, use same token decimals
+    ) public initializer {
+        // setup token first, use same token decimals
         uint8 decimals_ = ERC20Upgradeable(underlying_).decimals();
         __ERC20_init(name_, symbol_);
         _setupDecimals(decimals_);
 
+        // setup permit
+        __ERC20Permit_init(name_);
+
+        // initialize subscriber and storage
         initializeSubscriber(registry_);
         initializeStorage(underlying_);
     }
 
-    /// @notice
+    /// @notice The Bank Strategy at index i
+    /// @param i The Strategy index
     function strategies(uint256 i) public view override returns (address) {
         return IManager(manager()).strategies(address(this), i);
     }
 
-    /// @notice
+    /// @notice The number of Strategies this Bank uses
     function totalStrategies() public view override returns (uint256) {
         return IManager(manager()).totalStrategies(address(this));
-    }
-
-    /// @notice The EIP-712 typehash used for replay protection, set at deployment
-    function DOMAIN_SEPARATOR() public view returns (bytes32) {
-        return _DOMAIN_SEPARATOR();
-    }
-
-    /// @notice The EIP-712 typehash for the contract's domain
-    function DOMAIN_TYPEHASH() public view returns (bytes32) {
-        return _DOMAIN_TYPEHASH();
-    }
-
-    /// @notice the EIP-712 typehash for approving token transfers via signature
-    function PERMIT_TYPEHASH() public view returns (bytes32) {
-        return _PERMIT_TYPEHASH();
     }
 
     /// @notice The underlying token that is deposited
@@ -91,13 +99,14 @@ contract OhBank is ERC20Upgradeable, IBank, OhSubscriberUpgradeable, OhBankStora
         return IERC20(underlying()).balanceOf(address(this));
     }
 
-    // Get the virtual balance invested in a given strategy (using index)
+    /// @notice Get the virtual balance invested in a given strategy
+    /// @param i The Strategy Index
     function strategyBalance(uint256 i) public view override returns (uint256) {
         address strategy = strategies(i);
         return IStrategy(strategy).investedBalance();
     }
 
-    // Get the total virtual amount invested in all strategies
+    /// @notice Get the total virtual amount invested in all strategies
     function investedBalance() public view override returns (uint256 amount) {
         uint256 length = totalStrategies();
         for (uint256 i = 0; i < length; i++) {
@@ -105,7 +114,7 @@ contract OhBank is ERC20Upgradeable, IBank, OhSubscriberUpgradeable, OhBankStora
         }
     }
 
-    // Get the total virtual amount available to the bank
+    /// @notice Get the total virtual amount available to the bank
     function virtualBalance() public view override returns (uint256) {
         return underlyingBalance().add(investedBalance());
     }
@@ -146,6 +155,19 @@ contract OhBank is ERC20Upgradeable, IBank, OhSubscriberUpgradeable, OhBankStora
     // deposit an amount of underlying for a given recipient
     function depositFor(uint256 amount, address recipient) external override defense {
         require(recipient != address(0), "Bank: Invalid Recipient");
+        _deposit(amount, msg.sender, recipient);
+    }
+
+    function depositWithPermit(
+        uint256 amount,
+        address recipient,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external defense {
+        require(recipient != address(0), "Bank: Invalid Recipient");
+        IERC20Permit(underlying()).permit(msg.sender, address(this), amount, deadline, v, r, s);
         _deposit(amount, msg.sender, recipient);
     }
 

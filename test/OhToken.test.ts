@@ -11,7 +11,7 @@ describe('OhToken', () => {
     fixture = await coreFixture();
   });
 
-  it('token is deployed correctly', async () => {
+  it('is deployed correctly', async () => {
     const {token, registry, deployer} = fixture;
 
     const registryAddress = await token.registry();
@@ -25,11 +25,13 @@ describe('OhToken', () => {
     expect(minted.toString()).eq(getDecimalNumber(100000000).toString());
   });
 
-  it('token permits transferFrom with signature', async () => {
+  it('permits transfers with signature', async () => {
     const {token, deployer, worker} = fixture;
     const value = getDecimalNumber(100);
 
     const {message, data} = getPermitMessageData(
+      'Oh! Finance',
+      '1',
       token.address,
       deployer.address,
       worker.address,
@@ -66,7 +68,7 @@ describe('OhToken', () => {
     expect(permitNonce.toNumber()).eq(1);
   });
 
-  it('token delegates votes for user with signature', async () => {
+  it('delegates votes for user with signature', async () => {
     const {token, deployer, worker} = fixture;
 
     // delegate to self to create a checkpoint

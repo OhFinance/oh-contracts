@@ -10,6 +10,7 @@ import {HardhatUserConfig, task} from 'hardhat/config';
 // hardhat
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-etherscan';
+import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
 import 'hardhat-abi-exporter';
 import 'hardhat-gas-reporter';
@@ -56,37 +57,12 @@ const config: HardhatUserConfig = {
     enabled: !!process.env.REPORT_GAS,
     coinmarketcap: process.env.COINMARKETCAP_KEY || '',
   },
-  // namedAccounts: {
-  //   deployer: 0,
-  //   manager: 1,
-  //   uniswapRouter: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-  //   sushiswapRouter: '0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F',
-  //   weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-  //   usdc: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-  //   aaveAddressProvider: '0x24a42fD28C976A61Df5D00D0599C34c4f90748c8',
-  //   aaveAddressProviderV2: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5',
-  //   aaveDataProvider: '',
-  //   aaveDataProviderV2: '0x057835Ad21a177dbdd3090bB1CAE03EaCF78Fc6d',
-  //   aaveUsdcToken: '0x9bA00D6856a4eDF4665BcA2C2309936572473B7E',
-  //   compoundComptroller: '',
-  //   compoundToken: '0xc00e94Cb662C3520282E6f5717214004A7f26888',
-  //   compoundUsdcToken: '',
-  //   curve3Token: '0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490',
-  //   curve3Pool: '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7',
-  //   curveGauge: '',
-  //   curveLocker: '0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2',
-  //   curveMintr: '',
-  //   curveToken: '0xD533a949740bb3306d119CC777fa900bA034cd52',
-
-  //   sushiswapMasterchef: '',
-  // },
   networks: {
     localhost: {
       url: 'http://127.0.0.1:8545',
     },
     hardhat: {
-      // loggingEnabled: true,
-      chainId: 1,
+      chainId: 1, //31337,
       forking: {
         // enabled: false,
         blockNumber: 12495621,

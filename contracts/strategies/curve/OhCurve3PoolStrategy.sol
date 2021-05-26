@@ -25,7 +25,15 @@ contract OhCurve3PoolStrategy is
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
-    /// @notice Initialize the Curve 3Pool Strategy
+    /// @notice Initialize the Curve 3Pool Strategy Logic
+    constructor() initializer {
+        assert(registry() == address(0));
+        assert(bank() == address(0));
+        assert(underlying() == address(0));
+        assert(reward() == address(0));
+    }
+
+    /// @notice Initialize the Curve 3Pool Strategy Proxy
     /// @param registry_ Address of the Registry
     /// @param bank_ Address of the Bank
     /// @param underlying_ Underlying (DAI, USDC, USDT)
@@ -45,7 +53,7 @@ contract OhCurve3PoolStrategy is
         address gauge_,
         address mintr_,
         uint256 index_
-    ) public initializer onlyGovernancePost {
+    ) public initializer {
         initializeStrategy(registry_, bank_, underlying_, derivative_, reward_);
         initializeCurve3PoolStorage(pool_, gauge_, mintr_, index_);
     }

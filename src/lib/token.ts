@@ -1,13 +1,15 @@
 import {network} from 'hardhat';
 
-export const getDomain = (token: string) => ({
-  name: 'Oh! Finance',
-  version: '1',
+export const getDomain = (name: string, version: string, token: string) => ({
+  name,
+  version,
   chainId: network.config.chainId,
   verifyingContract: token,
 });
 
 export const getPermitMessageData = (
+  name: string,
+  version: string,
   token: string,
   owner: string,
   spender: string,
@@ -24,7 +26,7 @@ export const getPermitMessageData = (
   };
 
   const data = JSON.stringify({
-    domain: getDomain(token),
+    domain: getDomain(name, version, token),
     message,
     primaryType: 'Permit',
     types: {
@@ -92,7 +94,7 @@ export const getDelegationMessageData = (
   };
 
   const data = JSON.stringify({
-    domain: getDomain(token),
+    domain: getDomain('Oh! Finance', '1', token),
     message,
     primaryType: 'Delegation',
     types: {

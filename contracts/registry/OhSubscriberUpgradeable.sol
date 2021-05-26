@@ -29,13 +29,6 @@ abstract contract OhSubscriberUpgradeable is Initializable, ISubscriber, OhUpgra
         _;
     }
 
-    /// @notice Only allow the governance address to execute a function
-    /// @notice Do the check post-execution
-    modifier onlyGovernancePost {
-        _;
-        require(msg.sender == governance(), "Subscriber: Only Governance");
-    }
-
     constructor() {
         assert(_REGISTRY_SLOT == bytes32(uint256(keccak256("eip1967.subscriber.registry")) - 1));
     }

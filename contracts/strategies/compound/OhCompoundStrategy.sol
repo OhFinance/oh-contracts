@@ -18,7 +18,15 @@ contract OhCompoundStrategy is IStrategy, OhCompoundHelper, OhStrategy, OhCompou
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    /// @notice Initializes the Compound Strategy
+    /// @notice Initialize the Compound Strategy Logic
+    constructor() initializer {
+        assert(registry() == address(0));
+        assert(bank() == address(0));
+        assert(underlying() == address(0));
+        assert(reward() == address(0));
+    }
+
+    /// @notice Initializes the Compound Strategy Proxy
     /// @param registry_ the registry contract
     /// @param bank_ the bank associated with the strategy
     /// @param underlying_ the underlying token that is deposited
@@ -33,7 +41,7 @@ contract OhCompoundStrategy is IStrategy, OhCompoundHelper, OhStrategy, OhCompou
         address derivative_,
         address reward_,
         address comptroller_
-    ) public initializer onlyGovernancePost {
+    ) public initializer {
         initializeStrategy(registry_, bank_, underlying_, derivative_, reward_);
         initializeCompoundStorage(comptroller_);
 

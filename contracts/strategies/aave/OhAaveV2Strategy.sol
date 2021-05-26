@@ -20,7 +20,15 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
-    /// Initializes the AaveV2 Strategy
+    /// @notice Initialize the AaveV2 Strategy Logic
+    constructor() initializer {
+        assert(registry() == address(0));
+        assert(bank() == address(0));
+        assert(underlying() == address(0));
+        assert(reward() == address(0));
+    }
+
+    /// @notice Initialize the AaveV2 Strategy Proxy
     /// @param registry_ the registry contract
     /// @param bank_ the bank associated with the strategy
     /// @param underlying_ the underlying token that is deposited
@@ -37,7 +45,7 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
         address reward_,
         address lendingPool_,
         address incentiveController_
-    ) public initializer onlyGovernancePost {
+    ) public initializer {
         initializeStrategy(registry_, bank_, underlying_, derivative_, reward_);
         initializeAaveV2Storage(lendingPool_, incentiveController_);
     }

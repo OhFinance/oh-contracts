@@ -44,6 +44,7 @@ contract OhUpgradeableProxy is TransparentUpgradeableProxy {
     /// @notice Get the current version number
     function _version() internal view returns (uint256 version_) {
         bytes32 slot = _VERSION_SLOT;
+
         // solhint-disable-next-line no-inline-assembly
         assembly {
             version_ := sload(slot)

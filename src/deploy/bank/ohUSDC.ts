@@ -20,8 +20,8 @@ export const deployOhUsdcBank = async (
 ) => {
   // form the input data
   const data = getInitializeBankData(
-    'Oh! Interest Bearing USDC',
-    'ohUSDC',
+    'Oh! USDC',
+    'Oh! USDC',
     registry,
     addresses.usdc
   );
@@ -149,38 +149,32 @@ export const deploy = async (
     bankLogic
   );
 
-  const {
-    aaveV2StrategyUpgradeableProxy,
-    aaveV2StrategyProxy,
-  } = await deployOhUsdcAaveV2Strategy(
-    deployer,
-    registry,
-    proxyAdmin,
-    bankProxy.address,
-    aaveV2StrategyLogic
-  );
+  const {aaveV2StrategyUpgradeableProxy, aaveV2StrategyProxy} =
+    await deployOhUsdcAaveV2Strategy(
+      deployer,
+      registry,
+      proxyAdmin,
+      bankProxy.address,
+      aaveV2StrategyLogic
+    );
 
-  const {
-    compoundStrategyUpgradeableProxy,
-    compoundStrategyProxy,
-  } = await deployOhUsdcCompoundStrategy(
-    deployer,
-    registry,
-    proxyAdmin,
-    bankProxy.address,
-    compoundStrategyLogic
-  );
+  const {compoundStrategyUpgradeableProxy, compoundStrategyProxy} =
+    await deployOhUsdcCompoundStrategy(
+      deployer,
+      registry,
+      proxyAdmin,
+      bankProxy.address,
+      compoundStrategyLogic
+    );
 
-  const {
-    curve3PoolStrategyUpgradeableProxy,
-    curve3PoolStrategyProxy,
-  } = await deployOhUsdcCurve3PoolStrategy(
-    deployer,
-    registry,
-    proxyAdmin,
-    bankProxy.address,
-    curve3PoolStrategyLogic
-  );
+  const {curve3PoolStrategyUpgradeableProxy, curve3PoolStrategyProxy} =
+    await deployOhUsdcCurve3PoolStrategy(
+      deployer,
+      registry,
+      proxyAdmin,
+      bankProxy.address,
+      curve3PoolStrategyLogic
+    );
 
   return {
     bankUpgradeableProxy,

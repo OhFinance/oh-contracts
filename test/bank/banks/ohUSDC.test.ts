@@ -1,7 +1,7 @@
 import {expect} from 'chai';
-import {addresses, execute, getDecimalString} from 'utils';
+import {addresses, execute, getDecimalString, signMessageData} from 'utils';
 import {ohUsdcFixture, OhUsdcFixture} from 'fixture';
-import {getErc20At, swapEthForTokens} from 'lib';
+import {getErc20At, getPermitMessageData, swapEthForTokens} from 'lib';
 import {ERC20} from 'types';
 import {formatUnits} from '@ethersproject/units';
 
@@ -9,7 +9,7 @@ describe('ohUSDC', () => {
   let fixture: OhUsdcFixture;
   let usdc: ERC20;
 
-  before(async () => {
+  beforeEach(async () => {
     fixture = await ohUsdcFixture();
     usdc = await getErc20At(addresses.usdc, fixture.worker);
 
@@ -31,8 +31,8 @@ describe('ohUSDC', () => {
 
     expect(underlying).eq(addresses.usdc);
     expect(decimals).eq(6);
-    expect(symbol).eq('ohUSDC');
-    expect(name).eq('Oh! Interest Bearing USDC');
+    expect(symbol).eq('Oh! USDC');
+    expect(name).eq('Oh! USDC');
   });
 
   it('added AaveV2, Compound, and Curve strategies to ohUSDC Bank correctly', async () => {
@@ -52,6 +52,40 @@ describe('ohUSDC', () => {
     expect(aaveV2StrategyAddress).eq(aaveV2StrategyProxy.address);
     expect(compoundStrategyAddress).eq(compoundStrategyProxy.address);
     expect(curve3PoolStrategyAddress).eq(curve3PoolStrategyProxy.address);
+  });
+
+  it('allows users to deposit with permit', async () => {
+    let {bankProxy, worker} = fixture;
+    bankProxy = bankProxy.connect(worker);
+
+    const balance = await usdc.balanceOf(worker.address);
+    console.log(balance.toString());
+    const {message, data} = getPermitMessageData(
+      'USD Coin',
+      '2',
+      addresses.usdc,
+      worker.address,
+      bankProxy.address,
+      balance.toString(),
+      0,
+      Date.now() + 900
+    );
+
+    const {v, r, s} = await signMessageData(worker.address, data);
+
+    await execute(
+      bankProxy.depositWithPermit(
+        balance,
+        worker.address,
+        message.deadline,
+        v,
+        r,
+        s
+      )
+    );
+
+    const shares = await bankProxy.balanceOf(worker.address);
+    expect(shares).to.be.eq(balance);
   });
 
   it('allows users to deposit and withdraw from the ohUSDC Bank', async () => {
