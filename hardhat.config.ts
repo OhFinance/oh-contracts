@@ -13,6 +13,7 @@ import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-waffle';
 import '@typechain/hardhat';
 import 'hardhat-abi-exporter';
+import 'hardhat-docgen';
 import 'hardhat-gas-reporter';
 import 'hardhat-spdx-license-identifier';
 
@@ -47,6 +48,9 @@ const config: HardhatUserConfig = {
   abiExporter: {
     flat: true,
     clear: true,
+  },
+  docgen: {
+    path: './docs',
   },
   typechain: {
     outDir: 'types',

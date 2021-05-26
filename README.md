@@ -20,17 +20,22 @@ yarn compile
 
 ```
 yarn test
+yarn test test/OhToken.test.ts
 ```
 
 ## Usage
 
-- Deploy the contracts
+- Build the docs site
 
 ```
-npx hardhat --network rinkeby deploy
+# build the docs
+yarn docs:build
 
-yarn rinkeby:deploy
-yarn mainnet:deploy
+# if you don't have serve installed
+yarn global add serve
+
+# serve the site
+yarn docs:serve
 ```
 
 - Run a script

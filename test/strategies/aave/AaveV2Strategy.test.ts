@@ -10,9 +10,7 @@ describe('AaveV2Strategy', () => {
     const {manager, bankProxy, aaveV2StrategyProxy} = fixture;
 
     await execute(manager.setBank(bankProxy.address, true));
-    await execute(
-      manager.addStrategy(bankProxy.address, aaveV2StrategyProxy.address)
-    );
+    await execute(manager.addStrategy(bankProxy.address, aaveV2StrategyProxy.address));
   });
 
   it('deployed and initialized AaveV2 USDC Strategy proxy correctly', async () => {
@@ -23,13 +21,13 @@ describe('AaveV2Strategy', () => {
     const derivative = await aaveV2StrategyProxy.derivative();
     const reward = await aaveV2StrategyProxy.reward();
     const lendingPool = await aaveV2StrategyProxy.lendingPool();
-    const incentiveController = await aaveV2StrategyProxy.incentiveController();
+    const incentivesController = await aaveV2StrategyProxy.incentivesController();
 
     expect(bank).eq(bankProxy.address);
     expect(underlying).eq(addresses.usdc);
     expect(derivative).eq(addresses.aaveUsdcToken);
     expect(reward).eq(addresses.aave);
     expect(lendingPool).eq(addresses.aaveLendingPool);
-    expect(incentiveController).eq(addresses.aaveIncentivesController);
+    expect(incentivesController).eq(addresses.aaveIncentivesController);
   });
 });

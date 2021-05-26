@@ -8,7 +8,13 @@
         "tabWidth": 4,
         "singleQuote": false,
         "explicitTypes": "always",
-        "printWidth": 100
+        "printWidth": 140
+      }
+    },
+    {
+      "files": "*.ts",
+      "options": {
+        "printWidth": 140
       }
     }
   ]

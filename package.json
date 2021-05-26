@@ -21,6 +21,8 @@
     "lint": "yarn prettier && solhint -c .solhint.json contracts/**/*.sol",
     "build": "hardhat compile && tsc",
     "compile": "hardhat compile",
+    "docs:build": "rm -rf docs && yarn run hardhat docgen",
+    "docs:serve": "serve -s docs",
     "dev": "hardhat node --watch",
     "test": "hardhat test",
     "test:gas": "cross-env REPORT_GAS=1 hardhat test",
@@ -35,6 +37,7 @@
     "mainnet:verify": "hardhat --network mainnet etherscan-verify"
   },
   "devDependencies": {
+    "@digix/doxity": "^0.5.2",
     "@ethereum-waffle/chai": "^3.2.2",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.2",
@@ -56,6 +59,7 @@
     "ethers": "^5.1.4",
     "hardhat": "^2.0.6",
     "hardhat-abi-exporter": "^2.0.7",
+    "hardhat-docgen": "^1.1.1",
     "hardhat-gas-reporter": "^1.0.4",
     "hardhat-spdx-license-identifier": "^2.0.3",
     "hardhat-typechain": "^0.3.4",

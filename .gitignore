@@ -12,6 +12,7 @@ yarn.lock
 /abi
 /artifacts
 /cache
+/docs
 /types
 
 # credentials
