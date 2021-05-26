@@ -2,12 +2,12 @@
 
 pragma solidity 0.7.6;
 
-interface IBank {
+import {IBankStorage} from "./IBankStorage.sol";
+
+interface IBank is IBankStorage {
     function strategies(uint256 i) external view returns (address);
 
     function totalStrategies() external view returns (uint256);
-
-    function underlying() external view returns (address);
 
     function underlyingBalance() external view returns (uint256);
 
@@ -18,6 +18,10 @@ interface IBank {
     function virtualBalance() external view returns (uint256);
 
     function virtualPrice() external view returns (uint256);
+
+    function pause() external;
+
+    function unpause() external;
 
     function invest(address strategy, uint256 amount) external;
 

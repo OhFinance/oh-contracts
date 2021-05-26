@@ -4,7 +4,7 @@ pragma solidity 0.7.6;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {OhTransferHelper} from "./libraries/OhTransferHelper.sol";
+import {TransferHelper} from "./libraries/TransferHelper.sol";
 import {OhSubscriber} from "./registry/OhSubscriber.sol";
 
 contract OhTimelock is OhSubscriber {
@@ -57,7 +57,7 @@ contract OhTimelock is OhSubscriber {
         uint256 amount = claimable(msg.sender);
         require(amount > 0, "Timelock: No Tokens");
 
-        OhTransferHelper.safeTokenTransfer(msg.sender, token, amount);
+        TransferHelper.safeTokenTransfer(msg.sender, token, amount);
 
         balances[msg.sender].sub(amount);
         totalClaimed[msg.sender].add(amount);

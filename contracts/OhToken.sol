@@ -23,11 +23,8 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
     /// @notice A record of votes checkpoints for each account, by index
     mapping(address => mapping(uint32 => Checkpoint)) public checkpoints;
 
-    /// @notice A record of states for signing / validating signatures for delegation
-    mapping(address => uint256) public delegationNonces;
-
     /// @notice A record of states for signing / validating signatures
-    mapping(address => uint256) public permitNonces;
+    mapping(address => uint256) public nonces;
 
     /// @notice The number of checkpoints for each account
     mapping(address => uint32) public numCheckpoints;
@@ -41,50 +38,25 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
 
     /// @notice the EIP-712 typehash for approving token transfers via signature
     bytes32 public constant PERMIT_TYPEHASH =
-        keccak256(
-            "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
-        );
+        keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
     /// @notice The EIP-712 typehash for the contract's domain
     bytes32 public constant DOMAIN_TYPEHASH =
-        keccak256(
-            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-        );
+        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
     /// @notice The EIP-712 typehash used for replay protection, set at deployment
     // solhint-disable-next-line
     bytes32 public immutable DOMAIN_SEPARATOR;
 
     /// @notice An event thats emitted when an account changes its delegate
-    event DelegateChanged(
-        address indexed delegator,
-        address indexed fromDelegate,
-        address indexed toDelegate
-    );
+    event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
 
     /// @notice An event thats emitted when a delegate account's vote balance changes
-    event DelegateVotesChanged(
-        address indexed delegate,
-        uint256 previousBalance,
-        uint256 newBalance
-    );
+    event DelegateVotesChanged(address indexed delegate, uint256 previousBalance, uint256 newBalance);
 
     constructor(address registry_) OhSubscriber(registry_) {
-        uint256 chainId;
-
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            chainId := chainid()
-        }
-
         DOMAIN_SEPARATOR = keccak256(
-            abi.encode(
-                DOMAIN_TYPEHASH,
-                keccak256(bytes(name())),
-                keccak256(bytes("1")),
-                chainId,
-                address(this)
-            )
+            abi.encode(DOMAIN_TYPEHASH, keccak256(bytes(name())), keccak256(bytes("1")), getChainId(), address(this))
         );
 
         _mint(msg.sender, MAX_SUPPLY);
@@ -117,26 +89,18 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
         require(block.timestamp <= deadline, "Delegate: Invalid Expiration");
         require(delegator != address(0), "Delegate: Invalid Delegator");
 
-        uint256 currentValidNonce = delegationNonces[delegator];
+        uint256 currentValidNonce = nonces[delegator];
         bytes32 digest =
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
                     DOMAIN_SEPARATOR,
-                    keccak256(
-                        abi.encode(
-                            DELEGATION_TYPEHASH,
-                            delegator,
-                            delegatee,
-                            currentValidNonce,
-                            deadline
-                        )
-                    )
+                    keccak256(abi.encode(DELEGATION_TYPEHASH, delegator, delegatee, currentValidNonce, deadline))
                 )
             );
 
         require(delegator == ecrecover(digest, v, r, s), "Delegate: Invalid Signature");
-        delegationNonces[delegator] = currentValidNonce.add(1);
+        nonces[delegator] = currentValidNonce.add(1);
         return _delegate(delegator, delegatee);
     }
 
@@ -160,27 +124,18 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
         require(block.timestamp <= deadline, "Permit: Invalid Deadline");
         require(owner != address(0), "Permit: Invalid Owner");
 
-        uint256 currentValidNonce = permitNonces[owner];
+        uint256 currentValidNonce = nonces[owner];
         bytes32 digest =
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
                     DOMAIN_SEPARATOR,
-                    keccak256(
-                        abi.encode(
-                            PERMIT_TYPEHASH,
-                            owner,
-                            spender,
-                            value,
-                            currentValidNonce,
-                            deadline
-                        )
-                    )
+                    keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, value, currentValidNonce, deadline))
                 )
             );
 
         require(owner == ecrecover(digest, v, r, s), "Permit: Invalid Signature");
-        permitNonces[owner] = currentValidNonce.add(1);
+        nonces[owner] = currentValidNonce.add(1);
         return _approve(owner, spender, value);
     }
 
@@ -318,5 +273,12 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
         }
 
         emit DelegateVotesChanged(delegatee, oldVotes, newVotes);
+    }
+
+    function getChainId() internal pure returns (uint256 chainId) {
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            chainId := chainid()
+        }
     }
 }

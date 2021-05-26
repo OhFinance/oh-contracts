@@ -5,8 +5,8 @@ pragma solidity 0.7.6;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {IStrategy} from "../../interfaces/IStrategy.sol";
-import {OhTransferHelper} from "../../libraries/OhTransferHelper.sol";
+import {IStrategy} from "../../interfaces/strategies/IStrategy.sol";
+import {TransferHelper} from "../../libraries/TransferHelper.sol";
 import {OhStrategy} from "../OhStrategy.sol";
 import {OhCompoundHelper} from "./OhCompoundHelper.sol";
 import {OhCompoundStrategyStorage} from "./OhCompoundStrategyStorage.sol";
@@ -48,41 +48,9 @@ contract OhCompoundStrategy is IStrategy, OhCompoundHelper, OhStrategy, OhCompou
         IERC20(derivative_).safeApprove(underlying_, type(uint256).max);
     }
 
-    function bank() public view override returns (address) {
-        return _bank();
-    }
-
-    function derivative() public view override returns (address) {
-        return _derivative();
-    }
-
-    function reward() public view override returns (address) {
-        return _reward();
-    }
-
-    function underlying() public view override returns (address) {
-        return _underlying();
-    }
-
-    function derivativeBalance() public view override returns (uint256) {
-        return _derivativeBalance();
-    }
-
-    function rewardBalance() public view override returns (uint256) {
-        return _rewardBalance();
-    }
-
-    function underlyingBalance() public view override returns (uint256) {
-        return _underlyingBalance();
-    }
-
     function investedBalance() public view override returns (uint256) {
         uint256 exchangeRate = getExchangeRate(derivative());
         return exchangeRate.mul(derivativeBalance()).div(1e18);
-    }
-
-    function comptroller() public view returns (address) {
-        return _comptroller();
     }
 
     function invest() external override onlyBank {
@@ -137,7 +105,7 @@ contract OhCompoundStrategy is IStrategy, OhCompoundHelper, OhStrategy, OhCompou
         }
 
         // withdraw to bank
-        uint256 withdrawn = OhTransferHelper.safeTokenTransfer(recipient, underlying(), amount);
+        uint256 withdrawn = TransferHelper.safeTokenTransfer(recipient, underlying(), amount);
         return withdrawn;
     }
 }

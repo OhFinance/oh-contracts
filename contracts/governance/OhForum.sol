@@ -11,11 +11,14 @@ import {IToken} from "../interfaces/IToken.sol";
 import {OhSubscriber} from "../registry/OhSubscriber.sol";
 import {OhForumTypes} from "./OhForumTypes.sol";
 
+/// @title Oh! Finance Forum
+/// @notice Manages Protocol proposals and voting receipts to send to the Governor
+/// @dev Proposer-Executor Relationship to execute protocol changes
 contract OhForum is OhSubscriber, OhForumTypes {
     using SafeMath for uint256;
 
     /// @notice Contract Name
-    string public constant name = "Oh! Forum V1";
+    string public constant name = "Oh! Forum";
 
     /// @notice The maximum number of actions that can be included in a proposal
     uint256 public constant MAX_OPERATIONS = 10;
@@ -46,7 +49,7 @@ contract OhForum is OhSubscriber, OhForumTypes {
 
     /// @notice The EIP-712 typehash for the contract's domain
     bytes32 public constant DOMAIN_TYPEHASH =
-        keccak256("EIP712Domain(string name,uint256 chainId,address verifyingContract)");
+        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
     bytes32 public immutable DOMAIN_SEPARATOR;
 
@@ -116,7 +119,7 @@ contract OhForum is OhSubscriber, OhForumTypes {
         uint256 _proposalThreshold
     ) OhSubscriber(registry_) {
         DOMAIN_SEPARATOR = keccak256(
-            abi.encode(DOMAIN_TYPEHASH, keccak256(bytes(name)), getChainId(), address(this))
+            abi.encode(DOMAIN_TYPEHASH, keccak256(bytes(name)), keccak256(bytes("1")), getChainId(), address(this))
         );
 
         guardian = msg.sender;
@@ -138,13 +141,7 @@ contract OhForum is OhSubscriber, OhForumTypes {
         bytes32 s
     ) external {
         bytes32 digest =
-            keccak256(
-                abi.encodePacked(
-                    "\x19\x01",
-                    DOMAIN_SEPARATOR,
-                    keccak256(abi.encode(BALLOT_TYPEHASH, proposalId, support))
-                )
-            );
+            keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, keccak256(abi.encode(BALLOT_TYPEHASH, proposalId, support))));
 
         address signatory = ecrecover(digest, v, r, s);
         require(signatory != address(0), "Forum: Invalid Signature");
@@ -158,8 +155,7 @@ contract OhForum is OhSubscriber, OhForumTypes {
         require(
             msg.sender == guardian ||
                 msg.sender == proposal.proposer ||
-                IToken(token).getPriorVotes(proposal.proposer, block.number.sub(1)) <
-                proposalThreshold,
+                IToken(token).getPriorVotes(proposal.proposer, block.number.sub(1)) < proposalThreshold,
             "Forum: Valid Proposer"
         );
 
@@ -200,14 +196,9 @@ contract OhForum is OhSubscriber, OhForumTypes {
         bytes[] memory calldatas,
         string memory description
     ) external returns (uint256) {
+        require(IToken(token).getPriorVotes(msg.sender, block.number.sub(1)) > proposalThreshold, "Forum: Votes Below Threshold");
         require(
-            IToken(token).getPriorVotes(msg.sender, block.number.sub(1)) > proposalThreshold,
-            "Forum: Votes Below Threshold"
-        );
-        require(
-            targets.length == values.length &&
-                targets.length == signatures.length &&
-                targets.length == calldatas.length,
+            targets.length == values.length && targets.length == signatures.length && targets.length == calldatas.length,
             "Forum: Arity Mismatch"
         );
         require(targets.length != 0, "Forum: No Actions");
@@ -217,10 +208,7 @@ contract OhForum is OhSubscriber, OhForumTypes {
         if (latestProposalId != 0) {
             ProposalState latestProposalState = state(latestProposalId);
             require(latestProposalState != ProposalState.Active, "Forum: Proposal Already Active");
-            require(
-                latestProposalState != ProposalState.Pending,
-                "Forum: Proposal Already Pending"
-            );
+            require(latestProposalState != ProposalState.Pending, "Forum: Proposal Already Pending");
         }
 
         uint256 startBlock = block.number.add(votingDelay);
@@ -247,17 +235,7 @@ contract OhForum is OhSubscriber, OhForumTypes {
         proposals[newProposal.id] = newProposal;
         latestProposalIds[newProposal.proposer] = newProposal.id;
 
-        emit ProposalAdded(
-            newProposal.id,
-            msg.sender,
-            targets,
-            values,
-            signatures,
-            calldatas,
-            startBlock,
-            endBlock,
-            description
-        );
+        emit ProposalAdded(newProposal.id, msg.sender, targets, values, signatures, calldatas, startBlock, endBlock, description);
         return newProposal.id;
     }
 
@@ -266,13 +244,7 @@ contract OhForum is OhSubscriber, OhForumTypes {
         Proposal storage proposal = proposals[proposalId];
         uint256 eta = block.timestamp.add(IGovernor(governance()).delay());
         for (uint256 i = 0; i < proposal.targets.length; i++) {
-            _queueOrRevert(
-                proposal.targets[i],
-                proposal.values[i],
-                proposal.signatures[i],
-                proposal.calldatas[i],
-                eta
-            );
+            _queueOrRevert(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], eta);
         }
         proposal.eta = eta;
         emit ProposalQueued(proposalId, eta);
@@ -304,30 +276,12 @@ contract OhForum is OhSubscriber, OhForumTypes {
         guardian = address(0);
     }
 
-    function queueSetGovernorPendingAdmin(address newPendingAdmin, uint256 eta)
-        external
-        onlyGuardian
-    {
-        IGovernor(governance()).queueTransaction(
-            governance(),
-            0,
-            "setPendingAdmin(address)",
-            abi.encode(newPendingAdmin),
-            eta
-        );
+    function queueSetGovernorPendingAdmin(address newPendingAdmin, uint256 eta) external onlyGuardian {
+        IGovernor(governance()).queueTransaction(governance(), 0, "setPendingAdmin(address)", abi.encode(newPendingAdmin), eta);
     }
 
-    function executeSetGovernorPendingAdmin(address newPendingAdmin, uint256 eta)
-        external
-        onlyGuardian
-    {
-        IGovernor(governance()).executeTransaction(
-            governance(),
-            0,
-            "setPendingAdmin(address)",
-            abi.encode(newPendingAdmin),
-            eta
-        );
+    function executeSetGovernorPendingAdmin(address newPendingAdmin, uint256 eta) external onlyGuardian {
+        IGovernor(governance()).executeTransaction(governance(), 0, "setPendingAdmin(address)", abi.encode(newPendingAdmin), eta);
     }
 
     function getActions(uint256 proposalId)
@@ -404,9 +358,7 @@ contract OhForum is OhSubscriber, OhForumTypes {
         uint256 eta
     ) internal {
         require(
-            !IGovernor(governance()).queuedTransactions(
-                keccak256(abi.encode(target, value, signature, data, eta))
-            ),
+            !IGovernor(governance()).queuedTransactions(keccak256(abi.encode(target, value, signature, data, eta))),
             "Forum: Proposal Already Queued"
         );
         IGovernor(governance()).queueTransaction(target, value, signature, data, eta);

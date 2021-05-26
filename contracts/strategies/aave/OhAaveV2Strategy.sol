@@ -5,8 +5,8 @@ pragma solidity 0.7.6;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {IStrategy} from "../../interfaces/IStrategy.sol";
-import {OhTransferHelper} from "../../libraries/OhTransferHelper.sol";
+import {IStrategy} from "../../interfaces/strategies/IStrategy.sol";
+import {TransferHelper} from "../../libraries/TransferHelper.sol";
 import {OhStrategy} from "../OhStrategy.sol";
 import {OhAaveV2Helper} from "./OhAaveV2Helper.sol";
 import {OhAaveV2StrategyStorage} from "./OhAaveV2StrategyStorage.sol";
@@ -35,7 +35,7 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
     /// @param derivative_ the aToken address received from Aave
     /// @param reward_ the address of the reward token stkAAVE
     /// @param lendingPool_ the AaveV2 lending pool that we lend to
-    /// @param incentiveController_ the AaveV2 rewards contract
+    /// @param incentivesController_ the AaveV2 rewards contract
     /// @dev The function should be called at time of deployment
     function initializeAaveV2Strategy(
         address registry_,
@@ -44,61 +44,16 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
         address derivative_,
         address reward_,
         address lendingPool_,
-        address incentiveController_
+        address incentivesController_
     ) public initializer {
         initializeStrategy(registry_, bank_, underlying_, derivative_, reward_);
-        initializeAaveV2Storage(lendingPool_, incentiveController_);
-    }
-
-    /// @notice The Bank that the Strategy is associated with
-    function bank() public view override returns (address) {
-        return _bank();
-    }
-
-    /// @notice The underlying token the Strategy invests in AaveV2
-    function underlying() public view override returns (address) {
-        return _underlying();
-    }
-
-    /// @notice The derivative token received from AaveV2 (aToken)
-    function derivative() public view override returns (address) {
-        return _derivative();
-    }
-
-    /// @notice The reward token received from AaveV2 (stkAave)
-    function reward() public view override returns (address) {
-        return _reward();
-    }
-
-    /// @notice Balance of underlying tokens on the Strategy
-    function underlyingBalance() public view override returns (uint256) {
-        return _underlyingBalance();
-    }
-
-    /// @notice Balance of derivative tokens on the Strategy (aTokens)
-    function derivativeBalance() public view override returns (uint256) {
-        return _derivativeBalance();
-    }
-
-    /// @notice Balance of reward tokens on the Strategy (stkAave)
-    function rewardBalance() public view override returns (uint256) {
-        return _rewardBalance();
+        initializeAaveV2Storage(lendingPool_, incentivesController_);
     }
 
     /// @notice Balance of underlying invested in AaveV2
     /// @dev aTokens are 1:1 with underlying, they are continuously distributed to users
     function investedBalance() public view override returns (uint256) {
-        return _derivativeBalance();
-    }
-
-    /// @notice AaveV2 Lending Pool
-    function lendingPool() public view returns (address) {
-        return _lendingPool();
-    }
-
-    /// @notice AaveV2 Incentive Controller, Reward Contract
-    function incentiveController() public view returns (address) {
-        return _incentiveController();
+        return derivativeBalance();
     }
 
     function invest() external override onlyBank {
@@ -106,8 +61,18 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
         _compound();
     }
 
+    function withdraw(uint256 amount) external override onlyBank returns (uint256) {
+        uint256 withdrawn = _withdraw(msg.sender, amount);
+        return withdrawn;
+    }
+
+    function withdrawAll() external override onlyBank {
+        uint256 amount = derivativeBalance();
+        _withdraw(msg.sender, amount);
+    }
+
     function _compound() internal {
-        claim(incentiveController(), derivative());
+        claim(incentivesController(), derivative());
         uint256 amount = rewardBalance();
         // unwrap the stkAAVE to AAVE
         if (amount > 0) {
@@ -122,23 +87,13 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
         }
     }
 
-    function withdrawAll() external override onlyBank {
-        uint256 amount = derivativeBalance();
-        _withdraw(msg.sender, amount);
-    }
-
-    function withdraw(uint256 amount) external override onlyBank returns (uint256) {
-        uint256 withdrawn = _withdraw(msg.sender, amount);
-        return withdrawn;
-    }
-
     // withdraw tokens from protocol after converting aTokens to underlying
     function _withdraw(address recipient, uint256 amount) internal returns (uint256) {
         if (amount == 0) {
             return 0;
         }
         uint256 reclaimed = reclaim(lendingPool(), underlying(), amount);
-        uint256 withdrawn = OhTransferHelper.safeTokenTransfer(recipient, underlying(), reclaimed);
+        uint256 withdrawn = TransferHelper.safeTokenTransfer(recipient, underlying(), reclaimed);
         return withdrawn;
     }
 }

@@ -15,13 +15,7 @@ interface ILendingPoolV2 {
      * @param amount The amount deposited
      * @param referral The referral code used
      **/
-    event Deposit(
-        address indexed reserve,
-        address user,
-        address indexed onBehalfOf,
-        uint256 amount,
-        uint16 indexed referral
-    );
+    event Deposit(address indexed reserve, address user, address indexed onBehalfOf, uint256 amount, uint16 indexed referral);
 
     /**
      * @dev Emitted on withdraw()
@@ -30,12 +24,7 @@ interface ILendingPoolV2 {
      * @param to Address that will receive the underlying
      * @param amount The amount to be withdrawn
      **/
-    event Withdraw(
-        address indexed reserve,
-        address indexed user,
-        address indexed to,
-        uint256 amount
-    );
+    event Withdraw(address indexed reserve, address indexed user, address indexed to, uint256 amount);
 
     /**
      * @dev Emitted on borrow() and flashLoan() when debt needs to be opened
@@ -65,12 +54,7 @@ interface ILendingPoolV2 {
      * @param repayer The address of the user initiating the repay(), providing the funds
      * @param amount The amount repaid
      **/
-    event Repay(
-        address indexed reserve,
-        address indexed user,
-        address indexed repayer,
-        uint256 amount
-    );
+    event Repay(address indexed reserve, address indexed user, address indexed repayer, uint256 amount);
 
     /**
      * @dev Emitted on swapBorrowRateMode()
@@ -351,8 +335,7 @@ interface ILendingPoolV2 {
         address interestRateStrategyAddress
     ) external;
 
-    function setReserveInterestRateStrategyAddress(address reserve, address rateStrategyAddress)
-        external;
+    function setReserveInterestRateStrategyAddress(address reserve, address rateStrategyAddress) external;
 
     function setConfiguration(address reserve, uint256 configuration) external;
 
@@ -361,20 +344,14 @@ interface ILendingPoolV2 {
      * @param asset The address of the underlying asset of the reserve
      * @return The configuration of the reserve
      **/
-    function getConfiguration(address asset)
-        external
-        view
-        returns (DataTypes.ReserveConfigurationMap memory);
+    function getConfiguration(address asset) external view returns (DataTypes.ReserveConfigurationMap memory);
 
     /**
      * @dev Returns the configuration of the user across all the reserves
      * @param user The user address
      * @return The configuration of the user
      **/
-    function getUserConfiguration(address user)
-        external
-        view
-        returns (DataTypes.UserConfigurationMap memory);
+    function getUserConfiguration(address user) external view returns (DataTypes.UserConfigurationMap memory);
 
     /**
      * @dev Returns the normalized income normalized income of the reserve

@@ -2,34 +2,24 @@
 
 pragma solidity 0.7.6;
 
-import {
-    ERC20Upgradeable
-} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import {
-    ERC20PermitUpgradeable
-} from "@openzeppelin/contracts-upgradeable/drafts/ERC20PermitUpgradeable.sol";
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {ERC20PermitUpgradeable} from "@openzeppelin/contracts-upgradeable/drafts/ERC20PermitUpgradeable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Permit} from "@openzeppelin/contracts/drafts/IERC20Permit.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {IBank} from "../interfaces/IBank.sol";
+import {IBank} from "../interfaces/bank/IBank.sol";
+import {IStrategy} from "../interfaces/strategies/IStrategy.sol";
 import {IManager} from "../interfaces/IManager.sol";
-import {IStrategy} from "../interfaces/IStrategy.sol";
 import {IRegistry} from "../interfaces/IRegistry.sol";
-import {OhTransferHelper} from "../libraries/OhTransferHelper.sol";
+import {TransferHelper} from "../libraries/TransferHelper.sol";
 import {OhSubscriberUpgradeable} from "../registry/OhSubscriberUpgradeable.sol";
 import {OhBankStorage} from "./OhBankStorage.sol";
 
 /// @title Oh! Finance Bank
-/// @notice Base Upgradeable Bank Contract
 /// @notice ERC-20 Token that represents user share ownership
-contract OhBank is
-    ERC20Upgradeable,
-    ERC20PermitUpgradeable,
-    IBank,
-    OhSubscriberUpgradeable,
-    OhBankStorage
-{
+/// @dev Base Upgradeable Bank Contract
+contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgradeable, OhBankStorage, IBank {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
@@ -37,11 +27,10 @@ contract OhBank is
     event Deposit(address indexed user, uint256 amount);
     event Withdraw(address indexed user, uint256 amount);
 
+    /// @notice Protocol defense modifier
+    /// @dev Only allow user-facing functions to be called by EOA or be whitelisted
     modifier defense {
-        require(
-            msg.sender == tx.origin || IManager(manager()).whitelisted(msg.sender),
-            "Bank: Only EOA or whitelisted"
-        );
+        require(msg.sender == tx.origin || IManager(manager()).whitelisted(msg.sender), "Bank: Only EOA or whitelisted");
         _;
     }
 
@@ -78,19 +67,15 @@ contract OhBank is
 
     /// @notice The Bank Strategy at index i
     /// @param i The Strategy index
+    /// @return The address of the Strategy
     function strategies(uint256 i) public view override returns (address) {
         return IManager(manager()).strategies(address(this), i);
     }
 
-    /// @notice The number of Strategies this Bank uses
+    /// @notice Total Strategies for this Bank
+    /// @return The number of Strategies this Bank uses
     function totalStrategies() public view override returns (uint256) {
         return IManager(manager()).totalStrategies(address(this));
-    }
-
-    /// @notice The underlying token that is deposited
-    /// @return Underlying token address
-    function underlying() public view override returns (address) {
-        return _underlying();
     }
 
     /// @notice Get the underlying balance on the Bank
@@ -99,14 +84,17 @@ contract OhBank is
         return IERC20(underlying()).balanceOf(address(this));
     }
 
-    /// @notice Get the virtual balance invested in a given strategy
+    /// @notice Get the virtual balance invested in the Strategy at a given index
+    /// @dev Virtual Balance represents the amount of underlying available if we withdrew all
     /// @param i The Strategy Index
+    /// @return The virtual balance of underlying invested in the Strategy
     function strategyBalance(uint256 i) public view override returns (uint256) {
         address strategy = strategies(i);
         return IStrategy(strategy).investedBalance();
     }
 
-    /// @notice Get the total virtual amount invested in all strategies
+    /// @notice Get the total virtual amount invested in all Strategies
+    /// @return amount The virtual balance invested in all Strategies
     function investedBalance() public view override returns (uint256 amount) {
         uint256 length = totalStrategies();
         for (uint256 i = 0; i < length; i++) {
@@ -128,16 +116,22 @@ contract OhBank is
     }
 
     /// @notice Invest a given amount underlying into a given strategy
+    /// @dev Only callable by Governance or Manager
+    /// @param strategy The address of the Strategy to invest in
+    /// @param amount The amount of underlying to invest in the Strategy
     function invest(address strategy, uint256 amount) external override onlyAuthorized {
         _invest(strategy, amount);
     }
 
     /// @notice Invest all available underlying into a given strategy
+    /// @dev Only callable by Governance or Manager
+    /// @param strategy The address of the Strategy to invest all underlying in
     function investAll(address strategy) external override onlyAuthorized {
         _invest(strategy, underlyingBalance());
     }
 
     /// @notice Exit and withdraw a given amount from a strategy
+    /// @param strategy The address of the Strategy to exit
     function exit(address strategy, uint256 amount) external override onlyAuthorized {
         IStrategy(strategy).withdraw(amount);
     }
@@ -147,17 +141,37 @@ contract OhBank is
         IStrategy(strategy).withdrawAll();
     }
 
-    // deposit an amount of underlying
+    function pause() external override onlyGovernance {
+        _setPaused(true);
+    }
+
+    function unpause() external override onlyGovernance {
+        _setPaused(false);
+    }
+
+    /// @notice Deposit an amount of underlying to receive Bank shares
+    /// @dev Deposits for the caller
+    /// @param amount The amount of underlying to deposit
     function deposit(uint256 amount) external override defense {
         _deposit(amount, msg.sender, msg.sender);
     }
 
-    // deposit an amount of underlying for a given recipient
+    /// @notice Deposit an amount of underlying for a given recipient
+    /// @dev Deposits for any address except the burn address
+    /// @param amount The amount of underlying to deposit
+    /// @param recipient The address to receive Bank shares
     function depositFor(uint256 amount, address recipient) external override defense {
         require(recipient != address(0), "Bank: Invalid Recipient");
         _deposit(amount, msg.sender, recipient);
     }
 
+    /// @notice Deposit with Permit for ERC712 Compliant Tokens
+    /// @param amount The amount of undelrying to deposit
+    /// @param recipient The address to receive Bank shares
+    /// @param deadline The UNIX timestamp the permit expires at
+    /// @param v The recovery byte of the signature
+    /// @param r Half of the ECDSA signature pair
+    /// @param s Half of the ECDSA signature pair
     function depositWithPermit(
         uint256 amount,
         address recipient,
@@ -180,7 +194,7 @@ contract OhBank is
         if (amount == 0) {
             return;
         }
-        OhTransferHelper.safeTokenTransfer(strategy, underlying(), amount);
+        TransferHelper.safeTokenTransfer(strategy, underlying(), amount);
         IStrategy(strategy).invest();
     }
 
@@ -194,8 +208,7 @@ contract OhBank is
         require(amount > 0, "Bank: Invalid Deposit");
 
         uint256 totalSupply = totalSupply();
-        uint256 mintAmount =
-            totalSupply == 0 ? amount : amount.mul(totalSupply).div(virtualBalance());
+        uint256 mintAmount = totalSupply == 0 ? amount : amount.mul(totalSupply).div(virtualBalance());
 
         _mint(recipient, mintAmount);
         IERC20(underlying()).transferFrom(sender, address(this), amount);
@@ -223,7 +236,7 @@ contract OhBank is
             }
         }
 
-        OhTransferHelper.safeTokenTransfer(user, underlying(), withdrawAmount);
+        TransferHelper.safeTokenTransfer(user, underlying(), withdrawAmount);
         emit Withdraw(user, shares);
     }
 

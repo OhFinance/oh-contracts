@@ -10,7 +10,7 @@ import {OhUpgradeable} from "../proxy/OhUpgradeable.sol";
 
 /// @title Oh! Finance Subscriber Upgradeable
 /// @notice Base Oh! Finance upgradeable contract used to control access throughout the protocol
-abstract contract OhSubscriberUpgradeable is Initializable, ISubscriber, OhUpgradeable {
+abstract contract OhSubscriberUpgradeable is Initializable, OhUpgradeable, ISubscriber {
     bytes32 private constant _REGISTRY_SLOT =
         0x1b5717851286d5e98a28354be764b8c0a20eb2fbd059120090ee8bcfe1a9bf6c;
 

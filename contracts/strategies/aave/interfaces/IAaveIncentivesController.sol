@@ -8,12 +8,7 @@ import {IAaveDistributionManager} from "./IAaveDistributionManager.sol";
 interface IAaveIncentivesController {
     event RewardsAccrued(address indexed user, uint256 amount);
 
-    event RewardsClaimed(
-        address indexed user,
-        address indexed to,
-        address indexed claimer,
-        uint256 amount
-    );
+    event RewardsClaimed(address indexed user, address indexed to, address indexed claimer, uint256 amount);
 
     event ClaimerSet(address indexed user, address indexed claimer);
 
@@ -36,8 +31,7 @@ interface IAaveIncentivesController {
      * @param assets The assets to incentivize
      * @param emissionsPerSecond The emission for each asset
      */
-    function configureAssets(address[] calldata assets, uint256[] calldata emissionsPerSecond)
-        external;
+    function configureAssets(address[] calldata assets, uint256[] calldata emissionsPerSecond) external;
 
     /**
      * @dev Called by the corresponding asset on any update that affects the rewards distribution
@@ -55,10 +49,7 @@ interface IAaveIncentivesController {
      * @dev Returns the total of rewards of an user, already accrued + not yet accrued
      * @return The rewards
      **/
-    function getRewardsBalance(address[] calldata assets, address user)
-        external
-        view
-        returns (uint256);
+    function getRewardsBalance(address[] calldata assets, address user) external view returns (uint256);
 
     /**
      * @dev Claims reward for an user, on all the assets of the lending pool, accumulating the pending rewards

@@ -3,16 +3,13 @@
 pragma solidity 0.7.6;
 
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
-import {
-    TransparentUpgradeableProxy
-} from "@openzeppelin/contracts/proxy/TransparentUpgradeableProxy.sol";
+import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/TransparentUpgradeableProxy.sol";
 
 /// @title Oh! Finance Upgradeable Proxy
 /// @notice Versioned, EIP-1967 Compliant Proxy
 /// @dev Upgrades managed by the proxy admin contract
 contract OhUpgradeableProxy is TransparentUpgradeableProxy {
-    bytes32 private constant _VERSION_SLOT =
-        0x460994c355dbc8229336897ed9def5884fb6b26b0a995b156780d056c758577d;
+    bytes32 private constant _VERSION_SLOT = 0x460994c355dbc8229336897ed9def5884fb6b26b0a995b156780d056c758577d;
 
     constructor(
         address _logic,

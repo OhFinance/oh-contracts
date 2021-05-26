@@ -6,8 +6,8 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Math} from "@openzeppelin/contracts/math/Math.sol";
-import {IStrategy} from "../../interfaces/IStrategy.sol";
-import {OhTransferHelper} from "../../libraries/OhTransferHelper.sol";
+import {IStrategy} from "../../interfaces/strategies/IStrategy.sol";
+import {TransferHelper} from "../../libraries/TransferHelper.sol";
 import {OhStrategy} from "../OhStrategy.sol";
 import {OhCurve3PoolHelper} from "./OhCurve3PoolHelper.sol";
 import {OhCurve3PoolStrategyStorage} from "./OhCurve3PoolStrategyStorage.sol";
@@ -16,12 +16,7 @@ import "hardhat/console.sol";
 /// @title Oh! Finance Curve 3Pool Strategy
 /// @notice Standard Curve 3Pool LP + Gauge Single Underlying Strategy
 /// @notice 3Pool Underlying, in order: (DAI, USDC, USDT)
-contract OhCurve3PoolStrategy is
-    IStrategy,
-    OhCurve3PoolHelper,
-    OhStrategy,
-    OhCurve3PoolStrategyStorage
-{
+contract OhCurve3PoolStrategy is OhStrategy, OhCurve3PoolStrategyStorage, OhCurve3PoolHelper, IStrategy {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
@@ -58,50 +53,6 @@ contract OhCurve3PoolStrategy is
         initializeCurve3PoolStorage(pool_, gauge_, mintr_, index_);
     }
 
-    function bank() public view override returns (address) {
-        return _bank();
-    }
-
-    function underlying() public view override returns (address) {
-        return _underlying();
-    }
-
-    function derivative() public view override returns (address) {
-        return _derivative();
-    }
-
-    function reward() public view override returns (address) {
-        return _reward();
-    }
-
-    function underlyingBalance() public view override returns (uint256) {
-        return _underlyingBalance();
-    }
-
-    function derivativeBalance() public view override returns (uint256) {
-        return _derivativeBalance();
-    }
-
-    function rewardBalance() public view override returns (uint256) {
-        return _rewardBalance();
-    }
-
-    function pool() public view returns (address) {
-        return _pool();
-    }
-
-    function gauge() public view returns (address) {
-        return _gauge();
-    }
-
-    function mintr() public view returns (address) {
-        return _mintr();
-    }
-
-    function index() public view returns (uint256) {
-        return _index();
-    }
-
     // calculate the total underlying balance
     function investedBalance() public view override returns (uint256) {
         return calcWithdraw(pool(), stakedBalance(), int128(index()));
@@ -119,19 +70,19 @@ contract OhCurve3PoolStrategy is
         _deposit();
     }
 
-    /// @notice Withdraw all underlying from Curve 3Pool Strategy
-    /// @dev Unstake from Gauge, Remove Liquidity
-    function withdrawAll() external override onlyBank {
-        uint256 invested = investedBalance();
-        _withdraw(msg.sender, invested);
-    }
-
     /// @notice Withdraw an amount of underlying from Curve 3Pool Strategy
     /// @param amount Amount of Underlying tokens to withdraw
     /// @dev Unstake from Gauge, Remove Liquidity
     function withdraw(uint256 amount) external override onlyBank returns (uint256) {
         uint256 withdrawn = _withdraw(msg.sender, amount);
         return withdrawn;
+    }
+
+    /// @notice Withdraw all underlying from Curve 3Pool Strategy
+    /// @dev Unstake from Gauge, Remove Liquidity
+    function withdrawAll() external override onlyBank {
+        uint256 invested = investedBalance();
+        _withdraw(msg.sender, invested);
     }
 
     /// @dev Compound rewards into underlying through liquidation
@@ -147,7 +98,7 @@ contract OhCurve3PoolStrategy is
 
     // deposit underlying into 3Pool to get 3CRV and stake into Gauge
     function _deposit() internal {
-        uint256 amount = _underlyingBalance();
+        uint256 amount = underlyingBalance();
         if (amount > 0) {
             // add liquidity to 3Pool to receive 3CRV
             addLiquidity(pool(), underlying(), index(), amount, 1);
@@ -180,7 +131,7 @@ contract OhCurve3PoolStrategy is
         removeLiquidity(pool(), index(), redeemAmount, unstakeAmount);
 
         // withdraw to bank
-        uint256 withdrawn = OhTransferHelper.safeTokenTransfer(recipient, underlying(), amount);
+        uint256 withdrawn = TransferHelper.safeTokenTransfer(recipient, underlying(), amount);
         return withdrawn;
     }
 }

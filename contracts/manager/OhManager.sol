@@ -6,7 +6,7 @@ import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import {IBank} from "../interfaces/IBank.sol";
+import {IBank} from "../interfaces/bank/IBank.sol";
 import {IManager} from "../interfaces/IManager.sol";
 import {OhSubscriber} from "../registry/OhSubscriber.sol";
 
@@ -17,29 +17,34 @@ contract OhManager is IManager, OhSubscriber {
     using Address for address;
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    /// @notice mapping of approved banks
+    /// @notice The mapping of Banks approved for investing
     mapping(address => bool) public override banks;
 
-    /// @notice mapping of `from` token to `to` token to liquidator contract
+    /// @notice The mapping of `from` token to `to` token to liquidator contract
     mapping(address => mapping(address => address)) public override liquidators;
 
-    /// @notice mapping of contracts that are whitelisted for Bank use/management
+    /// @notice The mapping of contracts that are whitelisted for Bank use/management
     mapping(address => bool) public override whitelisted;
 
-    /// @dev mapping of Banks to all strategies, additive only
+    /// @dev The mapping of Banks to all strategies, additive only
     mapping(address => EnumerableSet.AddressSet) internal _strategies;
 
-    /// @dev mapping of Banks to current strategy working index
+    /// @dev The mapping of Banks to current strategy working index
     mapping(address => uint8) internal _strategyIndex;
 
-    /// @notice amount of profits reserved for protocol buybacks, base 1000
+    /// @notice The amount of profits reserved for protocol buybacks, base 1000
     uint256 public override buybackFee;
 
-    /// @notice amount of profits reserved for fund management, base 1000
+    /// @notice The amount of profits reserved for fund management, base 1000
     uint256 public override managementFee;
 
+    /// @notice Event emitted when a Bank is set
     event BanksUpdated(address indexed bank, bool approved);
+
+    /// @notice Event emitted when a Strategy for a Bank is set
     event StrategiesUpdated(address indexed bank, address indexed strategy, bool approved);
+
+    /// @notice Event emitted when a Liquidator for a token liquidation path is set
     event LiquidatorsUpdated(
         address indexed oldLiquidator,
         address indexed newLiquidator,

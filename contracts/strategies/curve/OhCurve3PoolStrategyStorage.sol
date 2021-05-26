@@ -3,17 +3,14 @@
 pragma solidity 0.7.6;
 
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import {ICurve3PoolStrategyStorage} from "../../interfaces/strategies/curve/ICurve3PoolStrategyStorage.sol";
 import {OhUpgradeable} from "../../proxy/OhUpgradeable.sol";
 
-abstract contract OhCurve3PoolStrategyStorage is Initializable, OhUpgradeable {
-    bytes32 internal constant _POOL_SLOT =
-        0x6c9960513c6769ea8f48802ea7b637e9ce937cc3d022135cc43626003296fc46;
-    bytes32 internal constant _GAUGE_SLOT =
-        0x85c79ab2dc779eb860ec993658b7f7a753e59bdfda156c7391620a5f513311e6;
-    bytes32 internal constant _MINTR_SLOT =
-        0x3e7777dca2f9f31e4c2d62ce76af8def0f69b868d665539787b25b39a9f7224f;
-    bytes32 internal constant _INDEX_SLOT =
-        0xd5700a843c20bfe827ca47a7c73f83287e1b32b3cd4ac659d79f800228d617fd;
+contract OhCurve3PoolStrategyStorage is Initializable, OhUpgradeable, ICurve3PoolStrategyStorage {
+    bytes32 internal constant _POOL_SLOT = 0x6c9960513c6769ea8f48802ea7b637e9ce937cc3d022135cc43626003296fc46;
+    bytes32 internal constant _GAUGE_SLOT = 0x85c79ab2dc779eb860ec993658b7f7a753e59bdfda156c7391620a5f513311e6;
+    bytes32 internal constant _MINTR_SLOT = 0x3e7777dca2f9f31e4c2d62ce76af8def0f69b868d665539787b25b39a9f7224f;
+    bytes32 internal constant _INDEX_SLOT = 0xd5700a843c20bfe827ca47a7c73f83287e1b32b3cd4ac659d79f800228d617fd;
 
     constructor() {
         assert(_POOL_SLOT == bytes32(uint256(keccak256("eip1967.curve3PoolStrategy.pool")) - 1));
@@ -34,19 +31,19 @@ abstract contract OhCurve3PoolStrategyStorage is Initializable, OhUpgradeable {
         _setIndex(index_);
     }
 
-    function _pool() internal view returns (address) {
+    function pool() public view override returns (address) {
         return getAddress(_POOL_SLOT);
     }
 
-    function _gauge() internal view returns (address) {
+    function gauge() public view override returns (address) {
         return getAddress(_GAUGE_SLOT);
     }
 
-    function _mintr() internal view returns (address) {
+    function mintr() public view override returns (address) {
         return getAddress(_MINTR_SLOT);
     }
 
-    function _index() internal view returns (uint256) {
+    function index() public view override returns (uint256) {
         return getUInt256(_INDEX_SLOT);
     }
 

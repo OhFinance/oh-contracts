@@ -19,8 +19,7 @@ abstract contract OhAaveV2Helper {
     /// @param dataProvider The AaveV2 Data Provider
     /// @param underlying The underlying token to check
     function aToken(address dataProvider, address underlying) internal view returns (address) {
-        (address aTokenAddress, , ) =
-            IAaveProtocolDataProviderV2(dataProvider).getReserveTokensAddresses(underlying);
+        (address aTokenAddress, , ) = IAaveProtocolDataProviderV2(dataProvider).getReserveTokensAddresses(underlying);
         return aTokenAddress;
     }
 
@@ -31,21 +30,16 @@ abstract contract OhAaveV2Helper {
     }
 
     /// @notice Claim stkAAVE from the AaveV2 Incentive Controller
-    /// @param incentiveController The AaveV2 Incentive Controller
+    /// @param incentivesController The AaveV2 Incentive Controller
     /// @param token The aToken to claim rewards for
-    function claim(address incentiveController, address token) internal {
+    function claim(address incentivesController, address token) internal {
         address[] memory tokens = new address[](1);
         tokens[0] = token;
 
-        uint256 rewards =
-            IAaveIncentivesController(incentiveController).getRewardsBalance(tokens, address(this));
+        uint256 rewards = IAaveIncentivesController(incentivesController).getRewardsBalance(tokens, address(this));
 
         if (rewards > 0) {
-            IAaveIncentivesController(incentiveController).claimRewards(
-                tokens,
-                rewards,
-                address(this)
-            );
+            IAaveIncentivesController(incentivesController).claimRewards(tokens, rewards, address(this));
         }
     }
 

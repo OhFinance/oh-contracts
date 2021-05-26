@@ -7,7 +7,9 @@ import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {IGovernor} from "../interfaces/IGovernor.sol";
 
 /// @title Oh! Finance Governor
-/// @notice Contract that queues up and executes on-chain transactions to modify the protocol
+/// @notice Executor Contract that queues up and executes on-chain transactions to modify the protocol
+/// @notice Queued actions must come from a successful proposal
+/// @dev Proposer-Executor Relationship
 /// @dev Transactions can be executed after the `delay` has passed
 contract OhGovernor {
     using Address for address;
@@ -37,30 +39,9 @@ contract OhGovernor {
     event NewAdmin(address indexed newAdmin);
     event NewPendingAdmin(address indexed newPendingAdmin);
     event NewDelay(uint256 indexed newDelay);
-    event CancelTransaction(
-        bytes32 indexed txHash,
-        address indexed target,
-        uint256 value,
-        string signature,
-        bytes data,
-        uint256 eta
-    );
-    event ExecuteTransaction(
-        bytes32 indexed txHash,
-        address indexed target,
-        uint256 value,
-        string signature,
-        bytes data,
-        uint256 eta
-    );
-    event QueueTransaction(
-        bytes32 indexed txHash,
-        address indexed target,
-        uint256 value,
-        string signature,
-        bytes data,
-        uint256 eta
-    );
+    event CancelTransaction(bytes32 indexed txHash, address indexed target, uint256 value, string signature, bytes data, uint256 eta);
+    event ExecuteTransaction(bytes32 indexed txHash, address indexed target, uint256 value, string signature, bytes data, uint256 eta);
+    event QueueTransaction(bytes32 indexed txHash, address indexed target, uint256 value, string signature, bytes data, uint256 eta);
 
     modifier onlyAdmin {
         require(msg.sender == admin, "Governor: Only Admin");
