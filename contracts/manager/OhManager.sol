@@ -112,6 +112,14 @@ contract OhManager is IManager, OhSubscriber {
         }
     }
 
+    /// @notice Exit a strategy
+    /// @param _bank The bank that will be used to exit the strategy
+    /// @param _strategy The strategy to be exited
+    function exitStrategy(address _bank, address _strategy) external defense validBank(_bank) {
+        // Exit the strategy
+        IBank(_bank).exitAll(_strategy);
+    }
+
     /// @notice Finance the next Strategy in the Bank queue with all available underlyign
     function finance(address _bank) external defense validBank(_bank) {
         uint256 length = _strategies[_bank].length();

@@ -89,7 +89,7 @@ describe('AaveV2Strategy', () => {
     }
 
     // Withdraw all from the strategy to the bank
-    await execute(manager.rebalance(bankProxy.address));
+    await execute(manager.exitStrategy(bankProxy.address, aaveV2StrategyProxy.address));
 
     // Check that underlying balance for the user is now greater than when the test started
     const virtualBalance = await bankProxy.virtualBalance();
