@@ -1,4 +1,5 @@
 export const addresses = {
+  // contracts
   aave: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9', // AAVE
   aaveLendingPool: '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9',
   aaveIncentivesController: '0xd784927Ff2f95ba542BfC824c8a8a98F3495f6b5',
@@ -17,4 +18,9 @@ export const addresses = {
   uniswapV2: '0x7a250d5630b4cf539739df2c5dacb4c659f2488d', /// uni router
   weth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   zero: '0x0000000000000000000000000000000000000000',
+  // users
+  treasury: '0x2222222CF52D7F085596c61168A14FDF937aD0dC',
+  strategic: '0x33333331d5205cC38e34a1c245Df69985B9E5Be5',
+  community: '0x444444411db365b7bdC77dB79743f754c3095f3d',
+  // legal: '',
 };

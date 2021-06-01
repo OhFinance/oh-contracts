@@ -1,22 +1,12 @@
 import {Signer} from 'ethers';
-import {execute} from 'utils';
 import {getManagerAt} from './contract';
 
-export const setBank = async (
-  deployer: Signer,
-  manager: string,
-  bank: string
-) => {
+export const setBank = async (deployer: Signer, manager: string, bank: string) => {
   const managerContract = await getManagerAt(manager, deployer);
-  await execute(managerContract.setBank(bank, true));
+  await managerContract.setBank(bank, true);
 };
 
-export const addStrategy = async (
-  deployer: Signer,
-  manager: string,
-  bank: string,
-  strategy: string
-) => {
+export const addStrategy = async (deployer: Signer, manager: string, bank: string, strategy: string) => {
   const managerContract = await getManagerAt(manager, deployer);
-  await execute(managerContract.addStrategy(bank, strategy));
+  await managerContract.addStrategy(bank, strategy);
 };

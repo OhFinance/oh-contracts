@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {addresses, execute, getDecimalString, signMessageData} from 'utils';
+import {addresses, getDecimalString, signMessageData} from 'utils';
 import {ohUsdcFixture, OhUsdcFixture} from 'fixture';
 import {getErc20At, getPermitMessageData, swapEthForTokens} from 'lib';
 import {ERC20} from 'types';
@@ -14,11 +14,7 @@ describe('ohUSDC', () => {
     usdc = await getErc20At(addresses.usdc, fixture.worker);
 
     // buy usdc for worker to use in tests
-    await swapEthForTokens(
-      fixture.worker,
-      addresses.usdc,
-      getDecimalString(100)
-    );
+    await swapEthForTokens(fixture.worker, addresses.usdc, getDecimalString(100));
   });
 
   it('deployed and initialized ohUSDC Bank proxy correctly', async () => {
@@ -36,12 +32,7 @@ describe('ohUSDC', () => {
   });
 
   it('added AaveV2, Compound, and Curve strategies to ohUSDC Bank correctly', async () => {
-    const {
-      bankProxy,
-      aaveV2StrategyProxy,
-      compoundStrategyProxy,
-      curve3PoolStrategyProxy,
-    } = fixture;
+    const {bankProxy, aaveV2StrategyProxy, compoundStrategyProxy, curve3PoolStrategyProxy} = fixture;
 
     const totalStrategies = await bankProxy.totalStrategies();
     const aaveV2StrategyAddress = await bankProxy.strategies(0);
@@ -73,16 +64,7 @@ describe('ohUSDC', () => {
 
     const {v, r, s} = await signMessageData(worker.address, data);
 
-    await execute(
-      bankProxy.depositWithPermit(
-        balance,
-        worker.address,
-        message.deadline,
-        v,
-        r,
-        s
-      )
-    );
+    await bankProxy.depositWithPermit(balance, worker.address, message.deadline, v, r, s);
 
     const shares = await bankProxy.balanceOf(worker.address);
     expect(shares).to.be.eq(balance);
@@ -94,13 +76,13 @@ describe('ohUSDC', () => {
 
     const balance = await usdc.balanceOf(worker.address);
 
-    await execute(usdc.approve(bankProxy.address, balance));
-    await execute(bankProxy.deposit(balance));
+    await usdc.approve(bankProxy.address, balance);
+    await bankProxy.deposit(balance);
 
     const bankBalance = await bankProxy.underlyingBalance();
     const bankShares = await bankProxy.balanceOf(worker.address);
 
-    await execute(bankProxy.withdraw(bankShares));
+    await bankProxy.withdraw(bankShares);
 
     const remainingShares = await bankProxy.balanceOf(worker.address);
 
@@ -115,16 +97,16 @@ describe('ohUSDC', () => {
 
     const balance = await usdc.balanceOf(worker.address);
     console.log('Starting Balance is:', formatUnits(balance.toString(), 6));
-    await execute(usdc.approve(bankProxy.address, balance));
+    await usdc.approve(bankProxy.address, balance);
 
     const amount = balance.div(3);
     for (let i = 0; i < 3; i++) {
-      await execute(bankProxy.deposit(amount));
+      await bankProxy.deposit(amount);
 
       const bankBalance = await bankProxy.underlyingBalance();
 
       expect(bankBalance.toString()).eq(amount.toString());
-      await execute(manager.finance(bankProxy.address));
+      await manager.finance(bankProxy.address);
 
       const strategyBalance = await bankProxy.strategyBalance(i);
       console.log(strategyBalance.toString());
@@ -135,14 +117,11 @@ describe('ohUSDC', () => {
     const virtualBalance = await bankProxy.virtualBalance();
     const virtualPrice = await bankProxy.virtualPrice();
 
-    console.log(
-      'Virtual Balance is:',
-      formatUnits(virtualBalance.toString(), 6)
-    );
+    console.log('Virtual Balance is:', formatUnits(virtualBalance.toString(), 6));
     console.log('Virtual Price is:', formatUnits(virtualPrice.toString(), 6));
 
     const shares = await bankProxy.balanceOf(worker.address);
-    await execute(bankProxy.withdraw(shares.toString()));
+    await bankProxy.withdraw(shares.toString());
 
     const endBalance = await usdc.balanceOf(worker.address);
     console.log('Ending Balance is:', formatUnits(endBalance.toString(), 6));

@@ -25,8 +25,8 @@ export const deployToken = async (deployer: Signer, registry: string) => {
   return token;
 };
 
-export const deployTimelock = async (deployer: Signer, registry: string, token: string) => {
-  const timelock = (await deployContract(deployer, 'OhTimelock', registry, token)) as OhTimelock;
+export const deployTimelock = async (deployer: Signer, registry: string, token: string, delay: number, length: number) => {
+  const timelock = (await deployContract(deployer, 'OhTimelock', registry, token, delay, length)) as OhTimelock;
   return timelock;
 };
 

@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import {BankFixture, bankFixture} from 'fixture';
-import {addresses, execute} from 'utils';
+import {addresses} from 'utils';
 
 describe('Curve3PoolStrategy', () => {
   let fixture: BankFixture;
@@ -9,10 +9,8 @@ describe('Curve3PoolStrategy', () => {
     fixture = await bankFixture();
     const {manager, bankProxy, curve3PoolStrategyProxy} = fixture;
 
-    await execute(manager.setBank(bankProxy.address, true));
-    await execute(
-      manager.addStrategy(bankProxy.address, curve3PoolStrategyProxy.address)
-    );
+    await manager.setBank(bankProxy.address, true);
+    await manager.addStrategy(bankProxy.address, curve3PoolStrategyProxy.address);
   });
 
   it('deployed and initialized Curve 3Pool USDC Strategy proxy correctly', async () => {

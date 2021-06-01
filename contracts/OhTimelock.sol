@@ -22,9 +22,6 @@ contract OhTimelock is ReentrancyGuard, OhSubscriber, ITimelock {
     /// @notice The total amount of tokens a user has already claimed
     mapping(address => uint256) public claimed;
 
-    /// @notice The last timestamp a user claimed vested rewards at
-    mapping(address => uint256) public lastClaim;
-
     /// @notice The Oh! Finance Token address
     address public token;
 
@@ -43,14 +40,16 @@ contract OhTimelock is ReentrancyGuard, OhSubscriber, ITimelock {
     /// @notice Timelock constructor
     /// @param registry_ The address of the Registry
     /// @param _token The address of the Oh! Finance Token
+    /// @param _timelockDelay Seconds to delay the timelock from starting
     /// @param _timelockLength The length of the timelock in seconds
     constructor(
         address registry_,
         address _token,
+        uint256 _timelockDelay,
         uint256 _timelockLength
     ) OhSubscriber(registry_) {
         token = _token;
-        timelockStart = block.timestamp;
+        timelockStart = block.timestamp + _timelockDelay;
         timelockLength = _timelockLength;
     }
 
@@ -62,21 +61,21 @@ contract OhTimelock is ReentrancyGuard, OhSubscriber, ITimelock {
         require(users.length == amounts.length, "Timelock: Arrity mismatch");
 
         // find total, add to user balances
-        uint256 totalAmount;
+        uint256 totalAmount = 0;
         uint256 length = users.length;
-        for (uint256 i; i < length; i++) {
+        for (uint256 i = 0; i < length; i++) {
             // get user and amount
             address user = users[i];
             uint256 amount = amounts[i];
 
             // update state and total, emit add
             balances[user] = amount;
-            totalAmount += amount;
+            totalAmount = totalAmount.add(amount);
             emit Add(user, amount);
         }
 
         // transfer from msg.sender, delegate votes back to msg.sender
-        IERC20(token).transferFrom(msg.sender, token, totalAmount);
+        IERC20(token).transferFrom(msg.sender, address(this), totalAmount);
         IToken(token).delegate(msg.sender);
     }
 
@@ -92,7 +91,6 @@ contract OhTimelock is ReentrancyGuard, OhSubscriber, ITimelock {
 
         // update user claimed variables
         claimed[user] = claimed[user].add(amount);
-        lastClaim[user] = block.timestamp;
 
         // transfer to user
         TransferHelper.safeTokenTransfer(user, token, amount);
@@ -106,7 +104,6 @@ contract OhTimelock is ReentrancyGuard, OhSubscriber, ITimelock {
     function claimable(address user) public view returns (uint256 amount) {
         // save state variable to memory
         uint256 userClaimed = claimed[user];
-        uint256 userLastClaim = lastClaim[user];
 
         // if timelock hasn't started yet
         if (block.timestamp < timelockStart) {
@@ -120,11 +117,8 @@ contract OhTimelock is ReentrancyGuard, OhSubscriber, ITimelock {
         }
         // else we are currently in the vesting phase
         else {
-            // determine if we should use the timelock start or user's last claim to calculate vested
-            uint256 lastClaimTimestamp = userLastClaim == 0 ? timelockStart : userLastClaim;
-
-            // find the time passed since the last user claim and now
-            uint256 delta = block.timestamp.sub(lastClaimTimestamp);
+            // find the time passed since timelock start
+            uint256 delta = block.timestamp.sub(timelockStart);
 
             // find the total vested amount of tokens available
             uint256 totalVested = balances[user].mul(delta).div(timelockLength);

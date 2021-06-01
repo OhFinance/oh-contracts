@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import {bankFixture, BankFixture} from 'fixture';
-import {addresses, execute} from 'utils';
+import {addresses} from 'utils';
 
 describe('CompoundStrategy', async () => {
   let fixture: BankFixture;
@@ -9,10 +9,8 @@ describe('CompoundStrategy', async () => {
     fixture = await bankFixture();
     const {manager, bankProxy, compoundStrategyProxy} = fixture;
 
-    await execute(manager.setBank(bankProxy.address, true));
-    await execute(
-      manager.addStrategy(bankProxy.address, compoundStrategyProxy.address)
-    );
+    await manager.setBank(bankProxy.address, true);
+    await manager.addStrategy(bankProxy.address, compoundStrategyProxy.address);
   });
 
   it('deployed and initialized Compound USDC Strategy proxy correctly', async () => {

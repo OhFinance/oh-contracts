@@ -2,12 +2,7 @@ import {Signer} from 'ethers';
 import {ethers} from 'hardhat';
 import {getForumAt} from './contract';
 import OhManager from 'abi/OhManager.json';
-import {
-  execute,
-  getFunctionData,
-  getFunctionName,
-  getFunctionSignature,
-} from 'utils';
+import {getFunctionData, getFunctionName, getFunctionSignature} from 'utils';
 
 export const addBankAndStrategiesProposal = async (
   proposer: Signer,
@@ -29,10 +24,7 @@ export const addBankAndStrategiesProposal = async (
   //   addStrategyFunc
   // );
 
-  const setBankData = getFunctionData(managerInterface, setBankFunc, [
-    bank,
-    true,
-  ]);
+  const setBankData = getFunctionData(managerInterface, setBankFunc, [bank, true]);
 
   const targets = Array(strategies.length + 1).fill(manager);
   const values = Array(strategies.length + 1).fill(0);
@@ -43,14 +35,9 @@ export const addBankAndStrategiesProposal = async (
   const data = [];
   data.push(setBankData);
   for (let strategy of strategies) {
-    const addStrategyData = getFunctionData(managerInterface, addStrategyFunc, [
-      bank,
-      strategy,
-    ]);
+    const addStrategyData = getFunctionData(managerInterface, addStrategyFunc, [bank, strategy]);
     data.push(addStrategyData);
   }
 
-  await execute(
-    forumContract.propose(targets, values, signatures, data, description)
-  );
+  await forumContract.propose(targets, values, signatures, data, description);
 };

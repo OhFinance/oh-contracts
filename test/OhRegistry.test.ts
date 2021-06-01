@@ -1,11 +1,6 @@
 import {expect} from 'chai';
-import {addresses, execute} from 'utils';
-import {
-  CoreFixture,
-  coreFixture,
-  governanceFixture,
-  GovernanceFixture,
-} from 'fixture';
+import {addresses} from 'utils';
+import {CoreFixture, coreFixture, governanceFixture, GovernanceFixture} from 'fixture';
 
 describe('OhRegistry', () => {
   let fixture: CoreFixture;
@@ -29,7 +24,7 @@ describe('OhRegistry', () => {
   it('registry was configured correctly in governance phase', async () => {
     const {registry, governor, manager} = govFixture;
 
-    await execute(registry.setGovernance(governor.address));
+    await registry.setGovernance(governor.address);
 
     const governorAddress = await registry.governance();
     const managerAddress = await registry.manager();

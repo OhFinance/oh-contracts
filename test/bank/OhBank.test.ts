@@ -1,10 +1,4 @@
-import {
-  addresses,
-  execute,
-  getDecimalNumber,
-  getDecimalString,
-  signMessageData,
-} from 'utils';
+import {addresses, getDecimalString, signMessageData} from 'utils';
 import {BankFixture, bankFixture, ohUsdcFixture, OhUsdcFixture} from 'fixture';
 import {expect} from 'chai';
 import {getErc20At, getPermitMessageData, swapEthForTokens} from 'lib';
@@ -21,25 +15,14 @@ describe('OhBank', () => {
     usdc = await getErc20At(addresses.usdc, usdcFixture.worker);
 
     // buy usdc for worker to use in tests
-    await swapEthForTokens(
-      fixture.worker,
-      addresses.usdc,
-      getDecimalString(100)
-    );
+    await swapEthForTokens(fixture.worker, addresses.usdc, getDecimalString(100));
   });
 
   it('logic prevents initialization after deployment', async () => {
     const {bankLogic, worker, registry} = fixture;
     const bankLogicWorker = bankLogic.connect(worker);
 
-    expect(
-      bankLogicWorker.initializeBank(
-        'Test',
-        'TEST',
-        registry.address,
-        addresses.usdc
-      )
-    ).to.be.reverted;
+    expect(bankLogicWorker.initializeBank('Test', 'TEST', registry.address, addresses.usdc)).to.be.reverted;
   });
 
   it('permits transfers with signature', async () => {
@@ -48,8 +31,8 @@ describe('OhBank', () => {
     // connect to worker, deposit usdc to get shares
     const bankProxyWorker = bankProxy.connect(worker);
     const balance = await usdc.balanceOf(worker.address);
-    await execute(usdc.approve(bankProxyWorker.address, balance));
-    await execute(bankProxyWorker.deposit(balance));
+    await usdc.approve(bankProxyWorker.address, balance);
+    await bankProxyWorker.deposit(balance);
 
     // get permit message data and sign with the worker
     const shares = await bankProxy.balanceOf(worker.address);
@@ -66,26 +49,11 @@ describe('OhBank', () => {
     const {v, r, s} = await signMessageData(worker.address, data);
 
     // transfer away from worker
-    await execute(
-      bankProxy.permit(
-        worker.address,
-        deployer.address,
-        message.value,
-        message.deadline,
-        v,
-        r,
-        s
-      )
-    );
-    await execute(
-      bankProxy.transferFrom(worker.address, deployer.address, message.value)
-    );
+    await bankProxy.permit(worker.address, deployer.address, message.value, message.deadline, v, r, s);
+    await bankProxy.transferFrom(worker.address, deployer.address, message.value);
 
     const received = await bankProxy.balanceOf(deployer.address);
-    const allowance = await bankProxy.allowance(
-      worker.address,
-      deployer.address
-    );
+    const allowance = await bankProxy.allowance(worker.address, deployer.address);
     const nonces = await bankProxy.nonces(worker.address);
 
     expect(received.toString()).eq(shares.toString());

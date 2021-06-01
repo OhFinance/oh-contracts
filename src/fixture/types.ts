@@ -10,6 +10,7 @@ import {
   OhManager,
   OhProxyAdmin,
   OhRegistry,
+  OhTimelock,
   OhToken,
   OhUpgradeableProxy,
 } from 'types';
@@ -19,6 +20,13 @@ export interface CoreFixture {
   worker: SignerWithAddress;
   registry: OhRegistry;
   token: OhToken;
+}
+
+export interface TimelockFixture extends CoreFixture {
+  timelock: OhTimelock;
+  foundation: OhTimelock;
+  funds: OhTimelock;
+  legal: OhTimelock;
 }
 
 export interface ManagerFixture extends CoreFixture {

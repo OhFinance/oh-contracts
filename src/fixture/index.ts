@@ -1,7 +1,7 @@
-import {bank, core, governance, logic, management} from 'deploy';
+import {bank, core, governance, logic, management, vesting} from 'deploy';
 import {addStrategy, setBank} from 'lib';
 import {getAccounts} from 'utils';
-import {BankFixture, CoreFixture, GovernanceFixture, LogicFixture, ManagerFixture, OhUsdcFixture} from './types';
+import {BankFixture, CoreFixture, GovernanceFixture, LogicFixture, ManagerFixture, OhUsdcFixture, TimelockFixture} from './types';
 
 export * from './types';
 
@@ -13,6 +13,20 @@ export const coreFixture = async (): Promise<CoreFixture> => {
     worker,
     registry,
     token,
+  };
+};
+
+export const timelockFixture = async (): Promise<TimelockFixture> => {
+  const fixture = await coreFixture();
+  const {deployer, registry, token} = fixture;
+  const {timelock, foundation, funds, legal} = await vesting.deploy(deployer, registry.address, token.address);
+
+  return {
+    ...fixture,
+    timelock,
+    foundation,
+    funds,
+    legal,
   };
 };
 

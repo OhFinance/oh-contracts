@@ -44,9 +44,8 @@ describe('OhToken', () => {
     const {v, r, s} = await signMessageData(deployer.address, data);
 
     const workerToken = token.connect(worker);
-    await execute(workerToken.permit(deployer.address, worker.address, message.value, message.deadline, v, r, s));
-
-    await execute(workerToken.transferFrom(deployer.address, worker.address, message.value));
+    await workerToken.permit(deployer.address, worker.address, message.value, message.deadline, v, r, s);
+    await workerToken.transferFrom(deployer.address, worker.address, message.value);
 
     const balance = await token.balanceOf(worker.address);
     const allowance = await token.allowance(deployer.address, worker.address);
@@ -61,7 +60,7 @@ describe('OhToken', () => {
     const {token, deployer, worker} = fixture;
 
     // delegate to self to create a checkpoint
-    await execute(token.delegate(deployer.address));
+    await token.delegate(deployer.address);
     const currentVotes = await token.getCurrentVotes(deployer.address);
 
     // use nonce = 1 to show increments on both
@@ -70,7 +69,7 @@ describe('OhToken', () => {
     const {v, r, s} = await signMessageData(deployer.address, data);
 
     const workerToken = token.connect(worker);
-    await execute(workerToken.delegateBySig(deployer.address, worker.address, message.deadline, v, r, s));
+    await workerToken.delegateBySig(deployer.address, worker.address, message.deadline, v, r, s);
 
     const delegatedVotes = await token.getCurrentVotes(worker.address);
     const newVotes = await token.getCurrentVotes(deployer.address);

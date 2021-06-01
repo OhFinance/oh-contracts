@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import {BankFixture, bankFixture} from 'fixture';
-import {addresses, execute, getDecimalString} from 'utils';
+import {addresses, getDecimalString} from 'utils';
 import {getErc20At, swapEthForTokens} from 'lib';
 import {formatUnits} from '@ethersproject/units';
 import {network} from 'hardhat';
@@ -12,8 +12,8 @@ describe('AaveV2Strategy', () => {
     fixture = await bankFixture();
     const {manager, bankProxy, aaveV2StrategyProxy} = fixture;
 
-    await execute(manager.setBank(bankProxy.address, true));
-    await execute(manager.addStrategy(bankProxy.address, aaveV2StrategyProxy.address));
+    await manager.setBank(bankProxy.address, true);
+    await manager.addStrategy(bankProxy.address, aaveV2StrategyProxy.address);
   });
 
   it('deployed and initialized AaveV2 USDC Strategy proxy correctly', async () => {
@@ -45,17 +45,17 @@ describe('AaveV2Strategy', () => {
     // Check USDC balance and approve spending
     const workerStartingBalance = await usdc.balanceOf(worker.address);
     console.log('Starting Balance:', formatUnits(workerStartingBalance.toString(), 6));
-    await execute(usdc.approve(bankProxy.address, workerStartingBalance));
+    await usdc.approve(bankProxy.address, workerStartingBalance);
 
     // Deposit the USDC in the Bank
-    await execute(bankProxy.deposit(workerStartingBalance));
+    await bankProxy.deposit(workerStartingBalance);
     const bankBalance = await bankProxy.underlyingBalance();
 
     // Check that tha Bank now has proper amount of USDC deposited
     expect(bankBalance.toString()).eq(workerStartingBalance.toString());
 
     // Invest the USDC into the strategy
-    await execute(manager.finance(bankProxy.address));
+    await manager.finance(bankProxy.address);
     let strategyBalance = await bankProxy.strategyBalance(0);
     console.log('Strategy starting balance: ' + formatUnits(strategyBalance.toString(), 6));
 
@@ -81,11 +81,11 @@ describe('AaveV2Strategy', () => {
 
       // Finance will invest underlying (if any), liquidate the rewards to underlying,
       // and re-invest the collected underlying
-      await execute(manager.finance(bankProxy.address));
+      await manager.finance(bankProxy.address);
     }
 
     // Withdraw all from the strategy to the bank
-    await execute(manager.exit(bankProxy.address, aaveV2StrategyProxy.address));
+    await manager.exit(bankProxy.address, aaveV2StrategyProxy.address);
 
     // Check that underlying balance for the user is now greater than when the test started
     const virtualBalance = await bankProxy.virtualBalance();
@@ -95,7 +95,7 @@ describe('AaveV2Strategy', () => {
     console.log('Virtual Price:', formatUnits(virtualPrice.toString(), 6));
 
     const shares = await bankProxy.balanceOf(worker.address);
-    await execute(bankProxy.withdraw(shares.toString()));
+    await bankProxy.withdraw(shares.toString());
 
     const workerEndingBalance = await usdc.balanceOf(worker.address);
     expect(workerStartingBalance.lt(workerEndingBalance)).to.be.true;
