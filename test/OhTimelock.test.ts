@@ -1,7 +1,6 @@
 import {TimelockFixture, timelockFixture} from 'fixture';
 import {expect} from 'chai';
 import {addresses, advanceNBlocks, advanceNSeconds, advanceToTimestamp} from 'utils';
-import {assert} from 'console';
 import {ethers} from 'hardhat';
 
 describe('OhTimelock', () => {

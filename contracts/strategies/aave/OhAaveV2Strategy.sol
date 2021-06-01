@@ -43,17 +43,22 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
         address underlying_,
         address derivative_,
         address reward_,
+        address stakedToken_,
         address lendingPool_,
         address incentivesController_
     ) public initializer {
         initializeStrategy(registry_, bank_, underlying_, derivative_, reward_);
-        initializeAaveV2Storage(lendingPool_, incentivesController_);
+        initializeAaveV2Storage(stakedToken_, lendingPool_, incentivesController_);
     }
 
     /// @notice Balance of underlying invested in AaveV2
     /// @dev aTokens are 1:1 with underlying, they are continuously distributed to users
     function investedBalance() public view override returns (uint256) {
         return derivativeBalance();
+    }
+
+    function stakedBalance() public view returns (uint256) {
+        return staked(stakedToken(), address(this));
     }
 
     function invest() external override onlyBank {
@@ -72,13 +77,16 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
     }
 
     function _compound() internal {
-        claim(incentivesController(), derivative());
+        claimRewards(incentivesController(), derivative());
 
         // unwrap the stkAAVE to AAVE
-
-        uint256 amount = rewardBalance();
-        if (amount > 0) {
-            liquidate(reward(), underlying(), amount);
+        uint256 balance = stakedBalance();
+        if (balance > 0) {
+            redeem(stakedToken(), address(this), balance);
+            uint256 amount = rewardBalance();
+            if (amount > 0) {
+                liquidate(reward(), underlying(), amount);
+            }
         }
     }
 

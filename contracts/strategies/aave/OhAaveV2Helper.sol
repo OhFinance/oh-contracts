@@ -8,6 +8,7 @@ import {ILendingPoolV2} from "./interfaces/ILendingPoolV2.sol";
 import {ILendingPoolAddressesProviderV2} from "./interfaces/ILendingPoolAddressesProviderV2.sol";
 import {IAaveIncentivesController} from "./interfaces/IAaveIncentivesController.sol";
 import {IAaveProtocolDataProviderV2} from "./interfaces/IAaveProtocolDataProviderV2.sol";
+import {IStakedToken} from "./interfaces/IStakedToken.sol";
 
 /// @title Oh! Finance AaveV2 Helper
 /// @notice Helper functions to interact with the AaveV2
@@ -29,11 +30,27 @@ abstract contract OhAaveV2Helper {
         return ILendingPoolAddressesProviderV2(addressProvider).getLendingPool();
     }
 
+    function staked(address stakedToken, address user) internal view returns (uint256) {
+        return IERC20(stakedToken).balanceOf(user);
+    }
+
+    /// @notice Redeem an amount of stkAAVE to a user
+    /// @param stakedToken The address of stkAAVE
+    /// @param user The address of the user to receive the AAVE
+    /// @param amount The amount of stkAAVE to redeem
+    function redeem(
+        address stakedToken,
+        address user,
+        uint256 amount
+    ) internal {
+        IStakedToken(stakedToken).redeem(user, amount);
+    }
+
     /// @notice Claim stkAAVE from the AaveV2 Incentive Controller
     /// @dev Claim all available rewards, return if none available
     /// @param incentivesController The AaveV2 Incentive Controller
     /// @param token The aToken to claim rewards for
-    function claim(address incentivesController, address token) internal {
+    function claimRewards(address incentivesController, address token) internal {
         address[] memory tokens = new address[](1);
         tokens[0] = token;
 
