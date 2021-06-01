@@ -24,6 +24,10 @@ interface IToken {
         bytes32 s
     ) external;
 
+    function burn(uint256 amount) external;
+
+    function mint(address recipient, uint256 amount) external;
+
     function getCurrentVotes(address account) external view returns (uint256);
 
     function getPriorVotes(address account, uint256 blockNumber) external view returns (uint256);

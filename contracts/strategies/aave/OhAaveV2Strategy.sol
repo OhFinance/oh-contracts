@@ -57,8 +57,8 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
     }
 
     function invest() external override onlyBank {
-        _deposit();
         _compound();
+        _deposit();
     }
 
     function withdraw(uint256 amount) external override onlyBank returns (uint256) {
@@ -73,8 +73,10 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
 
     function _compound() internal {
         claim(incentivesController(), derivative());
-        uint256 amount = rewardBalance();
+
         // unwrap the stkAAVE to AAVE
+
+        uint256 amount = rewardBalance();
         if (amount > 0) {
             liquidate(reward(), underlying(), amount);
         }

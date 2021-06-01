@@ -20,11 +20,7 @@ export const deployRegistry = async (deployer: Signer) => {
 };
 
 export const deployToken = async (deployer: Signer, registry: string) => {
-  const token = (await deployContract(
-    deployer,
-    'OhToken',
-    registry
-  )) as OhToken;
+  const token = (await deployContract(deployer, 'OhToken', registry)) as OhToken;
   return token;
 };
 
@@ -47,48 +43,22 @@ export const deployForum = async (
   votingPeriod: number,
   proposalThreshold: string
 ) => {
-  const forum = (await deployContract(
-    deployer,
-    'OhForum',
-    registry,
-    token,
-    votingDelay,
-    votingPeriod,
-    proposalThreshold
-  )) as OhForum;
+  const forum = (await deployContract(deployer, 'OhForum', registry, token, votingDelay, votingPeriod, proposalThreshold)) as OhForum;
   return forum;
 };
 
-export const deployGovernor = async (
-  deployer: Signer,
-  registry: string,
-  admin: string,
-  delay: number
-) => {
-  const governor = (await deployContract(
-    deployer,
-    'OhGovernor',
-    admin,
-    delay
-  )) as OhGovernor;
+export const deployGovernor = async (deployer: Signer, registry: string, admin: string, delay: number) => {
+  const governor = (await deployContract(deployer, 'OhGovernor', admin, delay)) as OhGovernor;
   return governor;
 };
 
-export const deployManager = async (deployer: Signer, registry: string) => {
-  const manager = (await deployContract(
-    deployer,
-    'OhManager',
-    registry
-  )) as OhManager;
+export const deployManager = async (deployer: Signer, registry: string, token: string) => {
+  const manager = (await deployContract(deployer, 'OhManager', registry, token)) as OhManager;
   return manager;
 };
 
 export const deployProxyAdmin = async (deployer: Signer, registry: string) => {
-  const proxyAdmin = (await deployContract(
-    deployer,
-    'OhProxyAdmin',
-    registry
-  )) as OhProxyAdmin;
+  const proxyAdmin = (await deployContract(deployer, 'OhProxyAdmin', registry)) as OhProxyAdmin;
   return proxyAdmin;
 };
 
@@ -98,25 +68,16 @@ export const deployBank = async (deployer: Signer) => {
 };
 
 export const deployAaveV2Strategy = async (deployer: Signer) => {
-  const strategy = (await deployContract(
-    deployer,
-    'OhAaveV2Strategy'
-  )) as OhAaveV2Strategy;
+  const strategy = (await deployContract(deployer, 'OhAaveV2Strategy')) as OhAaveV2Strategy;
   return strategy;
 };
 
 export const deployCompoundStrategy = async (deployer: Signer) => {
-  const strategy = (await deployContract(
-    deployer,
-    'OhCompoundStrategy'
-  )) as OhCompoundStrategy;
+  const strategy = (await deployContract(deployer, 'OhCompoundStrategy')) as OhCompoundStrategy;
   return strategy;
 };
 
 export const deployCurve3PoolStrategy = async (deployer: Signer) => {
-  const strategy = (await deployContract(
-    deployer,
-    'OhCurve3PoolStrategy'
-  )) as OhCurve3PoolStrategy;
+  const strategy = (await deployContract(deployer, 'OhCurve3PoolStrategy')) as OhCurve3PoolStrategy;
   return strategy;
 };

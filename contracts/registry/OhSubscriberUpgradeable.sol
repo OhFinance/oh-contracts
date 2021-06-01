@@ -11,15 +11,11 @@ import {OhUpgradeable} from "../proxy/OhUpgradeable.sol";
 /// @title Oh! Finance Subscriber Upgradeable
 /// @notice Base Oh! Finance upgradeable contract used to control access throughout the protocol
 abstract contract OhSubscriberUpgradeable is Initializable, OhUpgradeable, ISubscriber {
-    bytes32 private constant _REGISTRY_SLOT =
-        0x1b5717851286d5e98a28354be764b8c0a20eb2fbd059120090ee8bcfe1a9bf6c;
+    bytes32 private constant _REGISTRY_SLOT = 0x1b5717851286d5e98a28354be764b8c0a20eb2fbd059120090ee8bcfe1a9bf6c;
 
     /// @notice Only allow authorized addresses (governance or manager) to execute a function
     modifier onlyAuthorized {
-        require(
-            msg.sender == governance() || msg.sender == manager(),
-            "Subscriber: Only Authorized"
-        );
+        require(msg.sender == governance() || msg.sender == manager(), "Subscriber: Only Authorized");
         _;
     }
 
@@ -29,6 +25,7 @@ abstract contract OhSubscriberUpgradeable is Initializable, OhUpgradeable, ISubs
         _;
     }
 
+    /// @notice Verify the registry storage slot is correct
     constructor() {
         assert(_REGISTRY_SLOT == bytes32(uint256(keccak256("eip1967.subscriber.registry")) - 1));
     }
@@ -53,22 +50,18 @@ abstract contract OhSubscriberUpgradeable is Initializable, OhUpgradeable, ISubs
     /// @notice Get the Governance address
     /// @return The current Governance address
     function governance() public view override returns (address) {
-        return IRegistry(_registry()).governance();
+        return IRegistry(registry()).governance();
     }
 
     /// @notice Get the Manager address
     /// @return The current Manager address
     function manager() public view override returns (address) {
-        return IRegistry(_registry()).manager();
+        return IRegistry(registry()).manager();
     }
 
     /// @notice Get the Registry address
     /// @return The current Registry address
     function registry() public view override returns (address) {
-        return _registry();
-    }
-
-    function _registry() internal view returns (address) {
         return getAddress(_REGISTRY_SLOT);
     }
 

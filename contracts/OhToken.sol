@@ -4,11 +4,12 @@ pragma solidity 0.7.6;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {IToken} from "./interfaces/IToken.sol";
 import {OhSubscriber} from "./registry/OhSubscriber.sol";
 
 /// @title Oh! Finance Token
 /// @notice Protocol Governance and Profit-Share ERC-20 Token
-contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
+contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber, IToken {
     using SafeMath for uint256;
 
     /// @notice A checkpoint for marking number of votes from a given block
@@ -16,18 +17,6 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
         uint32 fromBlock;
         uint256 votes;
     }
-
-    /// @notice Delegate votes from `msg.sender` to `delegatee`
-    mapping(address => address) public delegates;
-
-    /// @notice A record of votes checkpoints for each account, by index
-    mapping(address => mapping(uint32 => Checkpoint)) public checkpoints;
-
-    /// @notice A record of states for signing / validating signatures
-    mapping(address => uint256) public nonces;
-
-    /// @notice The number of checkpoints for each account
-    mapping(address => uint32) public numCheckpoints;
 
     /// @notice The max token supply, minted on initialization. 100m tokens.
     uint256 public constant MAX_SUPPLY = 100000000e18;
@@ -48,6 +37,18 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
     // solhint-disable-next-line
     bytes32 public immutable DOMAIN_SEPARATOR;
 
+    /// @notice Delegate votes from `msg.sender` to `delegatee`
+    mapping(address => address) public delegates;
+
+    /// @notice A record of votes checkpoints for each account, by index
+    mapping(address => mapping(uint32 => Checkpoint)) public checkpoints;
+
+    /// @notice A record of states for signing / validating signatures
+    mapping(address => uint256) public nonces;
+
+    /// @notice The number of checkpoints for each account
+    mapping(address => uint32) public numCheckpoints;
+
     /// @notice An event thats emitted when an account changes its delegate
     event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
 
@@ -62,11 +63,9 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
         _mint(msg.sender, MAX_SUPPLY);
     }
 
-    /**
-     * @notice Delegate votes from `msg.sender` to `delegatee`
-     * @param delegatee The address to delegate votes to
-     */
-    function delegate(address delegatee) external {
+    /// @notice Delegate votes from `msg.sender` to `delegatee`
+    /// @param delegatee The address to delegate votes to
+    function delegate(address delegatee) external override {
         return _delegate(msg.sender, delegatee);
     }
 
@@ -84,7 +83,7 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external {
+    ) external override {
         // solhint-disable-next-line
         require(block.timestamp <= deadline, "Delegate: Invalid Expiration");
         require(delegator != address(0), "Delegate: Invalid Delegator");
@@ -120,7 +119,7 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external {
+    ) external override {
         require(block.timestamp <= deadline, "Permit: Invalid Deadline");
         require(owner != address(0), "Permit: Invalid Owner");
 
@@ -142,7 +141,7 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
     /// @notice Gets the current votes balance for `account`
     /// @param account The address to get votes balance
     /// @return The number of current votes for `account`
-    function getCurrentVotes(address account) external view returns (uint256) {
+    function getCurrentVotes(address account) external view override returns (uint256) {
         uint32 nCheckpoints = numCheckpoints[account];
         return nCheckpoints > 0 ? checkpoints[account][nCheckpoints - 1].votes : 0;
     }
@@ -152,7 +151,7 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
     /// @param account The address of the account to check
     /// @param blockNumber The block number to get the vote balance at
     /// @return The number of votes the account had as of the given block
-    function getPriorVotes(address account, uint256 blockNumber) external view returns (uint256) {
+    function getPriorVotes(address account, uint256 blockNumber) external view override returns (uint256) {
         require(blockNumber < block.number, "GetPriorVotes: Invalid Block");
 
         uint32 nCheckpoints = numCheckpoints[account];
@@ -188,7 +187,7 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
 
     /// @notice Destroys an amount of tokens from the caller
     /// @param amount The amount of tokens to burn
-    function burn(uint256 amount) public {
+    function burn(uint256 amount) public override {
         _burn(msg.sender, amount);
     }
 
@@ -196,7 +195,7 @@ contract OhToken is ERC20("Oh! Finance", "OH"), OhSubscriber {
     /// @param recipient The receiver of the tokens
     /// @param amount The amount of tokens to mint
     /// @dev callable by governance only
-    function mint(address recipient, uint256 amount) public onlyGovernance {
+    function mint(address recipient, uint256 amount) public override onlyGovernance {
         _mint(recipient, amount);
     }
 

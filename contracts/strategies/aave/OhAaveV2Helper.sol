@@ -30,6 +30,7 @@ abstract contract OhAaveV2Helper {
     }
 
     /// @notice Claim stkAAVE from the AaveV2 Incentive Controller
+    /// @dev Claim all available rewards, return if none available
     /// @param incentivesController The AaveV2 Incentive Controller
     /// @param token The aToken to claim rewards for
     function claim(address incentivesController, address token) internal {

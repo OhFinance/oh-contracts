@@ -35,16 +35,12 @@ describe('AaveV2Strategy', () => {
   });
 
   it('is able to claim rewards and compound on AaveV2Strategy', async () => {
-    let { bankProxy, manager, worker, aaveV2StrategyProxy } = fixture;
+    let {bankProxy, manager, worker, aaveV2StrategyProxy} = fixture;
     bankProxy = bankProxy.connect(fixture.worker);
 
     // Buy USDC using the worker wallet
     const usdc = await getErc20At(addresses.usdc, fixture.worker);
-    await swapEthForTokens(
-      fixture.worker,
-      addresses.usdc,
-      getDecimalString(100)
-    );
+    await swapEthForTokens(fixture.worker, addresses.usdc, getDecimalString(100));
 
     // Check USDC balance and approve spending
     const workerStartingBalance = await usdc.balanceOf(worker.address);
@@ -89,16 +85,13 @@ describe('AaveV2Strategy', () => {
     }
 
     // Withdraw all from the strategy to the bank
-    await execute(manager.exitStrategy(bankProxy.address, aaveV2StrategyProxy.address));
+    await execute(manager.exit(bankProxy.address, aaveV2StrategyProxy.address));
 
     // Check that underlying balance for the user is now greater than when the test started
     const virtualBalance = await bankProxy.virtualBalance();
     const virtualPrice = await bankProxy.virtualPrice();
 
-    console.log(
-      'Virtual Balance:',
-      formatUnits(virtualBalance.toString(), 6)
-    );
+    console.log('Virtual Balance:', formatUnits(virtualBalance.toString(), 6));
     console.log('Virtual Price:', formatUnits(virtualPrice.toString(), 6));
 
     const shares = await bankProxy.balanceOf(worker.address);
@@ -107,7 +100,12 @@ describe('AaveV2Strategy', () => {
     const workerEndingBalance = await usdc.balanceOf(worker.address);
     expect(workerStartingBalance.lt(workerEndingBalance)).to.be.true;
 
-    console.log('Starting balance: ' + formatUnits(workerStartingBalance.toString(), 6) + '\n' +
-      'Ending Balance:' + formatUnits(workerEndingBalance.toString(), 6));
+    console.log(
+      'Starting balance: ' +
+        formatUnits(workerStartingBalance.toString(), 6) +
+        '\n' +
+        'Ending Balance:' +
+        formatUnits(workerEndingBalance.toString(), 6)
+    );
   });
 });

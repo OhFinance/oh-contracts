@@ -55,3 +55,5 @@ yarn mainnet:run scripts/my_script.ts
 - AAVE V2 Deployed Docs: https://docs.aave.com/developers/deployed-contracts/deployed-contracts
 - Compound Docs: https://compound.finance/docs
 - Curve Docs: https://resources.curve.fi/
+- EIP-2612 Permit Signature: https://eips.ethereum.org/EIPS/eip-2612
+- EIP-1967 Proxy Storage: https://eips.ethereum.org/EIPS/eip-1967

@@ -8,7 +8,6 @@ import {IBank} from "../interfaces/bank/IBank.sol";
 import {IStrategyBase} from "../interfaces/strategies/IStrategyBase.sol";
 import {ILiquidator} from "../interfaces/ILiquidator.sol";
 import {IManager} from "../interfaces/IManager.sol";
-import {OhSwapHelper} from "../libraries/OhSwapHelper.sol";
 import {TransferHelper} from "../libraries/TransferHelper.sol";
 import {OhSubscriberUpgradeable} from "../registry/OhSubscriberUpgradeable.sol";
 import {OhStrategyStorage} from "./OhStrategyStorage.sol";
@@ -80,14 +79,23 @@ contract OhStrategy is OhSubscriberUpgradeable, OhStrategyStorage, IStrategyBase
         emit Sweep(token, amount, recipient);
     }
 
-    // liquidation function to swap rewards for underlying
+    /// @dev Liquidation function to swap rewards for underlying
     function liquidate(
         address from,
         address to,
         uint256 amount
     ) internal {
-        address liquidator = IManager(manager()).liquidators(bank(), address(this));
-        IERC20(from).safeIncreaseAllowance(liquidator, amount);
-        ILiquidator(liquidator).liquidate(from, to, amount);
+        // if (amount > minimumSell())
+
+        // find the liquidator to use
+        address manager = manager();
+        address liquidator = IManager(manager).liquidators(from, to);
+
+        // increase allowance and liquidate to the manager
+        TransferHelper.safeTokenTransfer(liquidator, from, amount);
+        uint256 received = ILiquidator(liquidator).liquidate(manager, from, to, amount, 1);
+
+        // notify revenue and transfer proceeds back to strategy
+        IManager(manager).accrueRevenue(bank(), to, received);
     }
 }

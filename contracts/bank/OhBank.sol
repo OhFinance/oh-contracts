@@ -23,8 +23,13 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
+    /// @notice
     event InvestAll(uint256 amount);
+
+    /// @notice Event emitted when a user deposits an amount of underlying
     event Deposit(address indexed user, uint256 amount);
+
+    /// @notice Event emitted when a user withdraws an amount of underlying
     event Withdraw(address indexed user, uint256 amount);
 
     /// @notice Protocol defense modifier
@@ -103,6 +108,7 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
     }
 
     /// @notice Get the total virtual amount available to the bank
+    /// @return The balance of underlying if we were to exit all Strategies
     function virtualBalance() public view override returns (uint256) {
         return underlyingBalance().add(investedBalance());
     }
@@ -136,15 +142,17 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
         IStrategy(strategy).withdraw(amount);
     }
 
-    /// @notice Exit a given strategy
+    /// @notice Exit and withdrawll all underlying from a given strategy
     function exitAll(address strategy) external override onlyAuthorized {
         IStrategy(strategy).withdrawAll();
     }
 
+    /// @notice Pause the Bank
     function pause() external override onlyGovernance {
         _setPaused(true);
     }
 
+    /// @notice Unpause the Bank
     function unpause() external override onlyGovernance {
         _setPaused(false);
     }
@@ -237,7 +245,7 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
         }
 
         TransferHelper.safeTokenTransfer(user, underlying(), withdrawAmount);
-        emit Withdraw(user, shares);
+        emit Withdraw(user, withdrawAmount);
     }
 
     // withdraw all underlying to the bank

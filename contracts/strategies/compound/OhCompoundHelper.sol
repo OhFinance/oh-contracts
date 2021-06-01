@@ -15,9 +15,10 @@ import {ICEther} from "./interfaces/ICEther.sol";
 abstract contract OhCompoundHelper {
     using SafeERC20 for IERC20;
 
-    /// @notice Get the exchange rate of cTokens:underlying scaled by 1e18
-    /// @param cToken The cToken address rate to get
+    /// @notice Get the exchange rate of cTokens => underlying
     /// @dev https://compound.finance/docs/ctokens#exchange-rate
+    /// @param cToken The cToken address rate to get
+    /// @return The exchange rate scaled by 1e18
     function getExchangeRate(address cToken) internal view returns (uint256) {
         return ICToken(cToken).exchangeRateStored();
     }

@@ -47,25 +47,31 @@ contract OhLiquidator is OhSubscriber, ILiquidator {
         weth = IUniswapV2Router02(_uniswapRouter).WETH();
     }
 
-    /// @notice Liquidate an amount of 'from' tokens to 'to' tokens from the caller's address
+    /// @notice Liquidate an amount of 'from' tokens to 'to' tokens from this address
+    /// @dev Send proceeds to the caller, `msg.sender` will typically be a Strategy
+    /// @param recipient The recipient of the swap
     /// @param from The token we have
     /// @param to The token we want to swap to
     /// @param amount The amount of 'from' tokens to swap
-    /// @dev Send proceeds to the caller
-    /// @dev The `msg.sender` will typically be a Strategy
+    /// @param minOut The minimum output amount accepted
+    /// @return The amount of 'to' tokens received
     function liquidate(
+        address recipient,
         address from,
         address to,
-        uint256 amount
-    ) external override {
-        // require(IRegistry(registry).strategies(msg.sender), "Liquidator: Not Approved");
-        IERC20(from).safeTransferFrom(msg.sender, address(this), amount);
-
+        uint256 amount,
+        uint256 minOut
+    ) external override returns (uint256) {
+        // get the router address and swap path
         address router = tokenSwapRouter[from][to];
         address[] memory path = router == uniswapRouter ? uniswapRoutes[from][to] : sushiswapRoutes[from][to];
 
+        // increase allowance and swap
         IERC20(from).safeIncreaseAllowance(router, amount);
-        IUniswapV2Router02(router).swapExactTokensForTokens(amount, 1, path, msg.sender, block.timestamp);
+        uint256[] memory output = IUniswapV2Router02(router).swapExactTokensForTokens(amount, minOut, path, recipient, block.timestamp);
+
+        // return amount received
+        return output[path.length - 1];
     }
 
     /// @notice Set liquidation route for a token pair on Uniswap

@@ -18,7 +18,8 @@ export const coreFixture = async (): Promise<CoreFixture> => {
 
 export const managementFixture = async (): Promise<ManagerFixture> => {
   const fixture = await coreFixture();
-  const {manager, liquidator} = await management.deploy(fixture.deployer, fixture.registry.address);
+  const {deployer, registry, token} = fixture;
+  const {manager, liquidator} = await management.deploy(deployer, registry.address, token.address);
 
   return {
     ...fixture,

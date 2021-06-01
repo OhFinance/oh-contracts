@@ -14,6 +14,10 @@ library TransferHelper {
         address token,
         uint256 amount
     ) internal returns (uint256) {
+        if (amount == 0) {
+            return 0;
+        }
+
         uint256 balance = IERC20(token).balanceOf(address(this));
         if (balance < amount) {
             IERC20(token).safeTransfer(recipient, balance);
