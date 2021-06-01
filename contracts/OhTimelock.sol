@@ -4,24 +4,46 @@ pragma solidity 0.7.6;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {TransferHelper} from "./libraries/TransferHelper.sol";
+import {ITimelock} from "./interfaces/ITimelock.sol";
+import {IToken} from "./interfaces/IToken.sol";
 import {OhSubscriber} from "./registry/OhSubscriber.sol";
 
-contract OhTimelock is OhSubscriber {
+/// @title Oh! Finance Token Timelock
+/// @notice Contract to manage linear token vesting over a given time period
+/// @notice Users accrue vested tokens as soon as the timelock starts, every second
+contract OhTimelock is ReentrancyGuard, OhSubscriber, ITimelock {
     using SafeMath for uint256;
 
+    /// @notice The total vested balance of tokens a user can claim
     mapping(address => uint256) public balances;
 
-    mapping(address => uint256) public totalClaimed;
+    /// @notice The total amount of tokens a user has already claimed
+    mapping(address => uint256) public claimed;
 
+    /// @notice The last timestamp a user claimed vested rewards at
     mapping(address => uint256) public lastClaim;
 
+    /// @notice The Oh! Finance Token address
     address public token;
 
+    /// @notice The UNIX timestamp that the timelock starts at
     uint256 public timelockStart;
 
+    /// @notice The length in seconds of the timelock
     uint256 public timelockLength;
 
+    /// @notice Emitted when a user is added to the timelock
+    event Add(address indexed user, uint256 amount);
+
+    /// @notice Emitted every time a user claims tokens
+    event Claim(address indexed user, uint256 amount);
+
+    /// @notice Timelock constructor
+    /// @param registry_ The address of the Registry
+    /// @param _token The address of the Oh! Finance Token
+    /// @param _timelockLength The length of the timelock in seconds
     constructor(
         address registry_,
         address _token,
@@ -32,42 +54,83 @@ contract OhTimelock is OhSubscriber {
         timelockLength = _timelockLength;
     }
 
-    function claimable(address user) public view returns (uint256 amount) {
-        // save state variable to memory
-        uint256 userLastClaim = lastClaim[user];
-        uint256 userClaimed = totalClaimed[user];
-
-        if (block.timestamp > timelockStart.add(timelockLength)) {
-            // if timelock has expired, return remaining balance
-            amount = balances[user];
-        } else {
-            // find time passed since last claim relative to timelockLength, scale by 1e12 to prevent underflow
-            uint256 lastClaimTimestamp = userLastClaim == 0 ? timelockStart : userLastClaim;
-            uint256 delta = block.timestamp.sub(lastClaimTimestamp).mul(1e12);
-            uint256 deltaRatio = delta.div(timelockLength);
-
-            // find the total amount of tokens claimable by the user
-            uint256 userTotalAmount = balances[user].add(userClaimed);
-            uint256 userTotalOwed = userTotalAmount.mul(deltaRatio);
-            amount = userTotalOwed.div(1e12).sub(userClaimed);
-        }
-    }
-
-    function claim() external {
-        uint256 amount = claimable(msg.sender);
-        require(amount > 0, "Timelock: No Tokens");
-
-        TransferHelper.safeTokenTransfer(msg.sender, token, amount);
-
-        balances[msg.sender].sub(amount);
-        totalClaimed[msg.sender].add(amount);
-        lastClaim[msg.sender] = block.timestamp;
-    }
-
+    /// @notice Add a set of users to the vesting contract with a set amount
+    /// @dev Only callable by Governance, delegates token votes to msg.sender until they are claimed
+    /// @param users The array of users to be added to the vesting contract
+    /// @param amounts The array of amounts of tokens to add to each users vesting schedule
     function add(address[] memory users, uint256[] memory amounts) external onlyGovernance {
+        require(users.length == amounts.length, "Timelock: Arrity mismatch");
+
+        // find total, add to user balances
+        uint256 totalAmount;
         uint256 length = users.length;
         for (uint256 i; i < length; i++) {
-            balances[users[i]] = amounts[i];
+            // get user and amount
+            address user = users[i];
+            uint256 amount = amounts[i];
+
+            // update state and total, emit add
+            balances[user] = amount;
+            totalAmount += amount;
+            emit Add(user, amount);
+        }
+
+        // transfer from msg.sender, delegate votes back to msg.sender
+        IERC20(token).transferFrom(msg.sender, token, totalAmount);
+        IToken(token).delegate(msg.sender);
+    }
+
+    /// @notice Claim all available tokens for the msg.sender, if any
+    /// @dev Reentrancy guard to prevent double claims
+    function claim() external nonReentrant {
+        require(block.timestamp > timelockStart, "Timelock: Lock not started");
+
+        // check for available claims
+        address user = msg.sender;
+        uint256 amount = claimable(user);
+        require(amount > 0, "Timelock: No Tokens");
+
+        // update user claimed variables
+        claimed[user] = claimed[user].add(amount);
+        lastClaim[user] = block.timestamp;
+
+        // transfer to user
+        TransferHelper.safeTokenTransfer(user, token, amount);
+        emit Claim(user, amount);
+    }
+
+    /// @notice Available tokens available for a user to claim
+    /// @dev Available = ((Balances[user] * Time_Passed) / Total_Time) - Claimed[user]
+    /// @param user The user address to check
+    /// @return amount The amount of tokens available to claim
+    function claimable(address user) public view returns (uint256 amount) {
+        // save state variable to memory
+        uint256 userClaimed = claimed[user];
+        uint256 userLastClaim = lastClaim[user];
+
+        // if timelock hasn't started yet
+        if (block.timestamp < timelockStart) {
+            // return entire balance
+            amount = balances[user];
+        }
+        // else if timelock has expired
+        else if (block.timestamp > timelockStart.add(timelockLength)) {
+            // return total remaining balance
+            amount = balances[user].sub(userClaimed);
+        }
+        // else we are currently in the vesting phase
+        else {
+            // determine if we should use the timelock start or user's last claim to calculate vested
+            uint256 lastClaimTimestamp = userLastClaim == 0 ? timelockStart : userLastClaim;
+
+            // find the time passed since the last user claim and now
+            uint256 delta = block.timestamp.sub(lastClaimTimestamp);
+
+            // find the total vested amount of tokens available
+            uint256 totalVested = balances[user].mul(delta).div(timelockLength);
+
+            // return vested - claimed
+            amount = totalVested.sub(userClaimed);
         }
     }
 }

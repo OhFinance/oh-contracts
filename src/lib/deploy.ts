@@ -9,6 +9,7 @@ import {
   OhManager,
   OhProxyAdmin,
   OhRegistry,
+  OhTimelock,
   OhToken,
 } from 'types';
 import {Signer} from 'ethers';
@@ -22,6 +23,11 @@ export const deployRegistry = async (deployer: Signer) => {
 export const deployToken = async (deployer: Signer, registry: string) => {
   const token = (await deployContract(deployer, 'OhToken', registry)) as OhToken;
   return token;
+};
+
+export const deployTimelock = async (deployer: Signer, registry: string, token: string) => {
+  const timelock = (await deployContract(deployer, 'OhTimelock', registry, token)) as OhTimelock;
+  return timelock;
 };
 
 export const deployLiquidator = async (deployer: Signer, registry: string) => {
