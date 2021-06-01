@@ -76,7 +76,6 @@ contract OhTimelock is ReentrancyGuard, OhSubscriber, ITimelock {
 
         // transfer from msg.sender, delegate votes back to msg.sender
         IERC20(token).transferFrom(msg.sender, address(this), totalAmount);
-        IToken(token).delegate(msg.sender);
     }
 
     /// @notice Claim all available tokens for the msg.sender, if any

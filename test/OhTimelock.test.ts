@@ -106,7 +106,16 @@ describe('OhTimelock', () => {
 
     expect(totalClaimed).to.be.eq(finalBalance);
     expect(finalBalance).to.be.eq(vestAmount);
+
+    await expect(timelock.connect(worker).claim()).to.be.revertedWith('Timelock: No Tokens');
   });
 
-  it('timelock gas usage test', async () => {});
+  it('gas usage test', async () => {
+    const {timelock, token} = fixture;
+    const signers = await ethers.getSigners();
+    const recipients = signers.map((signer) => signer.address);
+
+    await token.approve(timelock.address, ethers.constants.MaxUint256);
+    await timelock.add(recipients, Array(20).fill(ethers.utils.parseEther('100000')));
+  });
 });
