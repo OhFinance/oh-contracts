@@ -198,11 +198,13 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
         _withdraw(msg.sender, shares);
     }
 
+    /// @dev Invest an amount into a strategy
     function _invest(address strategy, uint256 amount) internal {
-        if (amount == 0) {
-            return;
+        // transfer to strategy if amount > 0
+        if (amount != 0) {
+            TransferHelper.safeTokenTransfer(strategy, underlying(), amount);
         }
-        TransferHelper.safeTokenTransfer(strategy, underlying(), amount);
+        // perform strategy investment, handle no new underlying in strategy
         IStrategy(strategy).invest();
     }
 

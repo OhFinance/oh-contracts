@@ -19,6 +19,7 @@ abstract contract OhAaveV2Helper {
     /// @notice Get the AaveV2 aToken for a given underlying
     /// @param dataProvider The AaveV2 Data Provider
     /// @param underlying The underlying token to check
+    /// @return The address of the associated aToken
     function aToken(address dataProvider, address underlying) internal view returns (address) {
         (address aTokenAddress, , ) = IAaveProtocolDataProviderV2(dataProvider).getReserveTokensAddresses(underlying);
         return aTokenAddress;
@@ -26,24 +27,48 @@ abstract contract OhAaveV2Helper {
 
     /// @notice Get the AaveV2 Lending Pool
     /// @param addressProvider The AaveV2 Address Provider
+    /// @return The address of the AaveV2 Lending Pool
     function lendingPool(address addressProvider) internal view returns (address) {
         return ILendingPoolAddressesProviderV2(addressProvider).getLendingPool();
     }
 
-    function staked(address stakedToken, address user) internal view returns (uint256) {
-        return IERC20(stakedToken).balanceOf(user);
+    /// @notice Get the cooldown timestamp start for this contract
+    /// @param stakedToken The address of stkAAVE
+    /// @return The timestamp the cooldown started on
+    function stakersCooldown(address stakedToken) internal view returns (uint256) {
+        uint256 stakerCooldown = IStakedToken(stakedToken).stakersCooldowns(address(this));
+        return stakerCooldown;
     }
 
-    /// @notice Redeem an amount of stkAAVE to a user
+    /// @notice Get the cooldown window in seconds for unstaking stkAAVE to AAVE before cooldown expires
+    /// @dev 864000 - 10 days
     /// @param stakedToken The address of stkAAVE
-    /// @param user The address of the user to receive the AAVE
+    /// @return The cooldown seconds to wait before unstaking
+    function cooldownWindow(address stakedToken) internal view returns (uint256) {
+        uint256 window = IStakedToken(stakedToken).COOLDOWN_SECONDS();
+        return window;
+    }
+
+    /// @notice Get the unstake window in seconds for unstaking stkAAVE to AAVE after cooldown passes
+    /// @dev 172800 - 2 days
+    /// @param stakedToken The address of stkAAVE
+    /// @return The unstake window seconds we have to unwrap stkAAVE to AAVE
+    function unstakingWindow(address stakedToken) internal view returns (uint256) {
+        uint256 window = IStakedToken(stakedToken).UNSTAKE_WINDOW();
+        return window;
+    }
+
+    /// @notice Initiate a claim cooldown to swap stkAAVE to AAVE
+    /// @param stakedToken The address of stkAAVE
+    function cooldown(address stakedToken) internal {
+        IStakedToken(stakedToken).cooldown();
+    }
+
+    /// @notice Redeem an amount of stkAAVE for AAVE
+    /// @param stakedToken The address of stkAAVE
     /// @param amount The amount of stkAAVE to redeem
-    function redeem(
-        address stakedToken,
-        address user,
-        uint256 amount
-    ) internal {
-        IStakedToken(stakedToken).redeem(user, amount);
+    function redeem(address stakedToken, uint256 amount) internal {
+        IStakedToken(stakedToken).redeem(address(this), amount);
     }
 
     /// @notice Claim stkAAVE from the AaveV2 Incentive Controller

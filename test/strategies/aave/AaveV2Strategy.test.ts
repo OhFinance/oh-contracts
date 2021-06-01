@@ -1,9 +1,10 @@
 import {expect} from 'chai';
 import {BankFixture, bankFixture} from 'fixture';
-import {addresses, getDecimalString} from 'utils';
+import {addresses, advanceNBlocks, advanceNSeconds, getDecimalString} from 'utils';
 import {getErc20At, swapEthForTokens} from 'lib';
 import {formatUnits} from '@ethersproject/units';
-import {network} from 'hardhat';
+
+const TEN_DAYS = 86400 * 10;
 
 describe('AaveV2Strategy', () => {
   let fixture: BankFixture;
@@ -14,6 +15,9 @@ describe('AaveV2Strategy', () => {
 
     await manager.setBank(bankProxy.address, true);
     await manager.addStrategy(bankProxy.address, aaveV2StrategyProxy.address);
+
+    // Buy USDC using the worker wallet
+    await swapEthForTokens(fixture.worker, addresses.usdc, getDecimalString(100));
   });
 
   it('deployed and initialized AaveV2 USDC Strategy proxy correctly', async () => {
@@ -23,6 +27,7 @@ describe('AaveV2Strategy', () => {
     const underlying = await aaveV2StrategyProxy.underlying();
     const derivative = await aaveV2StrategyProxy.derivative();
     const reward = await aaveV2StrategyProxy.reward();
+    const stakedToken = await aaveV2StrategyProxy.stakedToken();
     const lendingPool = await aaveV2StrategyProxy.lendingPool();
     const incentivesController = await aaveV2StrategyProxy.incentivesController();
 
@@ -30,54 +35,47 @@ describe('AaveV2Strategy', () => {
     expect(underlying).eq(addresses.usdc);
     expect(derivative).eq(addresses.aaveUsdcToken);
     expect(reward).eq(addresses.aave);
+    expect(stakedToken).eq(addresses.aaveStakedToken);
     expect(lendingPool).eq(addresses.aaveLendingPool);
     expect(incentivesController).eq(addresses.aaveIncentivesController);
   });
 
   it('is able to claim rewards and compound on AaveV2Strategy', async () => {
-    let {bankProxy, manager, worker, aaveV2StrategyProxy} = fixture;
-    bankProxy = bankProxy.connect(fixture.worker);
-
-    // Buy USDC using the worker wallet
-    const usdc = await getErc20At(addresses.usdc, fixture.worker);
-    await swapEthForTokens(fixture.worker, addresses.usdc, getDecimalString(100));
+    const {bankProxy, manager, worker, aaveV2StrategyProxy} = fixture;
 
     // Check USDC balance and approve spending
+    const usdc = await getErc20At(addresses.usdc, worker);
     const workerStartingBalance = await usdc.balanceOf(worker.address);
     console.log('Starting Balance:', formatUnits(workerStartingBalance.toString(), 6));
     await usdc.approve(bankProxy.address, workerStartingBalance);
 
     // Deposit the USDC in the Bank
-    await bankProxy.deposit(workerStartingBalance);
+    await bankProxy.connect(worker).deposit(workerStartingBalance);
     const bankBalance = await bankProxy.underlyingBalance();
 
     // Check that tha Bank now has proper amount of USDC deposited
     expect(bankBalance.toString()).eq(workerStartingBalance.toString());
 
-    // Invest the USDC into the strategy
+    // Invest the initial USDC into the strategy
     await manager.finance(bankProxy.address);
-    let strategyBalance = await bankProxy.strategyBalance(0);
-    console.log('Strategy starting balance: ' + formatUnits(strategyBalance.toString(), 6));
+    const startingBalance = await bankProxy.strategyBalance(0);
+    console.log('Strategy starting balance: ' + formatUnits(startingBalance.toString(), 6));
 
-    let rewardBalance;
-    let strategyBankBalance;
+    // loop
     for (let i = 0; i < 3; i++) {
-      const twoDays = 86400 * 2;
       // Simulate 48 hours of waiting
-      await network.provider.send('evm_increaseTime', [twoDays]);
-
-      // Mine the next block 48 hours later
-      await network.provider.send('evm_mine');
+      await advanceNSeconds(TEN_DAYS);
+      await advanceNBlocks(1);
 
       // Check strategy invested balance (also check that the strategy balance through bank is the same)
-      strategyBalance = await aaveV2StrategyProxy.investedBalance();
-      strategyBankBalance = await bankProxy.strategyBalance(0);
-      expect(strategyBalance.toString()).eq(strategyBankBalance.toString());
+      const strategyBalance = await aaveV2StrategyProxy.investedBalance();
+      const strategyBankBalance = await bankProxy.strategyBalance(0);
+      expect(strategyBalance).to.be.eq(strategyBankBalance);
       console.log('Strategy balance [' + i.toString() + ']: ' + formatUnits(strategyBalance.toString(), 6));
 
-      // Check strategy reward balance
-      rewardBalance = await aaveV2StrategyProxy.rewardBalance();
-      console.log('Strategy reward balance: ' + formatUnits(rewardBalance.toString(), 6));
+      // Check strategy staked balance
+      const stakedBalance = await aaveV2StrategyProxy.stakedBalance();
+      console.log('Strategy stkAAVE balance: ' + formatUnits(stakedBalance.toString()));
 
       // Finance will invest underlying (if any), liquidate the rewards to underlying,
       // and re-invest the collected underlying
@@ -95,10 +93,10 @@ describe('AaveV2Strategy', () => {
     console.log('Virtual Price:', formatUnits(virtualPrice.toString(), 6));
 
     const shares = await bankProxy.balanceOf(worker.address);
-    await bankProxy.withdraw(shares.toString());
+    await bankProxy.connect(worker).withdraw(shares.toString());
 
     const workerEndingBalance = await usdc.balanceOf(worker.address);
-    expect(workerStartingBalance.lt(workerEndingBalance)).to.be.true;
+    expect(workerStartingBalance).to.be.lt(workerEndingBalance);
 
     console.log(
       'Starting balance: ' +
