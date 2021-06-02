@@ -8,7 +8,8 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer, usdc, aaveUsdcToken} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('10 - Oh! USDC AaveV2 Strategy');
+  log('12 - Oh! USDC AaveV2 Strategy');
+
   const registry = await ethers.getContract('OhRegistry');
   const ohUsdcBank = await ethers.getContract('OhUsdcBank');
   const proxyAdmin = await ethers.getContract('OhProxyAdmin');

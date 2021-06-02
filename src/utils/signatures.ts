@@ -1,4 +1,4 @@
-import {ethers, network, run} from 'hardhat';
+import {network} from 'hardhat';
 
 export const signMessageData = async (from: string, data: any) => {
   const result = (await network.provider.request({

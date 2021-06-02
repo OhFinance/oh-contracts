@@ -6,7 +6,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('12 - Governor');
+  log('8 - Governor');
 
   const forum = await ethers.getContract('OhForum');
 

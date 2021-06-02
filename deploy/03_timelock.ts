@@ -21,7 +21,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const timelocks = [
     {
-      name: 'Private',
+      name: 'Vesting',
       vest: EIGHT_MONTHS,
     },
     {
@@ -48,8 +48,9 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       timelock.vest, // vest from different schedule
     ];
 
-    const result = await deploy('OhTimelock', {
+    const result = await deploy(`Oh${timelock.name}Timelock`, {
       from: deployer,
+      contract: 'OhTimelock',
       args: constructorArguments,
       log: true,
       deterministicDeployment: false,
@@ -67,7 +68,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   return hre.network.live;
 };
 
-deploy.id = 'timelock_vesting';
+deploy.id = '1';
 deploy.tags = ['OhTimelock'];
 deploy.dependencies = ['OhRegistry', 'OhToken'];
 export default deploy;

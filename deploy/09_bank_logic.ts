@@ -6,7 +6,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('6 - Bank Logic');
+  log('9 - Bank Logic');
 
   await deploy('OhBank', {
     from: deployer,

@@ -1,6 +1,5 @@
 export * from './bank';
 export * from './contract';
-export * from './deploy';
 export * from './forum';
 export * from './manager';
 export * from './registry';

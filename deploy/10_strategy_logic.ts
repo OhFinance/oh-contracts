@@ -6,7 +6,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('7 - Strategy Logic');
+  log('10 - Strategy Logic');
 
   await deploy('OhAaveV2Strategy', {
     from: deployer,
