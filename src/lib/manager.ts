@@ -10,3 +10,8 @@ export const addStrategy = async (deployer: Signer, manager: string, bank: strin
   const managerContract = await getManagerAt(manager, deployer);
   await managerContract.addStrategy(bank, strategy);
 };
+
+export const setLiquidator = async (deployer: Signer, manager: string, liquidator: string, from: string, to: string) => {
+  const managerContract = await getManagerAt(manager, deployer);
+  await managerContract.setLiquidator(liquidator, from, to);
+};

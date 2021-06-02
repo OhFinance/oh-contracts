@@ -11,7 +11,7 @@ describe('OhRegistry', () => {
     govFixture = await governanceFixture();
   });
 
-  it('registry was deployed correctly in core phase', async () => {
+  it('was deployed correctly in core phase', async () => {
     const {registry, deployer} = fixture;
 
     const governorAddress = await registry.governance();
@@ -21,7 +21,7 @@ describe('OhRegistry', () => {
     expect(managerAddress).eq(addresses.zero);
   });
 
-  it('registry was configured correctly in governance phase', async () => {
+  it('was configured correctly in governance phase', async () => {
     const {registry, governor, manager} = govFixture;
 
     await registry.setGovernance(governor.address);
