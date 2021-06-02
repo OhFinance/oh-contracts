@@ -148,47 +148,6 @@ contract OhForum is OhSubscriber, OhForumTypes {
         return _castVote(signatory, proposalId, support);
     }
 
-    function cancel(uint256 proposalId) external {
-        require(state(proposalId) != ProposalState.Executed, "Forum: Proposal Already Executed");
-
-        Proposal storage proposal = proposals[proposalId];
-        require(
-            msg.sender == guardian ||
-                msg.sender == proposal.proposer ||
-                IToken(token).getPriorVotes(proposal.proposer, block.number.sub(1)) < proposalThreshold,
-            "Forum: Valid Proposer"
-        );
-
-        proposal.cancelled = true;
-        for (uint256 i = 0; i < proposal.targets.length; i++) {
-            IGovernor(governance()).cancelTransaction(
-                proposal.targets[i],
-                proposal.values[i],
-                proposal.signatures[i],
-                proposal.calldatas[i],
-                proposal.eta
-            );
-        }
-
-        emit ProposalCancelled(proposalId);
-    }
-
-    function execute(uint256 proposalId) external payable {
-        require(state(proposalId) == ProposalState.Queued, "Forum: Must Be Queued");
-        Proposal storage proposal = proposals[proposalId];
-        proposal.executed = true;
-        for (uint256 i = 0; i < proposal.targets.length; i++) {
-            IGovernor(governance()).executeTransaction{value: proposal.values[i]}(
-                proposal.targets[i],
-                proposal.values[i],
-                proposal.signatures[i],
-                proposal.calldatas[i],
-                proposal.eta
-            );
-        }
-        emit ProposalExecuted(proposalId);
-    }
-
     function propose(
         address[] memory targets,
         uint256[] memory values,
@@ -248,6 +207,47 @@ contract OhForum is OhSubscriber, OhForumTypes {
         }
         proposal.eta = eta;
         emit ProposalQueued(proposalId, eta);
+    }
+
+    function execute(uint256 proposalId) external payable {
+        require(state(proposalId) == ProposalState.Queued, "Forum: Must Be Queued");
+        Proposal storage proposal = proposals[proposalId];
+        proposal.executed = true;
+        for (uint256 i = 0; i < proposal.targets.length; i++) {
+            IGovernor(governance()).executeTransaction{value: proposal.values[i]}(
+                proposal.targets[i],
+                proposal.values[i],
+                proposal.signatures[i],
+                proposal.calldatas[i],
+                proposal.eta
+            );
+        }
+        emit ProposalExecuted(proposalId);
+    }
+
+        function cancel(uint256 proposalId) external {
+        require(state(proposalId) != ProposalState.Executed, "Forum: Proposal Already Executed");
+
+        Proposal storage proposal = proposals[proposalId];
+        require(
+            msg.sender == guardian ||
+                msg.sender == proposal.proposer ||
+                IToken(token).getPriorVotes(proposal.proposer, block.number.sub(1)) < proposalThreshold,
+            "Forum: Valid Proposer"
+        );
+
+        proposal.cancelled = true;
+        for (uint256 i = 0; i < proposal.targets.length; i++) {
+            IGovernor(governance()).cancelTransaction(
+                proposal.targets[i],
+                proposal.values[i],
+                proposal.signatures[i],
+                proposal.calldatas[i],
+                proposal.eta
+            );
+        }
+
+        emit ProposalCancelled(proposalId);
     }
 
     function setProposalThreshold(uint256 _proposalThreshold) external onlyGovernance {

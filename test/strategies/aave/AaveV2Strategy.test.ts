@@ -4,19 +4,20 @@ import {addresses, advanceNBlocks, advanceNSeconds, getDecimalString} from 'util
 import {getErc20At, swapEthForTokens} from 'lib';
 import {formatUnits} from '@ethersproject/units';
 import {ethers} from 'hardhat';
-import {ERC20, IStakedToken} from 'types';
+import {ERC20, IStakedToken, OhAaveV2Strategy, OhBank, OhManager} from 'types';
 import {BigNumber} from '@ethersproject/bignumber';
+import {Signer} from '@ethersproject/abstract-signer';
 
 const ONE_DAY = 86400;
 const TEN_DAYS = ONE_DAY * 10;
 const FIFTEEN_DAYS = ONE_DAY * 15;
 
-describe('AaveV2Strategy', () => {
+describe('AaveV2Strategy', function () {
   let fixture: BankFixture;
   let usdc: ERC20;
   let startingBalance: BigNumber;
 
-  before(async () => {
+  before(async function () {
     fixture = await bankFixture();
     const {manager, worker, bankProxy, aaveV2StrategyProxy} = fixture;
 
@@ -34,7 +35,7 @@ describe('AaveV2Strategy', () => {
     await usdc.approve(bankProxy.address, startingBalance);
   });
 
-  it('deployed and initialized AaveV2 USDC Strategy proxy correctly', async () => {
+  it('deployed and initialized AaveV2 USDC Strategy proxy correctly', async function () {
     const {bankProxy, aaveV2StrategyProxy} = fixture;
 
     const bank = await aaveV2StrategyProxy.bank();
@@ -54,8 +55,8 @@ describe('AaveV2Strategy', () => {
     expect(incentivesController).eq(addresses.aaveIncentivesController);
   });
 
-  it('finances and deposits into AaveV2', async () => {
-    const {bankProxy, worker, aaveV2StrategyProxy} = fixture;
+  it('finances and deposits into AaveV2', async function () {
+    const {bankProxy, worker, manager, aaveV2StrategyProxy} = fixture;
 
     // Deposit the USDC in the Bank
     await bankProxy.connect(worker).deposit(startingBalance);
@@ -69,8 +70,8 @@ describe('AaveV2Strategy', () => {
     expect(await aaveV2StrategyProxy.investedBalance()).to.be.gt(0);
   });
 
-  it('waits until initial cooldown has passed to claim rewards', async () => {
-    const {aaveV2StrategyProxy} = fixture;
+  it('waits until initial cooldown has passed to claim rewards', async function () {
+    const {aaveV2StrategyProxy, bankProxy, manager} = fixture;
 
     // wait 1 day, within initial claim delay
     await advanceNSeconds(ONE_DAY);
@@ -81,8 +82,8 @@ describe('AaveV2Strategy', () => {
     expect(await aaveV2StrategyProxy.stakedBalance()).to.be.eq(0);
   });
 
-  it('claims first batch of rewards and starts unstake cooldown', async () => {
-    const {aaveV2StrategyProxy} = fixture;
+  it('claims first batch of rewards and starts unstake cooldown', async function () {
+    const {aaveV2StrategyProxy, bankProxy, manager, worker} = fixture;
 
     // wait 10 days to pass the initial cooldown
     await advanceNSeconds(TEN_DAYS);
@@ -97,7 +98,7 @@ describe('AaveV2Strategy', () => {
   });
 
   it('unstakes and liquidates rewards after cooldown has passed', async () => {
-    const {aaveV2StrategyProxy} = fixture;
+    const {aaveV2StrategyProxy, bankProxy, manager, worker} = fixture;
 
     // wait 10 days to pass the unstaking cooldown
     await advanceNSeconds(TEN_DAYS);
@@ -119,7 +120,7 @@ describe('AaveV2Strategy', () => {
   });
 
   it('claims more rewards and resets if cooldown has expired', async () => {
-    const {aaveV2StrategyProxy} = fixture;
+    const {aaveV2StrategyProxy, bankProxy, manager, worker} = fixture;
 
     // wait 15 days to pass the expiration
     await advanceNSeconds(FIFTEEN_DAYS);
@@ -167,11 +168,11 @@ describe('AaveV2Strategy', () => {
   };
 
   // verify unstake cooldown is set properly
-  const verifyCooldown = async () => {
+  async function verifyCooldown() {
     const {aaveV2StrategyProxy, worker} = fixture;
 
     const contract = (await ethers.getContractAt('IStakedToken', addresses.aaveStakedToken, worker)) as IStakedToken;
     const cooldown = await contract.stakersCooldowns(aaveV2StrategyProxy.address);
     expect(await aaveV2StrategyProxy.rewardCooldown()).to.be.eq(cooldown.add(TEN_DAYS));
-  };
+  }
 });
