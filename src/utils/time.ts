@@ -1,5 +1,10 @@
 import {ethers} from 'hardhat';
 
+export const ONE_DAY = 86400;
+export const NINE_DAYS = ONE_DAY * 9;
+export const TEN_DAYS = ONE_DAY * 10;
+export const FIFTEEN_DAYS = ONE_DAY * 15;
+
 export const advanceNBlocks = async (n: number) => {
   for (let i = 0; i < n; i++) {
     await ethers.provider.send('evm_mine', []);

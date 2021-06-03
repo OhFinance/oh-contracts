@@ -10,7 +10,6 @@ import {TransferHelper} from "../../libraries/TransferHelper.sol";
 import {OhStrategy} from "../OhStrategy.sol";
 import {OhAaveV2Helper} from "./OhAaveV2Helper.sol";
 import {OhAaveV2StrategyStorage} from "./OhAaveV2StrategyStorage.sol";
-import "hardhat/console.sol";
 
 /// @title Oh! Finance Aave V2 Strategy
 /// @notice Standard strategy using Aave V2 Protocol
@@ -86,9 +85,7 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
     }
 
     /// @dev Compound stkAAVE rewards on a alternating cooldown schedule
-    /// @dev
     function _compound() internal {
-        console.log(block.timestamp);
         uint256 currentCooldown = rewardCooldown();
 
         // if the current cooldown has passed
@@ -108,17 +105,13 @@ contract OhAaveV2Strategy is IStrategy, OhAaveV2Helper, OhStrategy, OhAaveV2Stra
                 if (amount > 0) {
                     // liquidate for underlying
                     liquidate(reward(), underlying(), amount);
-                    console.log("LIQUIDATION: %s", amount);
                 }
             }
-            console.log("IC: %s", incentivesController());
-            console.log("aTOKENs: %s", derivativeBalance());
 
             // claim new batch of available stkAAVE rewards
             claimRewards(incentivesController(), derivative());
 
             balance = stakedBalance();
-            console.log("BALANCE: %s", balance);
             if (balance > 0) {
                 // initiate a new cooldown
                 cooldown(staked);

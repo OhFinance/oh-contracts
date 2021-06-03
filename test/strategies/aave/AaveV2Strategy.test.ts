@@ -1,16 +1,11 @@
 import {expect} from 'chai';
 import {BankFixture, setupBankTest} from 'fixture';
-import {advanceNBlocks, advanceNSeconds, getLatestBlock} from 'utils';
+import {advanceNBlocks, advanceNSeconds, FIFTEEN_DAYS, getLatestBlock, NINE_DAYS, ONE_DAY, TEN_DAYS} from 'utils';
 import {getErc20At, swapEthForTokens} from 'lib';
 import {formatUnits, parseEther} from '@ethersproject/units';
-import {ethers, getNamedAccounts} from 'hardhat';
-import {ERC20, IStakedToken} from 'types';
+import {getNamedAccounts} from 'hardhat';
+import {ERC20} from 'types';
 import {BigNumber} from '@ethersproject/bignumber';
-
-const ONE_DAY = 86400;
-const NINE_DAYS = ONE_DAY * 9;
-const TEN_DAYS = ONE_DAY * 10;
-const FIFTEEN_DAYS = ONE_DAY * 15;
 
 describe('AaveV2Strategy', function () {
   let fixture: BankFixture;

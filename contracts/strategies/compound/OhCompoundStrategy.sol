@@ -48,6 +48,9 @@ contract OhCompoundStrategy is IStrategy, OhCompoundHelper, OhStrategy, OhCompou
         IERC20(derivative_).safeApprove(underlying_, type(uint256).max);
     }
 
+    /// @notice Get the balance of underlying invested by the Strategy
+    /// @dev Get the exchange rate (which is scaled up by 1e18) and multiply by amount of cTokens
+    /// @return The amount of underlying the strategy has invested
     function investedBalance() public view override returns (uint256) {
         uint256 exchangeRate = getExchangeRate(derivative());
         return exchangeRate.mul(derivativeBalance()).div(1e18);
