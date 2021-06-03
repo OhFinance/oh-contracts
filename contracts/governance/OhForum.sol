@@ -225,7 +225,7 @@ contract OhForum is OhSubscriber, OhForumTypes {
         emit ProposalExecuted(proposalId);
     }
 
-        function cancel(uint256 proposalId) external {
+    function cancel(uint256 proposalId) external {
         require(state(proposalId) != ProposalState.Executed, "Forum: Proposal Already Executed");
 
         Proposal storage proposal = proposals[proposalId];

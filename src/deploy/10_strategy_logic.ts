@@ -28,4 +28,5 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 deploy.tags = ['OhStrategy'];
+deploy.dependencies = ['OhBank'];
 export default deploy;

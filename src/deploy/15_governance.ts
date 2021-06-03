@@ -21,14 +21,14 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   return network.live;
 };
 
-deploy.skip = async (hre: HardhatRuntimeEnvironment) => {
-  const {network} = hre;
-  if (!network.live) {
-    return true;
-  } else {
-    return false;
-  }
-};
+// deploy.skip = async (hre: HardhatRuntimeEnvironment) => {
+//   const {network} = hre;
+//   if (!network.live) {
+//     return true;
+//   } else {
+//     return false;
+//   }
+// };
 
 deploy.id = '1';
 deploy.tags = ['OhGovernance'];

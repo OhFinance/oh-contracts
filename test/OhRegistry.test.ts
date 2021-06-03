@@ -3,7 +3,7 @@ import {BaseFixture, ManagementFixture, setupManagementTest, setupTest} from 'fi
 import {getNamedAccounts} from 'hardhat';
 
 describe('OhRegistry', () => {
-  describe('core phase', () => {
+  describe('deployment', () => {
     let fixture: BaseFixture;
 
     before(async () => {
@@ -23,12 +23,11 @@ describe('OhRegistry', () => {
     });
   });
 
-  describe('management phase', () => {
+  describe('post-management', () => {
     let fixture: ManagementFixture;
 
     before(async () => {
       fixture = await setupManagementTest();
-      // managementFixture = await setupManagementTest();
     });
 
     it('set the manager correctly', async () => {
@@ -41,15 +40,5 @@ describe('OhRegistry', () => {
     });
   });
 
-  // it('was configured correctly in governance phase', async () => {
-  //   const {registry, governor, manager} = govFixture;
-
-  //   await registry.setGovernance(governor.address);
-
-  //   const governorAddress = await registry.governance();
-  //   const managerAddress = await registry.manager();
-
-  //   expect(governorAddress).eq(governor.address);
-  //   expect(managerAddress).eq(manager.address);
-  // });
+  describe('post-governance', () => {});
 });

@@ -3,7 +3,7 @@ import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const {deployments, ethers, getNamedAccounts} = hre;
+  const {deployments, ethers, getNamedAccounts, network} = hre;
   const {deployer} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
@@ -18,7 +18,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       registry.address,
       token.address,
       1, // 1 block review
-      17280, // 3 days in blocks
+      network.live ? 17280 : 100, // 3 days in blocks
       parseEther('1000000'), // 1m tokens to propose
     ],
     log: true,

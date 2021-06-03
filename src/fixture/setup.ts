@@ -32,7 +32,7 @@ export const setupManagementTest = deployments.createFixture(async ({deployments
 });
 
 export const setupGovernanceTest = deployments.createFixture(async ({deployments, getNamedAccounts}) => {
-  await deployments.fixture(['OhManager', 'OhLiquidator', 'OhProxyAdmin', 'OhForum', 'OhGovernor']);
+  await deployments.fixture(['OhLiquidator', 'OhProxyAdmin', 'OhForum', 'OhGovernor']);
   const {deployer, worker} = await getNamedAccounts();
 
   return {
@@ -80,6 +80,24 @@ export const setupUsdcBankTest = deployments.createFixture(async ({deployments, 
 
   return {
     deployer: deployerContracts,
+    worker: await getBankContracts(worker),
+  };
+});
+
+export const setupVotingTest = deployments.createFixture(async ({deployments, getNamedAccounts}) => {
+  await deployments.fixture([
+    'OhForum',
+    'OhGovernor',
+    'OhUsdcBank',
+    'OhUsdcAaveV2Strategy',
+    'OhUsdcCompoundStrategy',
+    'OhUsdcCurve3PoolStrategy',
+    'OhGovernance',
+  ]);
+  const {deployer, worker} = await getNamedAccounts();
+
+  return {
+    deployer: await getBankContracts(deployer),
     worker: await getBankContracts(worker),
   };
 });

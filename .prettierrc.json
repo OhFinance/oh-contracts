@@ -14,7 +14,7 @@
     {
       "files": "*.ts",
       "options": {
-        "printWidth": 140
+        "printWidth": 100
       }
     }
   ]

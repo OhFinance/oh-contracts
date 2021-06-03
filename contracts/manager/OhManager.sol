@@ -13,6 +13,7 @@ import {IManager} from "../interfaces/IManager.sol";
 import {IToken} from "../interfaces/IToken.sol";
 import {TransferHelper} from "../libraries/TransferHelper.sol";
 import {OhSubscriber} from "../registry/OhSubscriber.sol";
+import "hardhat/console.sol";
 
 /// @title Oh! Finance Manager
 /// @dev The Manager contains references to all active banks, strategies, and liquidation contracts.
@@ -284,7 +285,7 @@ contract OhManager is OhSubscriber, IManager {
         address _from,
         address _to
     ) external onlyGovernance {
-        require(_liquidator.isContract(), "Registry: Not Contract");
+        require(_liquidator.isContract(), "Manager: Not Contract");
 
         liquidators[_from][_to] = _liquidator;
         emit LiquidatorsUpdated(_liquidator, _from, _to);

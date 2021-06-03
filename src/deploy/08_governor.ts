@@ -1,5 +1,6 @@
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
+import {TWO_DAYS} from 'utils';
 
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, ethers, getNamedAccounts} = hre;
@@ -12,10 +13,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deploy('OhGovernor', {
     from: deployer,
-    args: [
-      forum.address,
-      172800, // 2 days
-    ],
+    args: [forum.address, TWO_DAYS],
     log: true,
   });
 };
