@@ -36,9 +36,9 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  // paths: {
-  //   deploy: ''
-  // },
+  paths: {
+    deploy: './src/deploy',
+  },
   spdxLicenseIdentifier: {
     overwrite: false,
     runOnCompile: true,

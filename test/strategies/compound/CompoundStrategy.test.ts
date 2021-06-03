@@ -1,31 +1,40 @@
 import {expect} from 'chai';
-import {bankFixture, BankFixture} from 'fixture';
-import {addresses} from 'utils';
+import {BankFixture, setupBankTest} from 'fixture';
+import {getNamedAccounts} from 'hardhat';
+import {getErc20At} from 'lib';
+import {ERC20} from 'types';
 
 describe('CompoundStrategy', async () => {
   let fixture: BankFixture;
+  let usdc: ERC20;
 
   before(async () => {
-    fixture = await bankFixture();
-    const {manager, bankProxy, compoundStrategyProxy} = fixture;
+    fixture = await setupBankTest();
+    const {deployer, worker} = fixture;
+    const {manager, usdcBank, usdcCompStrategy} = deployer;
 
-    await manager.setBank(bankProxy.address, true);
-    await manager.addStrategy(bankProxy.address, compoundStrategyProxy.address);
+    const addresses = await getNamedAccounts();
+    usdc = await getErc20At(addresses.usdc, worker.address);
+
+    await manager.setBank(usdcBank.address, true);
+    await manager.addStrategy(usdcBank.address, usdcCompStrategy.address);
   });
 
   it('deployed and initialized Compound USDC Strategy proxy correctly', async () => {
-    const {bankProxy, compoundStrategyProxy} = fixture;
+    const {deployer} = fixture;
+    const {usdcBank, usdcCompStrategy} = deployer;
 
-    const bank = await compoundStrategyProxy.bank();
-    const underlying = await compoundStrategyProxy.underlying();
-    const derivative = await compoundStrategyProxy.derivative();
-    const reward = await compoundStrategyProxy.reward();
-    const comptroller = await compoundStrategyProxy.comptroller();
+    const {compUsdcToken, comp, compComptroller} = await getNamedAccounts();
+    const bank = await usdcCompStrategy.bank();
+    const underlying = await usdcCompStrategy.underlying();
+    const derivative = await usdcCompStrategy.derivative();
+    const reward = await usdcCompStrategy.reward();
+    const comptroller = await usdcCompStrategy.comptroller();
 
-    expect(bank).eq(bankProxy.address);
-    expect(underlying).eq(addresses.usdc);
-    expect(derivative).eq(addresses.compUsdcToken);
-    expect(reward).eq(addresses.comp);
-    expect(comptroller).eq(addresses.compComptroller);
+    expect(bank).eq(usdcBank.address);
+    expect(underlying).eq(usdc.address);
+    expect(derivative).eq(compUsdcToken);
+    expect(reward).eq(comp);
+    expect(comptroller).eq(compComptroller);
   });
 });

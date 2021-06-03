@@ -1,34 +1,44 @@
 import {expect} from 'chai';
-import {addresses} from 'utils';
 import {BaseFixture, ManagementFixture, setupManagementTest, setupTest} from 'fixture';
+import {getNamedAccounts} from 'hardhat';
 
 describe('OhRegistry', () => {
-  let fixture: BaseFixture;
-  let managementFixture: ManagementFixture;
+  describe('core phase', () => {
+    let fixture: BaseFixture;
 
-  before(async () => {
-    fixture = await setupTest();
-    managementFixture = await setupManagementTest();
+    before(async () => {
+      fixture = await setupTest();
+    });
+
+    it('was deployed correctly', async () => {
+      const {deployer} = fixture;
+      const {registry} = deployer;
+
+      const {zero} = await getNamedAccounts();
+      const governorAddress = await registry.governance();
+      const managerAddress = await registry.manager();
+
+      expect(governorAddress).eq(deployer.address);
+      expect(managerAddress).eq(zero);
+    });
   });
 
-  it('was deployed correctly in core phase', async () => {
-    const {deployer} = fixture;
-    const {registry} = deployer;
+  describe('management phase', () => {
+    let fixture: ManagementFixture;
 
-    const governorAddress = await registry.governance();
-    const managerAddress = await registry.manager();
+    before(async () => {
+      fixture = await setupManagementTest();
+      // managementFixture = await setupManagementTest();
+    });
 
-    expect(governorAddress).eq(deployer.address);
-    expect(managerAddress).eq(addresses.zero);
-  });
+    it('set the manager correctly', async () => {
+      const {deployer} = fixture;
+      const {registry, manager} = deployer;
 
-  it('set the manager correctly during deployment', async () => {
-    const {deployer} = managementFixture;
-    const {registry, manager} = deployer;
+      const managerAddress = await registry.manager();
 
-    const managerAddress = await registry.manager();
-
-    expect(managerAddress).eq(manager.address);
+      expect(managerAddress).eq(manager.address);
+    });
   });
 
   // it('was configured correctly in governance phase', async () => {

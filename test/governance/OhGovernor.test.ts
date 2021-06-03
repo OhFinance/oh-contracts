@@ -1,17 +1,16 @@
 import {expect} from 'chai';
-import {ethers} from 'hardhat';
-import {governanceFixture, GovernanceFixture} from 'fixture';
+import {GovernanceFixture, setupGovernanceTest} from 'fixture';
 
 describe('OhGovernor', () => {
   let fixture: GovernanceFixture;
 
   before(async () => {
-    const [deployer] = await ethers.getSigners();
-    fixture = await governanceFixture();
+    fixture = await setupGovernanceTest();
   });
 
-  it('governor is deployed correctly', async () => {
-    const {governor, forum} = fixture;
+  it('is deployed correctly', async () => {
+    const {deployer} = fixture;
+    const {governor, forum} = deployer;
 
     const admin = await governor.admin();
     const delay = await governor.delay();

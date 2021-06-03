@@ -1,45 +1,52 @@
-import {addresses, getDecimalString, signMessageData} from 'utils';
-import {BankFixture, bankFixture, ohUsdcFixture, OhUsdcFixture} from 'fixture';
+import {signMessageData} from 'utils';
+import {BankFixture, setupUsdcBankTest} from 'fixture';
 import {expect} from 'chai';
 import {getErc20At, getPermitMessageData, swapEthForTokens} from 'lib';
 import {ERC20} from 'types';
+import {getNamedAccounts} from 'hardhat';
+import {parseEther} from '@ethersproject/units';
 
 describe('OhBank', () => {
   let fixture: BankFixture;
-  let usdcFixture: OhUsdcFixture;
   let usdc: ERC20;
 
   before(async () => {
-    fixture = await bankFixture();
-    usdcFixture = await ohUsdcFixture();
-    usdc = await getErc20At(addresses.usdc, usdcFixture.worker);
+    const addresses = await getNamedAccounts();
+
+    fixture = await setupUsdcBankTest();
+
+    const {worker} = fixture;
+
+    usdc = await getErc20At(addresses.usdc, worker.address);
 
     // buy usdc for worker to use in tests
-    await swapEthForTokens(fixture.worker, addresses.usdc, getDecimalString(100));
+    await swapEthForTokens(worker.address, addresses.usdc, parseEther('100'));
   });
 
   it('logic prevents initialization after deployment', async () => {
-    const {bankLogic, worker, registry} = fixture;
-    const bankLogicWorker = bankLogic.connect(worker);
+    const {worker} = fixture;
+    const {bank, registry} = worker;
 
-    expect(bankLogicWorker.initializeBank('Test', 'TEST', registry.address, addresses.usdc)).to.be.reverted;
+    // try to initialize the bank
+    expect(bank.initializeBank('Test', 'TEST', registry.address, usdc.address)).to.be.reverted;
   });
 
   it('permits transfers with signature', async () => {
-    let {bankProxy, deployer, worker} = usdcFixture;
+    const {deployer, worker} = fixture;
+    const {usdcBank} = worker;
 
     // connect to worker, deposit usdc to get shares
-    const bankProxyWorker = bankProxy.connect(worker);
     const balance = await usdc.balanceOf(worker.address);
-    await usdc.approve(bankProxyWorker.address, balance);
-    await bankProxyWorker.deposit(balance);
+    await usdc.approve(usdcBank.address, balance);
+
+    await usdcBank.deposit(balance);
 
     // get permit message data and sign with the worker
-    const shares = await bankProxy.balanceOf(worker.address);
+    const shares = await usdcBank.balanceOf(worker.address);
     const {message, data} = getPermitMessageData(
       'Oh! USDC',
       '1',
-      bankProxy.address,
+      usdcBank.address,
       worker.address,
       deployer.address,
       shares.toString(),
@@ -48,13 +55,13 @@ describe('OhBank', () => {
     );
     const {v, r, s} = await signMessageData(worker.address, data);
 
-    // transfer away from worker
-    await bankProxy.permit(worker.address, deployer.address, message.value, message.deadline, v, r, s);
-    await bankProxy.transferFrom(worker.address, deployer.address, message.value);
+    // use deployer and transfer from worker
+    await deployer.usdcBank.permit(worker.address, deployer.address, message.value, message.deadline, v, r, s);
+    await deployer.usdcBank.transferFrom(worker.address, deployer.address, message.value);
 
-    const received = await bankProxy.balanceOf(deployer.address);
-    const allowance = await bankProxy.allowance(worker.address, deployer.address);
-    const nonces = await bankProxy.nonces(worker.address);
+    const received = await usdcBank.balanceOf(deployer.address);
+    const allowance = await usdcBank.allowance(worker.address, deployer.address);
+    const nonces = await usdcBank.nonces(worker.address);
 
     expect(received.toString()).eq(shares.toString());
     expect(allowance.toNumber()).eq(0);

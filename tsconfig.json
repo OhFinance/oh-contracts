@@ -19,7 +19,6 @@
   ],
   "include": [
     "src",
-    "deploy",
     "test"
   ],
   "exclude": ["node_modules"]

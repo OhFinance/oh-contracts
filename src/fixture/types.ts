@@ -30,6 +30,27 @@ export interface VestingAccount extends BaseAccount {
 export interface ManagementAccount extends BaseAccount {
   manager: OhManager;
   liquidator: OhLiquidator;
+  proxyAdmin: OhProxyAdmin;
+}
+
+export interface GovernanceAccount extends ManagementAccount {
+  forum: OhForum;
+  governor: OhGovernor;
+}
+
+export interface BankAccount extends GovernanceAccount {
+  bank: OhBank;
+  aaveV2Strategy: OhAaveV2Strategy;
+  compStrategy: OhCompoundStrategy;
+  crv3PoolStrategy: OhCurve3PoolStrategy;
+  usdcBankProxy: OhUpgradeableProxy;
+  usdcAaveV2StrategyProxy: OhUpgradeableProxy;
+  usdcCompStrategyProxy: OhUpgradeableProxy;
+  usdcCrv3PoolStrategyProxy: OhUpgradeableProxy;
+  usdcBank: OhBank;
+  usdcAaveV2Strategy: OhAaveV2Strategy;
+  usdcCompStrategy: OhCompoundStrategy;
+  usdcCrv3PoolStrategy: OhCurve3PoolStrategy;
 }
 
 export interface BaseFixture {
@@ -45,6 +66,16 @@ export interface VestingFixture {
 export interface ManagementFixture {
   deployer: ManagementAccount;
   worker: ManagementAccount;
+}
+
+export interface GovernanceFixture {
+  deployer: GovernanceAccount;
+  worker: GovernanceAccount;
+}
+
+export interface BankFixture {
+  deployer: BankAccount;
+  worker: BankAccount;
 }
 
 // export interface CoreFixture {

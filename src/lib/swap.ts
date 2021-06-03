@@ -1,19 +1,19 @@
-import {Signer} from 'ethers';
-import {ethers} from 'hardhat';
+import {BigNumberish} from 'ethers';
+import {ethers, getNamedAccounts} from 'hardhat';
 import {IUniswapV2Router02} from 'types';
-import {addresses} from 'utils';
 
-export const getUniswapV2Router = async (deployer: Signer) => {
-  const router = (await ethers.getContractAt('IUniswapV2Router02', addresses.uniswapV2, deployer)) as IUniswapV2Router02;
+export const getUniswapV2Router = async (signer: string) => {
+  const {uniswapV2} = await getNamedAccounts();
+  const router = (await ethers.getContractAt('IUniswapV2Router02', uniswapV2, signer)) as IUniswapV2Router02;
   return router;
 };
 
-export const swapEthForTokens = async (deployer: Signer, token: string, value: string) => {
-  const router = await getUniswapV2Router(deployer);
-  const address = await deployer.getAddress();
-  const path = [addresses.weth, token];
+export const swapEthForTokens = async (signer: string, token: string, value: BigNumberish) => {
+  const {weth} = await getNamedAccounts();
+  const router = await getUniswapV2Router(signer);
+  const path = [weth, token];
 
-  await router.swapExactETHForTokens(0, path, address, Date.now() + 1000, {
+  await router.swapExactETHForTokens(0, path, signer, Date.now() + 1000, {
     value: value,
   });
 };

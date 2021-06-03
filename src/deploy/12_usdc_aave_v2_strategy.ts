@@ -1,24 +1,25 @@
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
-import {getInitializeCompoundStrategyData} from 'lib';
+import {getInitializeAaveV2StrategyData} from 'lib';
 
 // deploy the Oh! USDC Bank Proxies
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, ethers, getNamedAccounts, network, run} = hre;
-  const {deployer, usdc, compUsdcToken} = await getNamedAccounts();
+  const {deployer, usdc, aaveUsdcToken} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('13 - Oh! USDC Compound Strategy');
+  log('12 - Oh! USDC AaveV2 Strategy');
 
   const registry = await ethers.getContract('OhRegistry');
   const ohUsdcBank = await ethers.getContract('OhUsdcBank');
   const proxyAdmin = await ethers.getContract('OhProxyAdmin');
-  const aaveV2Logic = await ethers.getContract('OhCompoundStrategy');
+  const aaveV2Logic = await ethers.getContract('OhAaveV2Strategy');
 
-  const data = getInitializeCompoundStrategyData(registry.address, ohUsdcBank.address, usdc, compUsdcToken);
+  // build the data's for the strategies
+  const data = await getInitializeAaveV2StrategyData(registry.address, ohUsdcBank.address, usdc, aaveUsdcToken);
   const constructorArgs = [aaveV2Logic.address, proxyAdmin.address, data];
 
-  const result = await deploy('OhUsdcCompoundStrategy', {
+  const result = await deploy('OhUsdcAaveV2Strategy', {
     from: deployer,
     contract: 'OhUpgradeableProxy',
     args: constructorArgs,
@@ -36,6 +37,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 };
 
-deploy.tags = ['OhUsdcCompoundStrategy'];
-deploy.dependencies = ['OhRegistry', 'OhProxyAdmin', 'OhCompoundStrategy', 'OhUsdcBank'];
+deploy.tags = ['OhUsdcAaveV2Strategy'];
+deploy.dependencies = ['OhRegistry', 'OhProxyAdmin', 'OhStrategy', 'OhUsdcBank'];
 export default deploy;

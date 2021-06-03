@@ -1,7 +1,7 @@
 import {setupVestingTest, VestingFixture} from 'fixture';
 import {expect} from 'chai';
-import {addresses, advanceNBlocks, advanceNSeconds, advanceToTimestamp, getLatestBlock} from 'utils';
-import {ethers} from 'hardhat';
+import {advanceNBlocks, advanceNSeconds, advanceToTimestamp, getLatestBlock} from 'utils';
+import {ethers, getNamedAccounts} from 'hardhat';
 
 describe('OhTimelock', () => {
   let fixture: VestingFixture;
@@ -30,12 +30,13 @@ describe('OhTimelock', () => {
     const {deployer} = fixture;
     const {foundation, registry, token} = deployer;
 
+    const {treasury} = await getNamedAccounts();
     const timestamp = (await getLatestBlock()).timestamp;
     const registryAddress = await foundation.registry();
     const tokenAddress = await foundation.token();
     const start = await foundation.timelockStart();
     const length = await foundation.timelockLength();
-    const amount = await foundation.balances(addresses.treasury);
+    const amount = await foundation.balances(treasury);
 
     expect(registryAddress).eq(registry.address);
     expect(tokenAddress).eq(token.address);
@@ -48,13 +49,14 @@ describe('OhTimelock', () => {
     const {deployer} = fixture;
     const {growth, registry, token} = deployer;
 
+    const {community, strategic} = await getNamedAccounts();
     const timestamp = (await getLatestBlock()).timestamp;
     const registryAddress = await growth.registry();
     const tokenAddress = await growth.token();
     const start = await growth.timelockStart();
     const length = await growth.timelockLength();
-    const community = await growth.balances(addresses.community);
-    const strategic = await growth.balances(addresses.strategic);
+    // const communityAmount = await growth.balances(community);
+    // const strategicAmount = await growth.balances(strategic);
 
     expect(registryAddress).eq(registry.address);
     expect(tokenAddress).eq(token.address);
