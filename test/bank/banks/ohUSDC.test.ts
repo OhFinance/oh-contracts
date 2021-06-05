@@ -1,7 +1,7 @@
 import {expect} from 'chai';
-import {signMessageData} from 'utils';
+import {signMessageData, swapEthForTokens} from 'utils';
 import {BankFixture, setupUsdcBankTest} from 'fixture';
-import {getErc20At, getPermitMessageData, swapEthForTokens} from 'lib';
+import {getErc20At, getPermitMessageData} from 'lib';
 import {ERC20} from 'types';
 import {formatUnits, parseEther} from '@ethersproject/units';
 import {getNamedAccounts} from 'hardhat';

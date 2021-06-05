@@ -183,7 +183,8 @@ contract OhManager is OhSubscriber, IManager {
         address liquidator = liquidators[from][_token];
         uint256 amount = IERC20(from).balanceOf(address(this));
 
-        // buyback and burn
+        // send to liquidator, buyback and burn
+        TransferHelper.safeTokenTransfer(liquidator, from, amount);
         uint256 received = ILiquidator(liquidator).liquidate(address(this), from, _token, amount, 1);
         IToken(_token).burn(received);
 

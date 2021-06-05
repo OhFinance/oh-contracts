@@ -1,7 +1,7 @@
-import {signMessageData} from 'utils';
+import {signMessageData, swapEthForTokens} from 'utils';
 import {BankFixture, setupUsdcBankTest} from 'fixture';
 import {expect} from 'chai';
-import {getErc20At, getPermitMessageData, swapEthForTokens} from 'lib';
+import {getErc20At, getPermitMessageData} from 'lib';
 import {ERC20} from 'types';
 import {getNamedAccounts} from 'hardhat';
 import {parseEther} from '@ethersproject/units';
@@ -56,7 +56,15 @@ describe('OhBank', () => {
     const {v, r, s} = await signMessageData(worker.address, data);
 
     // use deployer and transfer from worker
-    await deployer.usdcBank.permit(worker.address, deployer.address, message.value, message.deadline, v, r, s);
+    await deployer.usdcBank.permit(
+      worker.address,
+      deployer.address,
+      message.value,
+      message.deadline,
+      v,
+      r,
+      s
+    );
     await deployer.usdcBank.transferFrom(worker.address, deployer.address, message.value);
 
     const received = await usdcBank.balanceOf(deployer.address);

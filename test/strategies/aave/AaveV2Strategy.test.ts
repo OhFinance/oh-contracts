@@ -1,7 +1,16 @@
 import {expect} from 'chai';
 import {BankFixture, setupBankTest} from 'fixture';
-import {advanceNBlocks, advanceNSeconds, FIFTEEN_DAYS, getLatestBlock, NINE_DAYS, ONE_DAY, TEN_DAYS} from 'utils';
-import {getErc20At, swapEthForTokens} from 'lib';
+import {
+  advanceNBlocks,
+  advanceNSeconds,
+  FIFTEEN_DAYS,
+  getLatestBlock,
+  NINE_DAYS,
+  ONE_DAY,
+  TEN_DAYS,
+} from 'utils';
+import {getErc20At} from 'lib';
+import {swapEthForTokens} from 'utils';
 import {formatUnits, parseEther} from '@ethersproject/units';
 import {getNamedAccounts} from 'hardhat';
 import {ERC20} from 'types';
@@ -36,7 +45,8 @@ describe('AaveV2Strategy', function () {
     const {deployer} = fixture;
     const {usdcBank, usdcAaveV2Strategy} = deployer;
 
-    const {aaveUsdcToken, aave, aaveStakedToken, aaveLendingPool, aaveIncentivesController} = await getNamedAccounts();
+    const {aaveUsdcToken, aave, aaveStakedToken, aaveLendingPool, aaveIncentivesController} =
+      await getNamedAccounts();
     const bank = await usdcAaveV2Strategy.bank();
     const underlying = await usdcAaveV2Strategy.underlying();
     const derivative = await usdcAaveV2Strategy.derivative();
@@ -125,8 +135,8 @@ describe('AaveV2Strategy', function () {
     await advanceNBlocks(1);
 
     // finance to unstake stkAAVE to AAVE and trigger liquidation
-    const liquidated = await usdcAaveV2Strategy.stakedBalance();
-    const balanceBefore = await usdcAaveV2Strategy.investedBalance();
+    const investedBefore = await usdcAaveV2Strategy.investedBalance();
+    const balanceBefore = await usdc.balanceOf(worker.address);
 
     await manager.finance(usdcBank.address);
 
@@ -134,14 +144,30 @@ describe('AaveV2Strategy', function () {
     const rewardCooldown = await usdcAaveV2Strategy.rewardCooldown();
     const stakedBalance = await usdcAaveV2Strategy.stakedBalance();
 
-    const balanceAfter = await usdcAaveV2Strategy.investedBalance();
-    console.log('Liquidated', formatUnits(liquidated), 'stkAAVE for', formatUnits(balanceAfter.sub(balanceBefore), 6), 'USDC');
+    const investedAfter = await usdcAaveV2Strategy.investedBalance();
+    console.log('Compounded AAVE for', formatUnits(investedAfter.sub(investedBefore), 6), 'USDC');
+
+    const buybackBalance = await usdc.balanceOf(manager.address);
+    console.log(
+      'Manager received',
+      formatUnits(buybackBalance, 6),
+      'USDC for performing token buybacks'
+    );
+
+    const balanceAfter = await usdc.balanceOf(worker.address);
+    console.log(
+      'Worker received',
+      formatUnits(balanceAfter.sub(balanceBefore), 6),
+      'USDC for performing liquidation'
+    );
 
     const strategyBalance = await usdcBank.strategyBalance(0);
     console.log('Strategy Balance: ' + formatUnits(strategyBalance.toString(), 6));
 
-    // expect liquidation was profitable
+    // expect liquidation was profitable and fees were paid out
+    expect(investedAfter).to.be.gt(investedBefore);
     expect(balanceAfter).to.be.gt(balanceBefore);
+    expect(buybackBalance).to.be.gt(0);
 
     // verify we claimed more stkAAVE and reset the cooldown
     expect(rewardCooldown).to.be.gt(timestamp + NINE_DAYS);

@@ -3,7 +3,8 @@ import {expect} from 'chai';
 import {BigNumber} from 'ethers';
 import {BankFixture, setupBankTest} from 'fixture';
 import {getNamedAccounts} from 'hardhat';
-import {getErc20At, swapEthForTokens} from 'lib';
+import {getErc20At} from 'lib';
+import {swapEthForTokens} from 'utils';
 import {ERC20} from 'types';
 import {advanceNBlocks, advanceNSeconds, TEN_DAYS} from 'utils';
 
