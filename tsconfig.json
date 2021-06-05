@@ -11,7 +11,7 @@
     "baseUrl": "src",
     "paths": {
       "abi/*": ["../abi/*"], // imports are relative to baseUrl
-      "types": ["../types"]
+      "types": ["../types/ethers"]
     }
   },
   "files": [

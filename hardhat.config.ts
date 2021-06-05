@@ -57,8 +57,8 @@ const config: HardhatUserConfig = {
     path: './docs',
   },
   typechain: {
-    outDir: 'types',
-    target: 'ethers-v5',
+    outDir: !!process.env.WEB3_TYPES ? 'types/web3' : 'types/ethers',
+    target: !!process.env.WEB3_TYPES ? 'web3-v1' : 'ethers-v5',
   },
   gasReporter: {
     currency: 'usd',
