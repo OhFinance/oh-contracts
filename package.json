@@ -1,9 +1,9 @@
 {
   "name": "@ohfinance/oh-contracts",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Oh! Finance Ethereum Smart Contracts",
   "homepage": "https://oh.finance",
-  "repository": "https://github.com/OhFinance/contracts",
+  "repository": "https://github.com/OhFinance/oh-contracts",
   "author": "OhFinance <hello@oh.finance>",
   "license": "MIT",
   "types": "types/ethers/index.ts",
