@@ -47,7 +47,7 @@ const config: HardhatUserConfig = {
     timeout: 1200000,
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_KEY || '',
+    apiKey: process.env.ETHERSCAN_API_KEY || '',
   },
   abiExporter: {
     flat: true,
@@ -63,7 +63,7 @@ const config: HardhatUserConfig = {
   gasReporter: {
     currency: 'usd',
     enabled: !!process.env.REPORT_GAS,
-    coinmarketcap: process.env.COINMARKETCAP_KEY || '',
+    coinmarketcap: process.env.CMC_API_KEY || '',
   },
   namedAccounts: {
     deployer: 0,
@@ -132,27 +132,27 @@ const config: HardhatUserConfig = {
     },
     hardhat: {
       live: false,
-      chainId: 1, //31337,
+      chainId: 1,
       forking: {
         // enabled: false,
         blockNumber: 12495621,
-        url: process.env.ALCHEMY_MAIN_KEY || '',
+        url: process.env.MAINNET_NODE_URL || '',
       },
     },
     rinkeby: {
-      url: process.env.ALCHEMY_RINKEBY_KEY || '',
+      url: process.env.RINKEBY_NODE_URL || '',
       chainId: 4,
-      accounts: process.env.DEPLOYER_RINKEBY_KEY ? [`0x${process.env.DEPLOYER_RINKEBY_KEY}`] : [],
+      accounts: process.env.TESTNET_DEPLOYER_KEY ? [`0x${process.env.TESTNET_DEPLOYER_KEY}`] : [],
     },
     kovan: {
-      url: process.env.ALCHEMY_KOVAN_KEY || '',
+      url: process.env.KOVAN_NODE_URL || '',
       chainId: 42,
-      accounts: process.env.DEPLOYER_KOVAN_KEY ? [`0x${process.env.DEPLOYER_KOVAN_KEY}`] : [],
+      accounts: process.env.TESTNET_DEPLOYER_KEY ? [`0x${process.env.TESTNET_DEPLOYER_KEY}`] : [],
     },
     mainnet: {
-      url: process.env.ALCHEMY_MAIN_KEY || '',
+      url: process.env.MAINNET_NODE_URL || '',
       chainId: 1,
-      accounts: process.env.DEPLOYER_MAIN_KEY ? [`0x${process.env.DEPLOYER_MAIN_KEY}`] : [],
+      accounts: process.env.DEPLOYER_KEY ? [`0x${process.env.DEPLOYER_PRIVATE_KEY}`] : [],
     },
   },
 };

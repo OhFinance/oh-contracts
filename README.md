@@ -10,16 +10,32 @@ Oh! Finance Ethereum Smart Contracts, written with Hardhat.
 yarn install
 ```
 
-2. Compile contracts & build artifacts with Hardhat
+2. Set environment variables. Create a `.env` file at the project root and paste the contents of `.env.example`. Add required and desired optional variables.
+
+- `MAINNET_NODE_URL`: **Required** - Mainnet archive node URL provided by Alchemy. Required for running tests that rely on locally forked mainnet.
+- `RINKEBY_NODE_URL`: _Optional_ - Rinkeby archive node URL provided by Alchemy. Required for running any Rinkeby deployments.
+- `KOVAN_NODE_URL`: _Optional_ - Kovan archive node URL provided by Alchemy. Required for running any Kovan deployments.
+- `ETHERSCAN_API_KEY`: _Optional_ - Etherscan API Key used for verifying contracts. Required for running any live network deployment.
+- `CMC_API_KEY`: _Optional_ - CoinMarketCap API Key used to output gas usage in USD using live ETH prices.
+- `DEPLOYER_KEY`: _Optional_ - Mainnet Deployer Private Key. Required for live mainnet deployments.
+- `TESTNET_DEPLOYER_KEY`: _Optional_ - Testnet Deployer Private Key. Required for live testnet deployments.
+
+3. Compile contracts & build artifacts with Hardhat
 
 ```
 yarn compile
 ```
 
-3. Run tests with Mocha
+4. Run tests with Mocha
 
 ```
+# Run the entire test suite
 yarn test
+
+# Run the entire test suite and output gas usage report
+yarn test:gas
+
+# Run a single file of tests
 yarn test test/OhToken.test.ts
 ```
 
