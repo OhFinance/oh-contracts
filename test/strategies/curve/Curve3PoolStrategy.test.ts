@@ -21,7 +21,7 @@ describe('Curve3PoolStrategy', () => {
     usdc = await getErc20At(addresses.usdc, worker.address);
 
     await manager.setBank(usdcBank.address, true);
-    await manager.addStrategy(usdcBank.address, usdcCrv3PoolStrategy.address);
+    await manager.setStrategy(usdcBank.address, usdcCrv3PoolStrategy.address, true);
 
     // Buy USDC using the worker wallet
     await swapEthForTokens(worker.address, addresses.usdc, parseEther('100'));

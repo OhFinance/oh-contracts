@@ -9,11 +9,12 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   log('8 - Governor');
 
+  const registry = await ethers.getContract('OhRegistry');
   const forum = await ethers.getContract('OhForum');
 
   await deploy('OhGovernor', {
     from: deployer,
-    args: [forum.address, TWO_DAYS],
+    args: [registry.address, forum.address, TWO_DAYS],
     log: true,
   });
 };

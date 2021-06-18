@@ -4,7 +4,7 @@ import {BigNumber} from 'ethers';
 import {BankFixture, setupBankTest} from 'fixture';
 import {getNamedAccounts} from 'hardhat';
 import {getErc20At} from 'lib';
-import {swapEthForTokens} from 'utils';
+import {ONE_DAY, swapEthForTokens} from 'utils';
 import {ERC20} from 'types';
 import {advanceNBlocks, advanceNSeconds, TEN_DAYS} from 'utils';
 
@@ -22,7 +22,7 @@ describe('CompoundStrategy', () => {
     usdc = await getErc20At(addresses.usdc, worker.address);
 
     await manager.setBank(usdcBank.address, true);
-    await manager.addStrategy(usdcBank.address, usdcCompStrategy.address);
+    await manager.setStrategy(usdcBank.address, usdcCompStrategy.address, true);
 
     // Buy USDC using the worker wallet
     await swapEthForTokens(worker.address, addresses.usdc, parseEther('100'));
@@ -76,6 +76,7 @@ describe('CompoundStrategy', () => {
     const {manager, usdcBank, usdcCompStrategy} = worker;
 
     // wait ~1 day in blocks to accrue rewards (comptroller rewards are block-based)
+    await advanceNSeconds(ONE_DAY);
     await advanceNBlocks(6000);
 
     // finance to claim COMP and trigger liquidation

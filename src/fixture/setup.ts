@@ -74,9 +74,9 @@ export const setupUsdcBankTest = deployments.createFixture(async ({deployments, 
 
   // add the bank to the manager to enable deposits
   await manager.setBank(usdcBank.address, true);
-  await manager.addStrategy(usdcBank.address, usdcAaveV2Strategy.address);
-  await manager.addStrategy(usdcBank.address, usdcCompStrategy.address);
-  await manager.addStrategy(usdcBank.address, usdcCrv3PoolStrategy.address);
+  await manager.setStrategy(usdcBank.address, usdcAaveV2Strategy.address, true);
+  await manager.setStrategy(usdcBank.address, usdcCompStrategy.address, true);
+  await manager.setStrategy(usdcBank.address, usdcCrv3PoolStrategy.address, true);
 
   return {
     deployer: deployerContracts,

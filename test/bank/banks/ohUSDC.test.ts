@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {signMessageData, swapEthForTokens} from 'utils';
+import {advanceNBlocks, advanceNSeconds, ONE_DAY, signMessageData, swapEthForTokens} from 'utils';
 import {BankFixture, setupUsdcBankTest} from 'fixture';
 import {getErc20At, getPermitMessageData} from 'lib';
 import {ERC20} from 'types';
@@ -117,6 +117,9 @@ describe('ohUSDC', () => {
       console.log('Balance:', strategyBalance.toString());
 
       expect(strategyBalance).to.be.gt(0);
+
+      await advanceNSeconds(ONE_DAY);
+      await advanceNBlocks(1);
     }
 
     const virtualBalance = await usdcBank.virtualBalance();

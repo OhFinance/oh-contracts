@@ -74,8 +74,8 @@ describe('OhForum', () => {
 
       // execute and assert
       await forum.execute(1);
-      const approved = await manager.banks(usdcBank.address);
-      expect(approved).to.be.true;
+      const usdcBankAddress = await manager.banks(0);
+      expect(usdcBankAddress).eq(usdcBank.address);
     });
 
     it('accepts proposal to add strategy and set liquidator', async () => {
@@ -83,9 +83,9 @@ describe('OhForum', () => {
       const {forum, manager, liquidator, token, usdcBank, aaveV2Strategy} = deployer;
       const {aave, weth, usdc} = await getNamedAccounts();
 
-      const addStrategyData = getCallData(
-        ['address', 'address'],
-        [usdcBank.address, aaveV2Strategy.address]
+      const setStrategyData = getCallData(
+        ['address', 'address', 'bool'],
+        [usdcBank.address, aaveV2Strategy.address, true]
       );
       const aaveRoutesData = getCallData(
         ['address', 'address', 'address[]'],
@@ -109,14 +109,14 @@ describe('OhForum', () => {
         [manager.address, liquidator.address, liquidator.address, manager.address, manager.address],
         [0, 0, 0, 0, 0],
         [
-          'addStrategy(address,address)',
+          'setStrategy(address,address,bool)',
           'setSushiswapRoutes(address,address,address[])',
           'setSushiswapRoutes(address,address,address[])',
           'setLiquidator(address,address,address)',
           'setLiquidator(address,address,address)',
         ],
         [
-          addStrategyData,
+          setStrategyData,
           aaveRoutesData,
           buybackRoutesData,
           aaveLiquidatorData,

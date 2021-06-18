@@ -250,7 +250,7 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
         emit Withdraw(user, withdrawAmount);
     }
 
-    // withdraw all underlying to the bank
+    /// @dev Withdraw all underlying to the bank
     function _withdrawAll() internal {
         uint256 length = totalStrategies();
         for (uint256 i = 0; i < length; i++) {
@@ -258,16 +258,41 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
         }
     }
 
-    // withdraw from each strategy until remaining amount is reached
+    /// @dev Withdraw from each strategy until remaining amount is reached
     function _withdrawRemaining(uint256 amount) internal {
+        address manager = manager();
+        uint256 index = IManager(manager).withdrawIndex(address(this));
         uint256 length = totalStrategies();
-        for (uint256 i = 0; i < length; i++) {
-            uint256 withdrawn = IStrategy(strategies(i)).withdraw(amount);
-            if (withdrawn < amount) {
-                amount = amount.sub(withdrawn);
+        uint256 i = 0;
+        
+        // while we haven't withdrawn from each Strategy and we haven't withdrawn the total amount
+        while(i < length && amount > 0) {
+            // perform the Strategy withdrawal
+            uint256 withdrawn = IStrategy(strategies(index)).withdraw(amount);
+            
+            // update variables
+            amount = amount.sub(withdrawn);
+            i = i + 1;
+
+            // increment Strategy index or restart
+            if (index - 1 == length) {
+                index = 0;
             } else {
-                return;
+                index = index + 1;
             }
         }
+
+        // update withdrawal index
+        IManager(manager).setWithdrawIndex(index);
+        
+        
+        // for (uint256 i = 0; i < length; i++) {
+        //     uint256 withdrawn = IStrategy(strategies(i)).withdraw(amount);
+        //     if (withdrawn < amount) {
+        //         amount = amount.sub(withdrawn);
+        //     } else {
+        //         return;
+        //     }
+        // }
     }
 }

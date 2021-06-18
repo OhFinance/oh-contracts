@@ -6,6 +6,7 @@ pragma experimental ABIEncoderV2;
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {IForum} from "../interfaces/IForum.sol";
 import {IGovernor} from "../interfaces/IGovernor.sol";
+import {IManager} from "../interfaces/IManager.sol";
 import {IRegistry} from "../interfaces/IRegistry.sol";
 import {IToken} from "../interfaces/IToken.sol";
 import {OhSubscriber} from "../registry/OhSubscriber.sol";
@@ -14,7 +15,7 @@ import {OhForumTypes} from "./OhForumTypes.sol";
 /// @title Oh! Finance Forum
 /// @notice Manages Protocol proposals and voting receipts to send to the Governor
 /// @dev Proposer-Executor Relationship to execute protocol changes
-contract OhForum is OhSubscriber, OhForumTypes {
+contract OhForum is OhSubscriber, OhForumTypes, IForum {
     using SafeMath for uint256;
 
     /// @notice Contract Name
@@ -53,7 +54,7 @@ contract OhForum is OhSubscriber, OhForumTypes {
 
     bytes32 public immutable DOMAIN_SEPARATOR;
 
-    /// @notice The address of Oh! Protocol Guardian
+    /// @notice The address of Oh! Finance Protocol Guardian
     address public guardian;
 
     /// @notice The address of the Oh! Finance Token
@@ -129,6 +130,9 @@ contract OhForum is OhSubscriber, OhForumTypes {
         proposalThreshold = _proposalThreshold;
     }
 
+    /// @notice Cast a vote for a given Proposal
+    /// @param proposalId The id of the Proposal to vote on
+    /// @param support The boolean representing whether the user supports or rejects the Proposal
     function castVote(uint256 proposalId, bool support) external {
         return _castVote(msg.sender, proposalId, support);
     }
@@ -268,22 +272,51 @@ contract OhForum is OhSubscriber, OhForumTypes {
         votingPeriod = _votingPeriod;
     }
 
+    function emergencyPause(address bank) external onlyGuardian {
+        IGovernor(governance()).executeEmergencyPause(bank);
+    }
+
+    function emergencyPauseAll() external onlyGuardian {
+        address manager = manager();
+        address governance = governance();
+
+        uint256 length = IManager(manager).totalBanks();
+        for (uint256 i = 0; i < length; i++) {
+            address bank = IManager(manager).banks(i);
+            IGovernor(governance).executeEmergencyPause(bank);
+        }
+    }
+
+    function pause(address bank) external onlyGuardian {
+        IGovernor(governance()).executePause(bank);
+    }
+
+    function unpause(address bank) external onlyGuardian {
+        IGovernor(governance()).executeUnpause(bank);
+    }
+
+    /// @notice Allow Guardian to accept admin rights after setting pending admin
     function acceptAdmin() external onlyGuardian {
         IGovernor(governance()).acceptAdmin();
     }
 
+    /// @notice Abdicate Guardian rights when protocol has suffiently matured
     function abdicate() external onlyGuardian {
         guardian = address(0);
     }
 
+    /// @notice Allow Guardian to queue transaction to accept admin rights with delay
     function queueSetGovernorPendingAdmin(address newPendingAdmin, uint256 eta) external onlyGuardian {
         IGovernor(governance()).queueTransaction(governance(), 0, "setPendingAdmin(address)", abi.encode(newPendingAdmin), eta);
     }
 
+    /// @notice Allow Guardian to set the pending admin once delay has expired
     function executeSetGovernorPendingAdmin(address newPendingAdmin, uint256 eta) external onlyGuardian {
         IGovernor(governance()).executeTransaction(governance(), 0, "setPendingAdmin(address)", abi.encode(newPendingAdmin), eta);
     }
 
+    /// @notice Get the actions for a given Proposal
+    /// @param proposalId The id of the Proposal to get actions from
     function getActions(uint256 proposalId)
         external
         view
@@ -298,10 +331,15 @@ contract OhForum is OhSubscriber, OhForumTypes {
         return (p.targets, p.values, p.signatures, p.calldatas);
     }
 
+    /// @notice Get the voting receipt for a given Voter for a given Proposal
+    /// @param proposalId The id of the Proposal to get the Receipt from
+    /// @param voter The address of the Voter to check
     function getReceipt(uint256 proposalId, address voter) external view returns (Receipt memory) {
         return receipts[proposalId][voter];
     }
 
+    /// @notice Get the current state of a given Proposal
+    /// @param proposalId The id of the Proposal to check
     function state(uint256 proposalId) public view returns (ProposalState) {
         require(proposalCount >= proposalId && proposalId > 0, "Forum: Invalid Proposal ID");
 

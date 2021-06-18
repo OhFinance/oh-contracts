@@ -30,7 +30,7 @@ describe('AaveV2Strategy', function () {
     usdc = await getErc20At(addresses.usdc, worker.address);
 
     await manager.setBank(usdcBank.address, true);
-    await manager.addStrategy(usdcBank.address, usdcAaveV2Strategy.address);
+    await manager.setStrategy(usdcBank.address, usdcAaveV2Strategy.address, true);
 
     // Buy USDC using the worker wallet
     await swapEthForTokens(worker.address, addresses.usdc, parseEther('100'));

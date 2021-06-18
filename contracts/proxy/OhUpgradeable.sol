@@ -3,7 +3,7 @@
 pragma solidity 0.7.6;
 
 /// @title Oh! Finance Base Upgradeable
-/// @notice Contains internal functions to get/set primitive data types used by a contract
+/// @notice Contains internal functions to get/set primitive data types used by a proxy contract
 abstract contract OhUpgradeable {
     function getAddress(bytes32 slot) internal view returns (address _address) {
         // solhint-disable-next-line no-inline-assembly

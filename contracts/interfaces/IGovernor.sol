@@ -34,4 +34,10 @@ interface IGovernor {
         bytes calldata data,
         uint256 eta
     ) external payable returns (bytes memory);
+
+    function executeEmergencyPause(address bank) external;
+
+    function executePause(address bank) external;
+
+    function executeUnpause(address bank) external;
 }

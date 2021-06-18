@@ -2,6 +2,7 @@
 
 Oh! Finance Ethereum Smart Contracts, written with Hardhat.
 
+
 ## Installation
 
 1. Install dependencies with Yarn
@@ -26,7 +27,15 @@ yarn install
 yarn compile
 ```
 
-4. Run tests with Mocha
+4. Start the development server
+
+```
+yarn dev
+```
+
+## Usage
+
+- Run tests with Mocha
 
 ```
 # Run the entire test suite
@@ -39,36 +48,48 @@ yarn test:gas
 yarn test test/OhToken.test.ts
 ```
 
-## Usage
-
 - Build the docs site
 
 ```
-# build the docs
-yarn docs:build
-
-# if you don't have serve installed
+# If you don't have serve installed
 yarn global add serve
 
-# serve the site
-yarn docs:serve
+# Build and serve the site
+yarn docs
 ```
 
-- Run a script
+- Execute a script
 
 ```
-npx hardhat --network testnet run scripts/my_script.ts
+# Run a script on testnets
+yarn rinkeby:run scripts/rinkeby_script.ts
+yarn kovan:run scripts/kovan_script.ts
 
-yarn testnet:run scripts/my_script.ts
+# Run a script on mainnet
 yarn mainnet:run scripts/my_script.ts
 ```
+
+- Deploy contracts
+
+```
+# Run entire deployment against localhost & testnets
+yarn localhost:deploy
+yarn rinkeby:deploy
+yarn kovan:deploy
+
+# Run entire mainnet deployment
+yarn mainnet:deploy
+
+# Run tagged mainnet deployments and any dependencies
+yarn mainnet:deploy --tags OhTimelock
+```
+
 
 ## References
 
 - Hardhat: https://hardhat.org/getting-started/
 - Hardhat Deploy: https://hardhat.org/plugins/hardhat-deploy.html
-- AAVE Deployed Docs: https://docs.aave.com/developers/v/1.0/deployed-contracts/deployed-contract-instances
-- AAVE V2 Deployed Docs: https://docs.aave.com/developers/deployed-contracts/deployed-contracts
+- AaveV2 Docs: https://docs.aave.com/developers
 - Compound Docs: https://compound.finance/docs
 - Curve Docs: https://resources.curve.fi/
 - EIP-2612 Permit Signature: https://eips.ethereum.org/EIPS/eip-2612

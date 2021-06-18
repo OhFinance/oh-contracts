@@ -11,7 +11,6 @@ import {TransferHelper} from "../../libraries/TransferHelper.sol";
 import {OhStrategy} from "../OhStrategy.sol";
 import {OhCurve3PoolHelper} from "./OhCurve3PoolHelper.sol";
 import {OhCurve3PoolStrategyStorage} from "./OhCurve3PoolStrategyStorage.sol";
-import "hardhat/console.sol";
 
 /// @title Oh! Finance Curve 3Pool Strategy
 /// @notice Standard Curve 3Pool LP + Gauge Single Underlying Strategy

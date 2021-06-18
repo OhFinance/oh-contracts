@@ -4,19 +4,22 @@ pragma solidity 0.7.6;
 
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {IBank} from "../interfaces/bank/IBank.sol";
 import {IGovernor} from "../interfaces/IGovernor.sol";
+import {IManager} from "../interfaces/IManager.sol";
+import {OhSubscriber} from "../registry/OhSubscriber.sol";
 
 /// @title Oh! Finance Governor
 /// @notice Executor Contract that queues up and executes on-chain transactions to modify the protocol
 /// @notice Queued actions must come from a successful proposal
 /// @dev Proposer-Executor Relationship
 /// @dev Transactions can be executed after the `delay` has passed
-contract OhGovernor {
+contract OhGovernor is OhSubscriber, IGovernor {
     using Address for address;
     using SafeMath for uint256;
 
     /// @notice
-    uint256 public constant GRACE_PERIOD = 14 days;
+    uint256 public constant override GRACE_PERIOD = 14 days;
 
     /// @notice Minimum time period transactions must be queued for
     uint256 public constant MINIMUM_DELAY = 2 days;
@@ -31,10 +34,10 @@ contract OhGovernor {
     address public pendingAdmin;
 
     /// @notice Time delay before queued transactions can be executed
-    uint256 public delay;
+    uint256 public override delay;
 
     /// @notice Transaction Queue of all successfull proposal actions
-    mapping(bytes32 => bool) public queuedTransactions;
+    mapping(bytes32 => bool) public override queuedTransactions;
 
     event NewAdmin(address indexed newAdmin);
     event NewPendingAdmin(address indexed newPendingAdmin);
@@ -53,7 +56,7 @@ contract OhGovernor {
         _;
     }
 
-    constructor(address admin_, uint256 delay_) {
+    constructor(address registry_, address admin_, uint256 delay_) OhSubscriber(registry_) {
         require(delay_ >= MINIMUM_DELAY, "Governor: Delay Too Low");
         require(delay_ <= MAXIMUM_DELAY, "Governor: Delay Too High");
 
@@ -63,7 +66,7 @@ contract OhGovernor {
 
     receive() external payable {}
 
-    function acceptAdmin() external {
+    function acceptAdmin() external override {
         require(msg.sender == pendingAdmin, "Governor: Only Pending Admin");
         admin = msg.sender;
         pendingAdmin = address(0);
@@ -91,7 +94,7 @@ contract OhGovernor {
         string memory signature,
         bytes memory data,
         uint256 eta
-    ) external onlyAdmin {
+    ) external override onlyAdmin {
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
         queuedTransactions[txHash] = false;
 
@@ -104,7 +107,7 @@ contract OhGovernor {
         string memory signature,
         bytes memory data,
         uint256 eta
-    ) external payable onlyAdmin returns (bytes memory) {
+    ) external payable override onlyAdmin returns (bytes memory) {
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
 
         require(queuedTransactions[txHash], "Governor: Transaction Not Queued");
@@ -134,7 +137,7 @@ contract OhGovernor {
         string memory signature,
         bytes memory data,
         uint256 eta
-    ) external onlyAdmin returns (bytes32) {
+    ) external override onlyAdmin returns (bytes32) {
         require(eta >= getBlockTimestamp().add(delay), "Governor: ETA Too Short");
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
@@ -142,6 +145,19 @@ contract OhGovernor {
 
         emit QueueTransaction(txHash, target, value, signature, data, eta);
         return txHash;
+    }
+
+    function executeEmergencyPause(address bank) external override onlyAdmin {
+        IManager(manager()).exitAll(bank);
+        IBank(bank).pause();
+    }
+
+    function executePause(address bank) external override onlyAdmin {
+        IBank(bank).pause();
+    }
+
+    function executeUnpause(address bank) external override onlyAdmin {
+        IBank(bank).unpause();
     }
 
     function getBlockTimestamp() internal view returns (uint256) {

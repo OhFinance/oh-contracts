@@ -37,6 +37,11 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 };
 
+// Skip the deployment if we are on 
+deploy.skip = async (hre: HardhatRuntimeEnvironment) => {
+  return hre.network.name === 'kovan'
+}
+
 deploy.tags = ['OhUsdcAaveV2Strategy'];
 deploy.dependencies = ['OhRegistry', 'OhProxyAdmin', 'OhStrategy', 'OhUsdcBank'];
 export default deploy;
