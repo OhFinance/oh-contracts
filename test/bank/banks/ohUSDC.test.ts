@@ -6,7 +6,7 @@ import {ERC20} from 'types';
 import {formatUnits, parseEther} from '@ethersproject/units';
 import {getNamedAccounts} from 'hardhat';
 
-describe('ohUSDC', () => {
+describe('Oh! USDC', () => {
   let fixture: BankFixture;
   let usdc: ERC20;
 
@@ -21,7 +21,7 @@ describe('ohUSDC', () => {
     await swapEthForTokens(worker.address, addresses.usdc, parseEther('100'));
   });
 
-  it('deployed and initialized ohUSDC Bank proxy correctly', async () => {
+  it('deployed and initialized Oh! USDC Bank proxy correctly', async () => {
     const {deployer} = fixture;
     const {usdcBank} = deployer;
 
@@ -32,11 +32,11 @@ describe('ohUSDC', () => {
 
     expect(underlying).eq(usdc.address);
     expect(decimals).eq(6);
-    expect(symbol).eq('Oh! USDC');
+    expect(symbol).eq('OH-USDC');
     expect(name).eq('Oh! USDC');
   });
 
-  it('added AaveV2, Compound, and Curve strategies to ohUSDC Bank correctly', async () => {
+  it('added AaveV2, Compound, and Curve strategies to Oh! USDC Bank correctly', async () => {
     const {deployer} = fixture;
     const {usdcBank, usdcAaveV2Strategy, usdcCompStrategy, usdcCrv3PoolStrategy} = deployer;
 
@@ -75,7 +75,7 @@ describe('ohUSDC', () => {
     expect(shares).to.be.eq(balance);
   });
 
-  it('allows users to deposit and withdraw from the ohUSDC Bank', async () => {
+  it('allows users to deposit and withdraw from the Oh! USDC Bank', async () => {
     const {worker} = fixture;
     const {usdcBank} = worker;
 
@@ -96,7 +96,7 @@ describe('ohUSDC', () => {
     expect(remainingShares.toNumber()).eq(0);
   });
 
-  it('allows users to deposit and allows investing into ohUSDC Bank Stratgies', async () => {
+  it('allows users to deposit and allows investing into Oh! USDC Bank Stratgies', async () => {
     const {worker} = fixture;
     const {usdcBank, manager} = worker;
 

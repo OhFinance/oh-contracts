@@ -15,7 +15,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const bankLogic = await ethers.getContract('OhBank');
 
   // get Oh! USDC Bank initializer bytecode
-  const data = getInitializeBankData('Oh! USDC', 'Oh! USDC', registry.address, usdc);
+  const data = getInitializeBankData('Oh! USDC', 'OH-USDC', registry.address, usdc);
   const constructorArguments = [bankLogic.address, proxyAdmin.address, data];
 
   // deploy the Oh! USDC Bank Proxy

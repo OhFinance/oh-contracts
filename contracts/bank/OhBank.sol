@@ -23,13 +23,13 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
-    /// @notice
-    event InvestAll(uint256 amount);
+    /// @notice Emitted when the Bank invests in a Strategy
+    event Invest(address strategy, uint256 amount);
 
-    /// @notice Event emitted when a user deposits an amount of underlying
+    /// @notice Emitted when a user deposits an amount of underlying
     event Deposit(address indexed user, uint256 amount);
 
-    /// @notice Event emitted when a user withdraws an amount of underlying
+    /// @notice Emitted when a user withdraws an amount of underlying
     event Withdraw(address indexed user, uint256 amount);
 
     /// @notice Protocol defense modifier
@@ -142,7 +142,7 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
         IStrategy(strategy).withdraw(amount);
     }
 
-    /// @notice Exit and withdrawll all underlying from a given strategy
+    /// @notice Exit and withdraw all underlying from a given strategy
     function exitAll(address strategy) external override onlyAuthorized {
         IStrategy(strategy).withdrawAll();
     }
@@ -206,6 +206,7 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
         }
         // perform strategy investment, handle no new underlying in strategy
         IStrategy(strategy).invest();
+        emit Invest(strategy, amount);
     }
 
     // deposit underlying to receive shares
@@ -284,15 +285,5 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
 
         // update withdrawal index
         IManager(manager).setWithdrawIndex(index);
-        
-        
-        // for (uint256 i = 0; i < length; i++) {
-        //     uint256 withdrawn = IStrategy(strategies(i)).withdraw(amount);
-        //     if (withdrawn < amount) {
-        //         amount = amount.sub(withdrawn);
-        //     } else {
-        //         return;
-        //     }
-        // }
     }
 }
