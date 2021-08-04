@@ -68,40 +68,116 @@ export const getGovernanceContracts = async (signer: string) => {
   };
 };
 
-export const getBankContracts = async (signer: string) => {
+export const getUsdcBankContracts = async (signer: string) => {
   const contracts = await getGovernanceContracts(signer);
-  const bank = (await ethers.getContract('OhBank', signer)) as OhBank;
-  const aaveV2Strategy = (await ethers.getContract('OhAaveV2Strategy', signer)) as OhAaveV2Strategy;
-  const compStrategy = (await ethers.getContract('OhCompoundStrategy', signer)) as OhCompoundStrategy;
-  const crv3PoolStrategy = (await ethers.getContract('OhCurve3PoolStrategy', signer)) as OhCurve3PoolStrategy;
+  const bankLogic = (await ethers.getContract('OhBank', signer)) as OhBank;
+  const aaveV2StrategyLogic = (await ethers.getContract('OhAaveV2Strategy', signer)) as OhAaveV2Strategy;
+  const compStrategyLogic = (await ethers.getContract('OhCompoundStrategy', signer)) as OhCompoundStrategy;
+  const crv3PoolStrategyLogic = (await ethers.getContract('OhCurve3PoolStrategy', signer)) as OhCurve3PoolStrategy;
 
-  const usdcBankProxy = (await ethers.getContract('OhUsdcBank', signer)) as OhUpgradeableProxy;
-  const usdcAaveV2StrategyProxy = (await ethers.getContract('OhUsdcAaveV2Strategy', signer)) as OhUpgradeableProxy;
-  const usdcCompStrategyProxy = (await ethers.getContract('OhUsdcCompoundStrategy', signer)) as OhUpgradeableProxy;
-  const usdcCrv3PoolStrategyProxy = (await ethers.getContract('OhUsdcCurve3PoolStrategy', signer)) as OhUpgradeableProxy;
+  const bankProxy = (await ethers.getContract('OhUsdcBank', signer)) as OhUpgradeableProxy;
+  const aaveV2StrategyProxy = (await ethers.getContract('OhUsdcAaveV2Strategy', signer)) as OhUpgradeableProxy;
+  const compStrategyProxy = (await ethers.getContract('OhUsdcCompoundStrategy', signer)) as OhUpgradeableProxy;
+  const crv3PoolStrategyProxy = (await ethers.getContract('OhUsdcCurve3PoolStrategy', signer)) as OhUpgradeableProxy;
 
-  const usdcBank = (await ethers.getContractAt('OhBank', usdcBankProxy.address, signer)) as OhBank;
-  const usdcAaveV2Strategy = (await ethers.getContractAt('OhAaveV2Strategy', usdcAaveV2StrategyProxy.address, signer)) as OhAaveV2Strategy;
-  const usdcCompStrategy = (await ethers.getContractAt('OhCompoundStrategy', usdcCompStrategyProxy.address, signer)) as OhCompoundStrategy;
-  const usdcCrv3PoolStrategy = (await ethers.getContractAt(
+  const bank = (await ethers.getContractAt('OhBank', bankProxy.address, signer)) as OhBank;
+  const aaveV2Strategy = (await ethers.getContractAt('OhAaveV2Strategy', aaveV2StrategyProxy.address, signer)) as OhAaveV2Strategy;
+  const compStrategy = (await ethers.getContractAt('OhCompoundStrategy', compStrategyProxy.address, signer)) as OhCompoundStrategy;
+  const crv3PoolStrategy = (await ethers.getContractAt(
     'OhCurve3PoolStrategy',
-    usdcCrv3PoolStrategyProxy.address,
+    crv3PoolStrategyProxy.address,
     signer
   )) as OhCurve3PoolStrategy;
 
   return {
     ...contracts,
+    bankLogic,
+    aaveV2StrategyLogic,
+    compStrategyLogic,
+    crv3PoolStrategyLogic,
+    bankProxy,
+    aaveV2StrategyProxy,
+    compStrategyProxy,
+    crv3PoolStrategyProxy,
     bank,
     aaveV2Strategy,
     compStrategy,
     crv3PoolStrategy,
-    usdcBankProxy,
-    usdcAaveV2StrategyProxy,
-    usdcCompStrategyProxy,
-    usdcCrv3PoolStrategyProxy,
-    usdcBank,
-    usdcAaveV2Strategy,
-    usdcCompStrategy,
-    usdcCrv3PoolStrategy,
+  };
+};
+
+export const getUsdtBankContracts = async (signer: string) => {
+  const contracts = await getGovernanceContracts(signer);
+  const bankLogic = (await ethers.getContract('OhBank', signer)) as OhBank;
+  const aaveV2StrategyLogic = (await ethers.getContract('OhAaveV2Strategy', signer)) as OhAaveV2Strategy;
+  const compStrategyLogic = (await ethers.getContract('OhCompoundStrategy', signer)) as OhCompoundStrategy;
+  const crv3PoolStrategyLogic = (await ethers.getContract('OhCurve3PoolStrategy', signer)) as OhCurve3PoolStrategy;
+
+  const bankProxy = (await ethers.getContract('OhUsdtBank', signer)) as OhUpgradeableProxy;
+  const aaveV2StrategyProxy = (await ethers.getContract('OhUsdtAaveV2Strategy', signer)) as OhUpgradeableProxy;
+  const compStrategyProxy = (await ethers.getContract('OhUsdtCompoundStrategy', signer)) as OhUpgradeableProxy;
+  const crv3PoolStrategyProxy = (await ethers.getContract('OhUsdtCurve3PoolStrategy', signer)) as OhUpgradeableProxy;
+
+  const bank = (await ethers.getContractAt('OhBank', bankProxy.address, signer)) as OhBank;
+  const aaveV2Strategy = (await ethers.getContractAt('OhAaveV2Strategy', aaveV2StrategyProxy.address, signer)) as OhAaveV2Strategy;
+  const compStrategy = (await ethers.getContractAt('OhCompoundStrategy', compStrategyProxy.address, signer)) as OhCompoundStrategy;
+  const crv3PoolStrategy = (await ethers.getContractAt(
+    'OhCurve3PoolStrategy',
+    crv3PoolStrategyProxy.address,
+    signer
+  )) as OhCurve3PoolStrategy;
+
+  return {
+    ...contracts,
+    bankLogic,
+    aaveV2StrategyLogic,
+    compStrategyLogic,
+    crv3PoolStrategyLogic,
+    bankProxy,
+    aaveV2StrategyProxy,
+    compStrategyProxy,
+    crv3PoolStrategyProxy,
+    bank,
+    aaveV2Strategy,
+    compStrategy,
+    crv3PoolStrategy,
+  };
+};
+
+export const getDaiBankContracts = async (signer: string) => {
+  const contracts = await getGovernanceContracts(signer);
+  const bankLogic = (await ethers.getContract('OhBank', signer)) as OhBank;
+  const aaveV2StrategyLogic = (await ethers.getContract('OhAaveV2Strategy', signer)) as OhAaveV2Strategy;
+  const compStrategyLogic = (await ethers.getContract('OhCompoundStrategy', signer)) as OhCompoundStrategy;
+  const crv3PoolStrategyLogic = (await ethers.getContract('OhCurve3PoolStrategy', signer)) as OhCurve3PoolStrategy;
+
+  const bankProxy = (await ethers.getContract('OhDaiBank', signer)) as OhUpgradeableProxy;
+  const aaveV2StrategyProxy = (await ethers.getContract('OhDaiAaveV2Strategy', signer)) as OhUpgradeableProxy;
+  const compStrategyProxy = (await ethers.getContract('OhDaiCompoundStrategy', signer)) as OhUpgradeableProxy;
+  const crv3PoolStrategyProxy = (await ethers.getContract('OhDaiCurve3PoolStrategy', signer)) as OhUpgradeableProxy;
+
+  const bank = (await ethers.getContractAt('OhBank', bankProxy.address, signer)) as OhBank;
+  const aaveV2Strategy = (await ethers.getContractAt('OhAaveV2Strategy', aaveV2StrategyProxy.address, signer)) as OhAaveV2Strategy;
+  const compStrategy = (await ethers.getContractAt('OhCompoundStrategy', compStrategyProxy.address, signer)) as OhCompoundStrategy;
+  const crv3PoolStrategy = (await ethers.getContractAt(
+    'OhCurve3PoolStrategy',
+    crv3PoolStrategyProxy.address,
+    signer
+  )) as OhCurve3PoolStrategy;
+
+  return {
+    ...contracts,
+    bankLogic,
+    aaveV2StrategyLogic,
+    compStrategyLogic,
+    crv3PoolStrategyLogic,
+    bankProxy,
+    aaveV2StrategyProxy,
+    compStrategyProxy,
+    crv3PoolStrategyProxy,
+    bank,
+    aaveV2Strategy,
+    compStrategy,
+    crv3PoolStrategy,
   };
 };

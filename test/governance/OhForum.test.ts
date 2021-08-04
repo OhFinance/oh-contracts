@@ -46,8 +46,8 @@ describe('OhForum', () => {
 
     it('accepts proposal to add bank', async () => {
       const {deployer} = fixture;
-      const {forum, manager, usdcBank} = deployer;
-      const setBankData = getCallData(['address', 'bool'], [usdcBank.address, true]);
+      const {forum, manager, bank} = deployer;
+      const setBankData = getCallData(['address', 'bool'], [bank.address, true]);
 
       // propose to add the usdc bank
       await forum.propose(
@@ -75,17 +75,17 @@ describe('OhForum', () => {
       // execute and assert
       await forum.execute(1);
       const usdcBankAddress = await manager.banks(0);
-      expect(usdcBankAddress).eq(usdcBank.address);
+      expect(usdcBankAddress).eq(bank.address);
     });
 
     it('accepts proposal to add strategy and set liquidator', async () => {
       const {deployer} = fixture;
-      const {forum, manager, liquidator, token, usdcBank, aaveV2Strategy} = deployer;
+      const {forum, manager, liquidator, token, bank, aaveV2Strategy} = deployer;
       const {aave, weth, usdc} = await getNamedAccounts();
 
       const setStrategyData = getCallData(
         ['address', 'address', 'bool'],
-        [usdcBank.address, aaveV2Strategy.address, true]
+        [bank.address, aaveV2Strategy.address, true]
       );
       const aaveRoutesData = getCallData(
         ['address', 'address', 'address[]'],
@@ -141,7 +141,7 @@ describe('OhForum', () => {
 
       // execute and assert
       await forum.execute(2);
-      const strategy = await manager.strategies(usdcBank.address, 0);
+      const strategy = await manager.strategies(bank.address, 0);
       expect(strategy).eq(aaveV2Strategy.address);
     });
 

@@ -10,14 +10,14 @@ describe('OhUpgradeableProxy', () => {
 
   it('is deployed correctly', async () => {
     const {deployer} = fixture;
-    const {usdcBankProxy, bank, proxyAdmin} = deployer;
+    const {bankProxy, bankLogic, proxyAdmin} = deployer;
 
-    const admin = await usdcBankProxy.getAdmin();
-    const implementation = await usdcBankProxy.getImplementation();
-    const version = await usdcBankProxy.getVersion();
+    const admin = await bankProxy.getAdmin();
+    const implementation = await bankProxy.getImplementation();
+    const version = await bankProxy.getVersion();
 
     expect(admin).eq(proxyAdmin.address);
-    expect(implementation).eq(bank.address);
+    expect(implementation).eq(bankLogic.address);
     expect(version.toNumber()).eq(1);
   });
 });

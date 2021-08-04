@@ -1,27 +1,27 @@
 import {expect} from 'chai';
 import {advanceNBlocks, advanceNSeconds, ONE_DAY, signMessageData, swapEthForTokens} from 'utils';
-import {BankFixture, setupUsdcBankTest} from 'fixture';
-import {getErc20At, getPermitMessageData} from 'lib';
+import {BankFixture, setupUsdtBankTest} from 'fixture';
+import {getErc20At} from 'lib';
 import {ERC20} from 'types';
 import {formatUnits, parseEther} from '@ethersproject/units';
 import {getNamedAccounts} from 'hardhat';
 
-describe('Oh! USDC', () => {
+describe('Oh! USDT', () => {
   let fixture: BankFixture;
-  let usdc: ERC20;
+  let usdt: ERC20;
 
   beforeEach(async () => {
     const addresses = await getNamedAccounts();
-    fixture = await setupUsdcBankTest();
+    fixture = await setupUsdtBankTest();
     const {worker} = fixture;
 
-    usdc = await getErc20At(addresses.usdc, worker.address);
+    usdt = await getErc20At(addresses.usdt, worker.address);
 
-    // buy usdc for worker to use in tests
-    await swapEthForTokens(worker.address, addresses.usdc, parseEther('100'));
+    // buy usdt for worker to use in tests
+    await swapEthForTokens(worker.address, addresses.usdt, parseEther('100'));
   });
 
-  it('deployed and initialized Oh! USDC Bank proxy correctly', async () => {
+  it('deployed and initialized ohUSDT Bank proxy correctly', async () => {
     const {deployer} = fixture;
     const {bank} = deployer;
 
@@ -30,13 +30,13 @@ describe('Oh! USDC', () => {
     const symbol = await bank.symbol();
     const name = await bank.name();
 
-    expect(underlying).eq(usdc.address);
+    expect(underlying).eq(usdt.address);
     expect(decimals).eq(6);
-    expect(symbol).eq('OH-USDC');
-    expect(name).eq('Oh! USDC');
+    expect(symbol).eq('OH-USDT');
+    expect(name).eq('Oh! USDT');
   });
 
-  it('added AaveV2, Compound, and Curve strategies to Oh! USDC Bank correctly', async () => {
+  it('added AaveV2, Compound, and Curve strategies to ohUSDT Bank correctly', async () => {
     const {deployer} = fixture;
     const {bank, aaveV2Strategy, compStrategy, crv3PoolStrategy} = deployer;
 
@@ -51,37 +51,13 @@ describe('Oh! USDC', () => {
     expect(curve3PoolStrategyAddress).eq(crv3PoolStrategy.address);
   });
 
-  it('allows users to deposit with permit', async () => {
+  it('allows users to deposit and withdraw from the ohUSDT Bank', async () => {
     const {worker} = fixture;
     const {bank} = worker;
 
-    // sign permit message for usdc
-    const balance = await usdc.balanceOf(worker.address);
-    const {message, data} = getPermitMessageData(
-      'USD Coin',
-      '2',
-      usdc.address,
-      worker.address,
-      bank.address,
-      balance.toString(),
-      0,
-      Date.now() + 900
-    );
-    const {v, r, s} = await signMessageData(worker.address, data);
+    const balance = await usdt.balanceOf(worker.address);
 
-    await bank.depositWithPermit(balance, worker.address, message.deadline, v, r, s);
-
-    const shares = await bank.balanceOf(worker.address);
-    expect(shares).to.be.eq(balance);
-  });
-
-  it('allows users to deposit and withdraw from the Oh! USDC Bank', async () => {
-    const {worker} = fixture;
-    const {bank} = worker;
-
-    const balance = await usdc.balanceOf(worker.address);
-
-    await usdc.approve(bank.address, balance);
+    await usdt.approve(bank.address, balance);
     await bank.deposit(balance);
 
     const bankBalance = await bank.underlyingBalance();
@@ -96,13 +72,13 @@ describe('Oh! USDC', () => {
     expect(remainingShares.toNumber()).eq(0);
   });
 
-  it('allows users to deposit and allows investing into Oh! USDC Bank Stratgies', async () => {
+  it('allows users to deposit and allows investing into ohUSDT Bank Stratgies', async () => {
     const {worker} = fixture;
     const {bank, manager} = worker;
 
-    const balance = await usdc.balanceOf(worker.address);
+    const balance = await usdt.balanceOf(worker.address);
     console.log('Starting Balance is:', formatUnits(balance.toString(), 6));
-    await usdc.approve(bank.address, balance);
+    await usdt.approve(bank.address, balance);
 
     const amount = balance.div(3);
     for (let i = 0; i < 3; i++) {
@@ -131,7 +107,7 @@ describe('Oh! USDC', () => {
     const shares = await bank.balanceOf(worker.address);
     await bank.withdraw(shares.toString());
 
-    const endBalance = await usdc.balanceOf(worker.address);
+    const endBalance = await usdt.balanceOf(worker.address);
     console.log('Ending Balance is:', formatUnits(endBalance.toString(), 6));
   });
 });

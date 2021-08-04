@@ -39,7 +39,7 @@ describe('OhManager', () => {
       fixture = await setupUsdcBankTest();
       const {deployer, worker} = fixture;
       const {token, liquidator, manager} = deployer;
-      const {usdcBank} = worker;
+      const {bank} = worker;
 
       const addresses = await getNamedAccounts();
       usdc = await getErc20At(addresses.usdc, worker.address);
@@ -49,8 +49,8 @@ describe('OhManager', () => {
 
       // approve and deposit balance of usdc into bank
       const balance = await usdc.balanceOf(worker.address);
-      await usdc.approve(usdcBank.address, balance);
-      await usdcBank.deposit(balance);
+      await usdc.approve(bank.address, balance);
+      await bank.deposit(balance);
 
       // add liquidity to uniswap
       await token.approve(addresses.uniswapV2, parseEther('1000000'));
@@ -72,18 +72,18 @@ describe('OhManager', () => {
 
     it('finances a single strategy, then rebalances to all strategies', async () => {
       const {worker} = fixture;
-      const {manager, usdcBank} = worker;
+      const {manager, bank} = worker;
 
-      await manager.finance(usdcBank.address);
+      await manager.finance(bank.address);
 
-      const invested = await usdcBank.strategyBalance(0);
+      const invested = await bank.strategyBalance(0);
       expect(invested).to.be.gt(0);
 
-      await manager.rebalance(usdcBank.address);
+      await manager.rebalance(bank.address);
 
-      const invested0 = await usdcBank.strategyBalance(0);
-      const invested1 = await usdcBank.strategyBalance(1);
-      const invested2 = await usdcBank.strategyBalance(2);
+      const invested0 = await bank.strategyBalance(0);
+      const invested1 = await bank.strategyBalance(1);
+      const invested2 = await bank.strategyBalance(2);
 
       expect(invested0).to.be.gt(0);
       expect(invested1).to.be.gt(0);
@@ -92,13 +92,13 @@ describe('OhManager', () => {
 
     it('finances all strategies', async () => {
       const {worker} = fixture;
-      const {manager, usdcBank} = worker;
+      const {manager, bank} = worker;
 
-      await manager.financeAll(usdcBank.address);
+      await manager.financeAll(bank.address);
 
-      const invested0 = await usdcBank.strategyBalance(0);
-      const invested1 = await usdcBank.strategyBalance(1);
-      const invested2 = await usdcBank.strategyBalance(2);
+      const invested0 = await bank.strategyBalance(0);
+      const invested1 = await bank.strategyBalance(1);
+      const invested2 = await bank.strategyBalance(2);
 
       expect(invested0).to.be.gt(0);
       expect(invested1).to.be.gt(0);
@@ -108,9 +108,9 @@ describe('OhManager', () => {
     it('accrues revenue when realizing profit and performs buybacks', async () => {
       const {deployer, worker} = fixture;
       const {token} = deployer;
-      const {manager, usdcBank} = worker;
+      const {manager, bank} = worker;
 
-      await manager.financeAll(usdcBank.address);
+      await manager.financeAll(bank.address);
 
       // advance time and blocks to accrue rewards on all strategies
       await advanceNSeconds(TWO_DAYS);
@@ -120,7 +120,7 @@ describe('OhManager', () => {
       const buybackBefore = await usdc.balanceOf(manager.address);
       const balanceBefore = await usdc.balanceOf(worker.address);
 
-      await manager.financeAll(usdcBank.address);
+      await manager.financeAll(bank.address);
 
       const buybackAfter = await usdc.balanceOf(manager.address);
       const balanceAfter = await usdc.balanceOf(worker.address);

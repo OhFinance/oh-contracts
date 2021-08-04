@@ -222,7 +222,7 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
         uint256 mintAmount = totalSupply == 0 ? amount : amount.mul(totalSupply).div(virtualBalance());
 
         _mint(recipient, mintAmount);
-        IERC20(underlying()).transferFrom(sender, address(this), amount);
+        IERC20(underlying()).safeTransferFrom(sender, address(this), amount);
 
         emit Deposit(recipient, amount);
     }

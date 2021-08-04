@@ -16,13 +16,13 @@ describe('CompoundStrategy', () => {
   before(async () => {
     fixture = await setupBankTest();
     const {worker, deployer} = fixture;
-    const {manager, usdcBank, usdcCompStrategy} = deployer;
+    const {manager, bank, compStrategy} = deployer;
 
     const addresses = await getNamedAccounts();
     usdc = await getErc20At(addresses.usdc, worker.address);
 
-    await manager.setBank(usdcBank.address, true);
-    await manager.setStrategy(usdcBank.address, usdcCompStrategy.address, true);
+    await manager.setBank(bank.address, true);
+    await manager.setStrategy(bank.address, compStrategy.address, true);
 
     // Buy USDC using the worker wallet
     await swapEthForTokens(worker.address, addresses.usdc, parseEther('100'));
@@ -30,21 +30,21 @@ describe('CompoundStrategy', () => {
     // Check USDC balance and approve spending
     startingBalance = await usdc.balanceOf(worker.address);
     console.log('Starting Balance:', formatUnits(startingBalance.toString(), 6));
-    await usdc.approve(usdcBank.address, startingBalance);
+    await usdc.approve(bank.address, startingBalance);
   });
 
   it('deployed and initialized Compound USDC Strategy proxy correctly', async () => {
     const {deployer} = fixture;
-    const {usdcBank, usdcCompStrategy} = deployer;
+    const {bank, compStrategy} = deployer;
 
     const {compUsdcToken, comp, compComptroller} = await getNamedAccounts();
-    const bank = await usdcCompStrategy.bank();
-    const underlying = await usdcCompStrategy.underlying();
-    const derivative = await usdcCompStrategy.derivative();
-    const reward = await usdcCompStrategy.reward();
-    const comptroller = await usdcCompStrategy.comptroller();
+    const compStrategyBank = await compStrategy.bank();
+    const underlying = await compStrategy.underlying();
+    const derivative = await compStrategy.derivative();
+    const reward = await compStrategy.reward();
+    const comptroller = await compStrategy.comptroller();
 
-    expect(bank).eq(usdcBank.address);
+    expect(compStrategyBank).eq(bank.address);
     expect(underlying).eq(usdc.address);
     expect(derivative).eq(compUsdcToken);
     expect(reward).eq(comp);
@@ -53,19 +53,19 @@ describe('CompoundStrategy', () => {
 
   it('finances and deposits into Compound', async () => {
     const {worker} = fixture;
-    const {manager, usdcBank} = worker;
+    const {manager, bank} = worker;
 
     // Deposit the USDC in the Bank
-    await usdcBank.deposit(startingBalance);
-    const bankBalance = await usdcBank.underlyingBalance();
+    await bank.deposit(startingBalance);
+    const bankBalance = await bank.underlyingBalance();
 
     // Check that tha Bank now has proper amount of USDC deposited
     expect(bankBalance).to.be.eq(startingBalance);
 
     // Invest the initial USDC into the strategy
-    await manager.finance(usdcBank.address);
+    await manager.finance(bank.address);
 
-    const strategyBalance = await usdcBank.strategyBalance(0);
+    const strategyBalance = await bank.strategyBalance(0);
     console.log('Strategy Balance: ' + formatUnits(strategyBalance.toString(), 6));
 
     expect(strategyBalance).to.be.gt(0);
@@ -73,21 +73,21 @@ describe('CompoundStrategy', () => {
 
   it('liquidates rewards and compounds deposit', async () => {
     const {worker} = fixture;
-    const {manager, usdcBank, usdcCompStrategy} = worker;
+    const {manager, bank, compStrategy} = worker;
 
     // wait ~1 day in blocks to accrue rewards (comptroller rewards are block-based)
     await advanceNSeconds(ONE_DAY);
     await advanceNBlocks(6000);
 
     // finance to claim COMP and trigger liquidation
-    const balanceBefore = await usdcCompStrategy.investedBalance();
+    const balanceBefore = await compStrategy.investedBalance();
 
-    await manager.finance(usdcBank.address);
+    await manager.finance(bank.address);
 
-    const balanceAfter = await usdcCompStrategy.investedBalance();
+    const balanceAfter = await compStrategy.investedBalance();
     console.log('Liquidated COMP for', formatUnits(balanceAfter.sub(balanceBefore), 6), 'USDC');
 
-    const strategyBalance = await usdcBank.strategyBalance(0);
+    const strategyBalance = await bank.strategyBalance(0);
     console.log('Strategy Balance: ' + formatUnits(strategyBalance.toString(), 6));
 
     // expect liquidation was profitable
@@ -98,20 +98,20 @@ describe('CompoundStrategy', () => {
   it('exits all and is profitable', async () => {
     const {worker, deployer} = fixture;
     const {manager} = deployer;
-    const {usdcBank, usdcCompStrategy} = worker;
+    const {bank, compStrategy} = worker;
 
     // Withdraw all from the strategy to the bank
-    await manager.exit(usdcBank.address, usdcCompStrategy.address);
+    await manager.exit(bank.address, compStrategy.address);
 
     // Check that underlying balance for the user is now greater than when the test started
-    const virtualBalance = await usdcBank.virtualBalance();
-    const virtualPrice = await usdcBank.virtualPrice();
+    const virtualBalance = await bank.virtualBalance();
+    const virtualPrice = await bank.virtualPrice();
 
     console.log('Virtual Balance:', formatUnits(virtualBalance.toString(), 6));
     console.log('Virtual Price:', formatUnits(virtualPrice.toString(), 6));
 
-    const shares = await usdcBank.balanceOf(worker.address);
-    await usdcBank.withdraw(shares.toString());
+    const shares = await bank.balanceOf(worker.address);
+    await bank.withdraw(shares.toString());
 
     const endingBalance = await usdc.balanceOf(worker.address);
     expect(startingBalance).to.be.lt(endingBalance);

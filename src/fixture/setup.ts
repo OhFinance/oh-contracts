@@ -1,5 +1,5 @@
 import {deployments} from 'hardhat';
-import {getBankContracts, getGovernanceContracts, getManagementContracts, getTestContracts, getVestingContracts} from './contracts';
+import {getUsdcBankContracts, getUsdtBankContracts, getDaiBankContracts, getGovernanceContracts, getManagementContracts, getTestContracts, getVestingContracts} from './contracts';
 
 export const setupTest = deployments.createFixture(async ({deployments, getNamedAccounts}) => {
   await deployments.fixture(['OhRegistry', 'OhToken']);
@@ -53,8 +53,8 @@ export const setupBankTest = deployments.createFixture(async ({deployments, getN
   const {deployer, worker} = await getNamedAccounts();
 
   return {
-    deployer: await getBankContracts(deployer),
-    worker: await getBankContracts(worker),
+    deployer: await getUsdcBankContracts(deployer),
+    worker: await getUsdcBankContracts(worker),
   };
 });
 
@@ -69,20 +69,73 @@ export const setupUsdcBankTest = deployments.createFixture(async ({deployments, 
   ]);
   const {deployer, worker} = await getNamedAccounts();
 
-  const deployerContracts = await getBankContracts(deployer);
-  const {manager, usdcBank, usdcAaveV2Strategy, usdcCompStrategy, usdcCrv3PoolStrategy} = deployerContracts;
+  const deployerContracts = await getUsdcBankContracts(deployer);
+  const {manager, bank, aaveV2Strategy, compStrategy, crv3PoolStrategy} = deployerContracts;
 
   // add the bank to the manager to enable deposits
-  await manager.setBank(usdcBank.address, true);
-  await manager.setStrategy(usdcBank.address, usdcAaveV2Strategy.address, true);
-  await manager.setStrategy(usdcBank.address, usdcCompStrategy.address, true);
-  await manager.setStrategy(usdcBank.address, usdcCrv3PoolStrategy.address, true);
+  await manager.setBank(bank.address, true);
+  await manager.setStrategy(bank.address, aaveV2Strategy.address, true);
+  await manager.setStrategy(bank.address, compStrategy.address, true);
+  await manager.setStrategy(bank.address, crv3PoolStrategy.address, true);
 
   return {
     deployer: deployerContracts,
-    worker: await getBankContracts(worker),
+    worker: await getUsdcBankContracts(worker),
   };
 });
+
+export const setupUsdtBankTest = deployments.createFixture(async ({deployments, getNamedAccounts}) => {
+  await deployments.fixture([
+    'OhForum',
+    'OhGovernor',
+    'OhUsdtBank',
+    'OhUsdtAaveV2Strategy',
+    'OhUsdtCompoundStrategy',
+    'OhUsdtCurve3PoolStrategy',
+  ]);
+  const {deployer, worker} = await getNamedAccounts();
+
+  const deployerContracts = await getUsdtBankContracts(deployer);
+  const {manager, bank, aaveV2Strategy, compStrategy, crv3PoolStrategy} = deployerContracts;
+
+  // add the bank to the manager to enable deposits
+  await manager.setBank(bank.address, true);
+  await manager.setStrategy(bank.address, aaveV2Strategy.address, true);
+  await manager.setStrategy(bank.address, compStrategy.address, true);
+  await manager.setStrategy(bank.address, crv3PoolStrategy.address, true);
+
+  return {
+    deployer: deployerContracts,
+    worker: await getUsdtBankContracts(worker),
+  };
+});
+
+export const setupDaiBankTest = deployments.createFixture(async ({deployments, getNamedAccounts}) => {
+  await deployments.fixture([
+    'OhForum',
+    'OhGovernor',
+    'OhBank',
+    'OhAaveV2Strategy',
+    'OhCompoundStrategy',
+    'OhCurve3PoolStrategy',
+  ]);
+  const {deployer, worker} = await getNamedAccounts();
+
+  const deployerContracts = await getDaiBankContracts(deployer);
+  const {manager, bank, aaveV2Strategy, compStrategy, crv3PoolStrategy} = deployerContracts;
+
+  // add the bank to the manager to enable deposits
+  await manager.setBank(bank.address, true);
+  await manager.setStrategy(bank.address, aaveV2Strategy.address, true);
+  await manager.setStrategy(bank.address, compStrategy.address, true);
+  await manager.setStrategy(bank.address, crv3PoolStrategy.address, true);
+
+  return {
+    deployer: deployerContracts,
+    worker: await getDaiBankContracts(worker),
+  };
+});
+
 
 export const setupVotingTest = deployments.createFixture(async ({deployments, getNamedAccounts}) => {
   await deployments.fixture([
@@ -97,7 +150,7 @@ export const setupVotingTest = deployments.createFixture(async ({deployments, ge
   const {deployer, worker} = await getNamedAccounts();
 
   return {
-    deployer: await getBankContracts(deployer),
-    worker: await getBankContracts(worker),
+    deployer: await getUsdcBankContracts(deployer),
+    worker: await getUsdcBankContracts(worker),
   };
 });

@@ -24,13 +24,13 @@ describe('AaveV2Strategy', function () {
   before(async function () {
     fixture = await setupBankTest();
     const {worker, deployer} = fixture;
-    const {manager, usdcBank, usdcAaveV2Strategy} = deployer;
+    const {manager, bank, aaveV2Strategy} = deployer;
 
     const addresses = await getNamedAccounts();
     usdc = await getErc20At(addresses.usdc, worker.address);
 
-    await manager.setBank(usdcBank.address, true);
-    await manager.setStrategy(usdcBank.address, usdcAaveV2Strategy.address, true);
+    await manager.setBank(bank.address, true);
+    await manager.setStrategy(bank.address, aaveV2Strategy.address, true);
 
     // Buy USDC using the worker wallet
     await swapEthForTokens(worker.address, addresses.usdc, parseEther('100'));
@@ -38,24 +38,24 @@ describe('AaveV2Strategy', function () {
     // Check USDC balance and approve spending
     startingBalance = await usdc.balanceOf(worker.address);
     console.log('Starting Balance:', formatUnits(startingBalance.toString(), 6));
-    await usdc.approve(usdcBank.address, startingBalance);
+    await usdc.approve(bank.address, startingBalance);
   });
 
   it('deployed and initialized AaveV2 USDC Strategy proxy correctly', async function () {
     const {deployer} = fixture;
-    const {usdcBank, usdcAaveV2Strategy} = deployer;
+    const {bank, aaveV2Strategy} = deployer;
 
     const {aaveUsdcToken, aave, aaveStakedToken, aaveLendingPool, aaveIncentivesController} =
       await getNamedAccounts();
-    const bank = await usdcAaveV2Strategy.bank();
-    const underlying = await usdcAaveV2Strategy.underlying();
-    const derivative = await usdcAaveV2Strategy.derivative();
-    const reward = await usdcAaveV2Strategy.reward();
-    const stakedToken = await usdcAaveV2Strategy.stakedToken();
-    const lendingPool = await usdcAaveV2Strategy.lendingPool();
-    const incentivesController = await usdcAaveV2Strategy.incentivesController();
+    const aaveV2StrategyBank = await aaveV2Strategy.bank();
+    const underlying = await aaveV2Strategy.underlying();
+    const derivative = await aaveV2Strategy.derivative();
+    const reward = await aaveV2Strategy.reward();
+    const stakedToken = await aaveV2Strategy.stakedToken();
+    const lendingPool = await aaveV2Strategy.lendingPool();
+    const incentivesController = await aaveV2Strategy.incentivesController();
 
-    expect(bank).eq(usdcBank.address);
+    expect(aaveV2StrategyBank).eq(bank.address);
     expect(underlying).eq(usdc.address);
     expect(derivative).eq(aaveUsdcToken);
     expect(reward).eq(aave);
@@ -66,19 +66,19 @@ describe('AaveV2Strategy', function () {
 
   it('finances and deposits into AaveV2', async function () {
     const {worker} = fixture;
-    const {manager, usdcBank} = worker;
+    const {manager, bank} = worker;
 
     // Deposit the USDC in the Bank
-    await usdcBank.deposit(startingBalance);
-    const bankBalance = await usdcBank.underlyingBalance();
+    await bank.deposit(startingBalance);
+    const bankBalance = await bank.underlyingBalance();
 
     // Check that tha Bank now has proper amount of USDC deposited
     expect(bankBalance).to.be.eq(startingBalance);
 
     // Invest the initial USDC into the strategy
-    await manager.finance(usdcBank.address);
+    await manager.finance(bank.address);
 
-    const strategyBalance = await usdcBank.strategyBalance(0);
+    const strategyBalance = await bank.strategyBalance(0);
     console.log('Strategy Balance: ' + formatUnits(strategyBalance.toString(), 6));
 
     expect(strategyBalance).to.be.gt(0);
@@ -86,17 +86,17 @@ describe('AaveV2Strategy', function () {
 
   it('waits until initial cooldown has passed to claim rewards', async function () {
     const {worker} = fixture;
-    const {manager, usdcBank, usdcAaveV2Strategy} = worker;
+    const {manager, bank, aaveV2Strategy} = worker;
 
     // wait 1 day, within initial claim delay
     await advanceNSeconds(ONE_DAY);
     await advanceNBlocks(1);
 
     // invest to show staked are not claimed yet
-    await manager.finance(usdcBank.address);
+    await manager.finance(bank.address);
 
-    const stakedBalance = await usdcAaveV2Strategy.stakedBalance();
-    const strategyBalance = await usdcBank.strategyBalance(0);
+    const stakedBalance = await aaveV2Strategy.stakedBalance();
+    const strategyBalance = await bank.strategyBalance(0);
     console.log('Strategy Balance: ' + formatUnits(strategyBalance.toString(), 6));
 
     expect(stakedBalance).to.be.eq(0);
@@ -105,19 +105,19 @@ describe('AaveV2Strategy', function () {
 
   it('claims first batch of rewards and starts unstake cooldown', async function () {
     const {worker} = fixture;
-    const {manager, usdcBank, usdcAaveV2Strategy} = worker;
+    const {manager, bank, aaveV2Strategy} = worker;
 
     // wait 10 days to pass the initial cooldown
     await advanceNSeconds(TEN_DAYS);
     await advanceNBlocks(1);
 
     // finance to claim first batch of rewards
-    await manager.finance(usdcBank.address);
+    await manager.finance(bank.address);
 
     const timestamp = (await getLatestBlock()).timestamp;
-    const rewardCooldown = await usdcAaveV2Strategy.rewardCooldown();
-    const stakedBalance = await usdcAaveV2Strategy.stakedBalance();
-    const strategyBalance = await usdcBank.strategyBalance(0);
+    const rewardCooldown = await aaveV2Strategy.rewardCooldown();
+    const stakedBalance = await aaveV2Strategy.stakedBalance();
+    const strategyBalance = await bank.strategyBalance(0);
     console.log('Strategy Balance: ' + formatUnits(strategyBalance.toString(), 6));
 
     // ensure claimed stkAAVE and cooldown was set
@@ -128,23 +128,23 @@ describe('AaveV2Strategy', function () {
 
   it('unstakes and liquidates rewards after cooldown has passed', async () => {
     const {worker} = fixture;
-    const {manager, usdcBank, usdcAaveV2Strategy} = worker;
+    const {manager, bank, aaveV2Strategy} = worker;
 
     // wait 10 days to pass the unstaking cooldown
     await advanceNSeconds(TEN_DAYS);
     await advanceNBlocks(1);
 
     // finance to unstake stkAAVE to AAVE and trigger liquidation
-    const investedBefore = await usdcAaveV2Strategy.investedBalance();
+    const investedBefore = await aaveV2Strategy.investedBalance();
     const balanceBefore = await usdc.balanceOf(worker.address);
 
-    await manager.finance(usdcBank.address);
+    await manager.finance(bank.address);
 
     const timestamp = (await getLatestBlock()).timestamp;
-    const rewardCooldown = await usdcAaveV2Strategy.rewardCooldown();
-    const stakedBalance = await usdcAaveV2Strategy.stakedBalance();
+    const rewardCooldown = await aaveV2Strategy.rewardCooldown();
+    const stakedBalance = await aaveV2Strategy.stakedBalance();
 
-    const investedAfter = await usdcAaveV2Strategy.investedBalance();
+    const investedAfter = await aaveV2Strategy.investedBalance();
     console.log('Compounded AAVE for', formatUnits(investedAfter.sub(investedBefore), 6), 'USDC');
 
     const buybackBalance = await usdc.balanceOf(manager.address);
@@ -161,7 +161,7 @@ describe('AaveV2Strategy', function () {
       'USDC for performing liquidation'
     );
 
-    const strategyBalance = await usdcBank.strategyBalance(0);
+    const strategyBalance = await bank.strategyBalance(0);
     console.log('Strategy Balance: ' + formatUnits(strategyBalance.toString(), 6));
 
     // expect liquidation was profitable and fees were paid out
@@ -177,22 +177,22 @@ describe('AaveV2Strategy', function () {
 
   it('claims more rewards and resets if cooldown has expired', async () => {
     const {worker} = fixture;
-    const {manager, usdcBank, usdcAaveV2Strategy} = worker;
+    const {manager, bank, aaveV2Strategy} = worker;
 
     // wait 15 days to pass the expiration
     await advanceNSeconds(FIFTEEN_DAYS);
     await advanceNBlocks(1);
 
     // finance to pass unstake and reset cooldown
-    const stakedBefore = await usdcAaveV2Strategy.stakedBalance();
+    const stakedBefore = await aaveV2Strategy.stakedBalance();
 
-    await manager.finance(usdcBank.address);
+    await manager.finance(bank.address);
 
     const timestamp = (await getLatestBlock()).timestamp;
-    const rewardCooldown = await usdcAaveV2Strategy.rewardCooldown();
-    const stakedAfter = await usdcAaveV2Strategy.stakedBalance();
+    const rewardCooldown = await aaveV2Strategy.rewardCooldown();
+    const stakedAfter = await aaveV2Strategy.stakedBalance();
 
-    const strategyBalance = await usdcBank.strategyBalance(0);
+    const strategyBalance = await bank.strategyBalance(0);
     console.log('Strategy Balance: ' + formatUnits(strategyBalance.toString(), 6));
 
     // expect staked balance increased, cooldown was reset
@@ -206,20 +206,20 @@ describe('AaveV2Strategy', function () {
   it('exits all and is profitable', async () => {
     const {worker, deployer} = fixture;
     const {manager} = deployer;
-    const {usdcBank, usdcAaveV2Strategy} = worker;
+    const {bank, aaveV2Strategy} = worker;
 
     // Withdraw all from the strategy to the bank
-    await manager.exit(usdcBank.address, usdcAaveV2Strategy.address);
+    await manager.exit(bank.address, aaveV2Strategy.address);
 
     // Check that underlying balance for the user is now greater than when the test started
-    const virtualBalance = await usdcBank.virtualBalance();
-    const virtualPrice = await usdcBank.virtualPrice();
+    const virtualBalance = await bank.virtualBalance();
+    const virtualPrice = await bank.virtualPrice();
 
     console.log('Virtual Balance:', formatUnits(virtualBalance.toString(), 6));
     console.log('Virtual Price:', formatUnits(virtualPrice.toString(), 6));
 
-    const shares = await usdcBank.balanceOf(worker.address);
-    await usdcBank.withdraw(shares.toString());
+    const shares = await bank.balanceOf(worker.address);
+    await bank.withdraw(shares.toString());
 
     const workerEndingBalance = await usdc.balanceOf(worker.address);
     expect(startingBalance).to.be.lt(workerEndingBalance);

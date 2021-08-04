@@ -88,6 +88,11 @@ const config: HardhatUserConfig = {
       1: '0xBcca60bB61934080951369a648Fb03DF4F96263C',
       42: '0xe12AFeC5aa12Cf614678f9bFeeB98cA9Bb95b5B0',
     },
+    aaveUsdtToken: {
+      // AaveV2 aUSDT
+      1: '0x3Ed3B47Dd13EC9a98b44e6204A523E766B225811',
+      42: '',
+    },
     comp: {
       // COMP ERC-20
       1: '0xc00e94Cb662C3520282E6f5717214004A7f26888',
@@ -103,6 +108,11 @@ const config: HardhatUserConfig = {
       1: '0x39AA39c021dfbaE8faC545936693aC917d5E7563',
       42: '0x4a92e71227d294f041bd82dd8f78591b75140d63',
     },
+    compUsdtToken: {
+      // Compound cUSDT
+      1: '0xf650C3d88D12dB855b8bf7D11Be6C55A4e07dCC9',
+      42: '0x3f0a0ea2f86bae6362cf9799b523ba06647da018',
+    },
     crv: '0xD533a949740bb3306d119CC777fa900bA034cd52', // underlying CRV
     crv3Gauge: '0xbFcF63294aD7105dEa65aA58F8AE5BE2D9d0952A', // 3CRV Staking Pool
     crv3Pool: '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7', // LP Pool
@@ -112,6 +122,10 @@ const config: HardhatUserConfig = {
       1: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // USDC
       42: '0xb7a4F3E9097C08dA09517b5aB877F7a917224ede', // USDC Compound
       // 42: '0xe22da380ee6B445bb8273C81944ADEB6E8450422' // USDC AAVE
+    },
+    usdt: {
+      1: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+      42: '0xf3e0d7bf58c5d455d31ef1c2d5375904df525105',
     },
     sushiswapV2: {
       // Sushiswap Router V2

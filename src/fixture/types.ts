@@ -39,18 +39,18 @@ export interface GovernanceAccount extends ManagementAccount {
 }
 
 export interface BankAccount extends GovernanceAccount {
+  bankLogic: OhBank;
+  aaveV2StrategyLogic: OhAaveV2Strategy;
+  compStrategyLogic: OhCompoundStrategy;
+  crv3PoolStrategyLogic: OhCurve3PoolStrategy;
+  bankProxy: OhUpgradeableProxy;
+  aaveV2StrategyProxy: OhUpgradeableProxy;
+  compStrategyProxy: OhUpgradeableProxy;
+  crv3PoolStrategyProxy: OhUpgradeableProxy;
   bank: OhBank;
   aaveV2Strategy: OhAaveV2Strategy;
   compStrategy: OhCompoundStrategy;
   crv3PoolStrategy: OhCurve3PoolStrategy;
-  usdcBankProxy: OhUpgradeableProxy;
-  usdcAaveV2StrategyProxy: OhUpgradeableProxy;
-  usdcCompStrategyProxy: OhUpgradeableProxy;
-  usdcCrv3PoolStrategyProxy: OhUpgradeableProxy;
-  usdcBank: OhBank;
-  usdcAaveV2Strategy: OhAaveV2Strategy;
-  usdcCompStrategy: OhCompoundStrategy;
-  usdcCrv3PoolStrategy: OhCurve3PoolStrategy;
 }
 
 export interface BaseFixture {
