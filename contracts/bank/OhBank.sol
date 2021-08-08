@@ -32,6 +32,18 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
     /// @notice Emitted when a user withdraws an amount of underlying
     event Withdraw(address indexed user, uint256 amount);
 
+    /// @notice Event emitted when an amount is withdrawn and exits a strategy
+    event Exit(address indexed strategy, uint256 amount);
+
+    /// @notice Event emitted when all capital is withdrawn and exitted from a strategy
+    event ExitAll(address indexed strategy);
+
+    /// @notice Event emitted when an amount is withdrawn and exits a strategy
+    event Pause(address indexed governance);
+
+    /// @notice Event emitted when all capital is withdrawn and exitted from a strategy
+    event Unpause(address indexed governance);
+
     /// @notice Protocol defense modifier
     /// @dev Only allow user-facing functions to be called by EOA or be whitelisted
     modifier defense {
@@ -140,21 +152,25 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
     /// @param strategy The address of the Strategy to exit
     function exit(address strategy, uint256 amount) external override onlyAuthorized {
         IStrategy(strategy).withdraw(amount);
+        emit Exit(strategy, amount);
     }
 
     /// @notice Exit and withdraw all underlying from a given strategy
     function exitAll(address strategy) external override onlyAuthorized {
         IStrategy(strategy).withdrawAll();
+        emit ExitAll(strategy);
     }
 
     /// @notice Pause the Bank
     function pause() external override onlyGovernance {
         _setPaused(true);
+        emit Pause(msg.sender);
     }
 
     /// @notice Unpause the Bank
     function unpause() external override onlyGovernance {
         _setPaused(false);
+        emit Unpause(msg.sender);
     }
 
     /// @notice Deposit an amount of underlying to receive Bank shares
@@ -265,12 +281,12 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
         uint256 index = IManager(manager).withdrawIndex(address(this));
         uint256 length = totalStrategies();
         uint256 i = 0;
-        
+
         // while we haven't withdrawn from each Strategy and we haven't withdrawn the total amount
-        while(i < length && amount > 0) {
+        while (i < length && amount > 0) {
             // perform the Strategy withdrawal
             uint256 withdrawn = IStrategy(strategies(index)).withdraw(amount);
-            
+
             // update variables
             amount = amount.sub(withdrawn);
             i = i + 1;
