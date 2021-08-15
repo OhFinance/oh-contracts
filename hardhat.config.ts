@@ -83,6 +83,10 @@ const config: HardhatUserConfig = {
       1: '0xd784927Ff2f95ba542BfC824c8a8a98F3495f6b5',
     },
     aaveStakedToken: '0x4da27a545c0c5B758a6BA100e3a049001de870f5', // stkAAVE
+    aaveDaiToken: {
+      1: '0x028171bca77440897b824ca71d1c56cac55b68a3',
+      42: '0xfc54861772473cf00df8be1f5f7301bdf82020cd', // Kovan
+    },
     aaveUsdcToken: {
       // AaveV2 aUSDC
       1: '0xBcca60bB61934080951369a648Fb03DF4F96263C',
@@ -103,6 +107,11 @@ const config: HardhatUserConfig = {
       1: '0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B',
       42: '0x5eAe89DC1C671724A672ff0630122ee834098657',
     },
+    compDaiToken: {
+      // Compound cDAI
+      1: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
+      42: '0xf0d0eb522cfa50b716b3b1604c4f0fa6f04376ad', // Kovan
+    },
     compUsdcToken: {
       // Compound cUSDC
       1: '0x39AA39c021dfbaE8faC545936693aC917d5E7563',
@@ -118,6 +127,10 @@ const config: HardhatUserConfig = {
     crv3Pool: '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7', // LP Pool
     crv3Token: '0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490', // 3CRV
     crvMintr: '0xd061D61a4d941c39E5453435B6345Dc261C2fcE0', // reward contract
+    dai: {
+      1: '0x6b175474e89094c44da98b954eedeac495271d0f',  // DAI
+      42: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643', // DAI Coumpound
+    },
     usdc: {
       1: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // USDC
       42: '0xb7a4F3E9097C08dA09517b5aB877F7a917224ede', // USDC Compound

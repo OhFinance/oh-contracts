@@ -1,25 +1,24 @@
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
-import {getInitializeAaveV2StrategyData} from 'lib';
+import {getInitializeCurve3PoolStrategyData} from 'lib';
 
 // deploy the Oh! USDC Bank Proxies
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, ethers, getNamedAccounts, network, run} = hre;
-  const {deployer, usdc, aaveUsdcToken} = await getNamedAccounts();
+  const {deployer, usdc} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('12 - Oh! USDC AaveV2 Strategy');
+  log('18 - Oh! USDC Curve 3Pool Strategy');
 
   const registry = await ethers.getContract('OhRegistry');
   const ohUsdcBank = await ethers.getContract('OhUsdcBank');
   const proxyAdmin = await ethers.getContract('OhProxyAdmin');
-  const aaveV2Logic = await ethers.getContract('OhAaveV2Strategy');
+  const crv3PoolLogic = await ethers.getContract('OhCurve3PoolStrategy');
 
-  // build the data's for the strategies
-  const data = await getInitializeAaveV2StrategyData(registry.address, ohUsdcBank.address, usdc, aaveUsdcToken);
-  const constructorArgs = [aaveV2Logic.address, proxyAdmin.address, data];
+  const data = await getInitializeCurve3PoolStrategyData(registry.address, ohUsdcBank.address, usdc, '1');
+  const constructorArgs = [crv3PoolLogic.address, proxyAdmin.address, data];
 
-  const result = await deploy('OhUsdcAaveV2Strategy', {
+  const result = await deploy('OhUsdcCurve3PoolStrategy', {
     from: deployer,
     contract: 'OhUpgradeableProxy',
     args: constructorArgs,
@@ -37,11 +36,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 };
 
-// Skip the deployment if we are on 
-deploy.skip = async (hre: HardhatRuntimeEnvironment) => {
-  return hre.network.name === 'kovan'
-}
-
-deploy.tags = ['OhUsdcAaveV2Strategy'];
+deploy.tags = ['OhUsdcCurve3PoolStrategy'];
 deploy.dependencies = ['OhRegistry', 'OhProxyAdmin', 'OhStrategy', 'OhUsdcBank'];
 export default deploy;

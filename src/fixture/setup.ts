@@ -114,10 +114,10 @@ export const setupDaiBankTest = deployments.createFixture(async ({deployments, g
   await deployments.fixture([
     'OhForum',
     'OhGovernor',
-    'OhBank',
-    'OhAaveV2Strategy',
-    'OhCompoundStrategy',
-    'OhCurve3PoolStrategy',
+    'OhDaiBank',
+    'OhDaiAaveV2Strategy',
+    'OhDaiCompoundStrategy',
+    'OhDaiCurve3PoolStrategy',
   ]);
   const {deployer, worker} = await getNamedAccounts();
 
@@ -135,7 +135,6 @@ export const setupDaiBankTest = deployments.createFixture(async ({deployments, g
     worker: await getDaiBankContracts(worker),
   };
 });
-
 
 export const setupVotingTest = deployments.createFixture(async ({deployments, getNamedAccounts}) => {
   await deployments.fixture([

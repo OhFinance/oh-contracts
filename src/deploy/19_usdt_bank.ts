@@ -8,7 +8,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer, usdt} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('15 - Oh! USDT Bank');
+  log('19 - Oh! USDT Bank');
 
   const registry = await ethers.getContract('OhRegistry');
   const proxyAdmin = await ethers.getContract('OhProxyAdmin');

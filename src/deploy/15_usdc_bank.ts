@@ -1,6 +1,6 @@
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
-import {getInitializeCurve3PoolStrategyData} from 'lib';
+import {getInitializeBankData} from 'lib';
 
 // deploy the Oh! USDC Bank Proxies
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -8,34 +8,35 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer, usdc} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('14 - Oh! USDC Curve 3Pool Strategy');
+  log('15 - Oh! USDC Bank');
 
   const registry = await ethers.getContract('OhRegistry');
-  const ohUsdcBank = await ethers.getContract('OhUsdcBank');
   const proxyAdmin = await ethers.getContract('OhProxyAdmin');
-  const crv3PoolLogic = await ethers.getContract('OhCurve3PoolStrategy');
+  const bankLogic = await ethers.getContract('OhBank');
 
-  const data = await getInitializeCurve3PoolStrategyData(registry.address, ohUsdcBank.address, usdc, '1');
-  const constructorArgs = [crv3PoolLogic.address, proxyAdmin.address, data];
+  // get Oh! USDC Bank initializer bytecode
+  const data = getInitializeBankData('Oh! USDC', 'OH-USDC', registry.address, usdc);
+  const constructorArguments = [bankLogic.address, proxyAdmin.address, data];
 
-  const result = await deploy('OhUsdcCurve3PoolStrategy', {
+  // deploy the Oh! USDC Bank Proxy
+  const ohUsdcBank = await deploy('OhUsdcBank', {
     from: deployer,
     contract: 'OhUpgradeableProxy',
-    args: constructorArgs,
+    args: constructorArguments,
     log: true,
     deterministicDeployment: false,
     skipIfAlreadyDeployed: false,
   });
 
   // verify the contract
-  if (result.newlyDeployed && network.live) {
+  if (ohUsdcBank.newlyDeployed && network.live) {
     await run('verify:verify', {
-      address: result.address,
-      constructorArgs,
+      address: ohUsdcBank.address,
+      constructorArguments,
     });
   }
 };
 
-deploy.tags = ['OhUsdcCurve3PoolStrategy'];
-deploy.dependencies = ['OhRegistry', 'OhProxyAdmin', 'OhStrategy', 'OhUsdcBank'];
+deploy.tags = ['OhUsdcBank'];
+deploy.dependencies = ['OhRegistry', 'OhBank', 'OhProxyAdmin'];
 export default deploy;

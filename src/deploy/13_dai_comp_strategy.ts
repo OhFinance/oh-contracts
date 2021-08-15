@@ -1,24 +1,24 @@
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
-import {getInitializeCurve3PoolStrategyData} from 'lib';
+import {getInitializeCompoundStrategyData} from 'lib';
 
-// deploy the Oh! USDT Bank Proxies
+// deploy the Oh! DAI Bank Proxies
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, ethers, getNamedAccounts, network, run} = hre;
-  const {deployer, usdt} = await getNamedAccounts();
+  const {deployer, dai, compDaiToken} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('18 - Oh! USDT Curve 3Pool Strategy');
+  log('13 - Oh! DAI Compound Strategy');
 
   const registry = await ethers.getContract('OhRegistry');
-  const ohUsdtBank = await ethers.getContract('OhUsdtBank');
+  const ohDaiBank = await ethers.getContract('OhDaiBank');
   const proxyAdmin = await ethers.getContract('OhProxyAdmin');
-  const crv3PoolLogic = await ethers.getContract('OhCurve3PoolStrategy');
+  const aaveV2Logic = await ethers.getContract('OhCompoundStrategy');
 
-  const data = await getInitializeCurve3PoolStrategyData(registry.address, ohUsdtBank.address, usdt, '2');
-  const constructorArgs = [crv3PoolLogic.address, proxyAdmin.address, data];
+  const data = await getInitializeCompoundStrategyData(registry.address, ohDaiBank.address, dai, compDaiToken);
+  const constructorArgs = [aaveV2Logic.address, proxyAdmin.address, data];
 
-  const result = await deploy('OhUsdtCurve3PoolStrategy', {
+  const result = await deploy('OhDaiCompoundStrategy', {
     from: deployer,
     contract: 'OhUpgradeableProxy',
     args: constructorArgs,
@@ -36,6 +36,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 };
 
-deploy.tags = ['OhUsdtCurve3PoolStrategy'];
-deploy.dependencies = ['OhRegistry', 'OhProxyAdmin', 'OhStrategy', 'OhUsdtBank'];
+deploy.tags = ['OhDaiCompoundStrategy'];
+deploy.dependencies = ['OhRegistry', 'OhProxyAdmin', 'OhStrategy', 'OhDaiBank'];
 export default deploy;
