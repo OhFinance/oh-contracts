@@ -1,24 +1,30 @@
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
-import {getInitializeCurve3PoolStrategyData} from 'lib';
+import {getInitializeAaveV2StrategyData} from 'lib';
 
 // deploy the Oh! DAI Bank Proxies
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, ethers, getNamedAccounts, network, run} = hre;
-  const {deployer, dai} = await getNamedAccounts();
+  const {deployer, dai, aaveDaiToken} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('14 - Oh! DAI Curve 3Pool Strategy');
+  log('12 - Oh! DAI AaveV2 Strategy');
 
   const registry = await ethers.getContract('OhRegistry');
   const ohDaiBank = await ethers.getContract('OhDaiBank');
   const proxyAdmin = await ethers.getContract('OhProxyAdmin');
-  const crv3PoolLogic = await ethers.getContract('OhCurve3PoolStrategy');
+  const aaveV2Logic = await ethers.getContract('OhAaveV2Strategy');
 
-  const data = await getInitializeCurve3PoolStrategyData(registry.address, ohDaiBank.address, dai, '0');
-  const constructorArgs = [crv3PoolLogic.address, proxyAdmin.address, data];
+  // build the data's for the strategies
+  const data = await getInitializeAaveV2StrategyData(
+    registry.address,
+    ohDaiBank.address,
+    dai,
+    aaveDaiToken
+  );
+  const constructorArgs = [aaveV2Logic.address, proxyAdmin.address, data];
 
-  const result = await deploy('OhDaiCurve3PoolStrategy', {
+  const result = await deploy('OhDaiAaveV2Strategy', {
     from: deployer,
     contract: 'OhUpgradeableProxy',
     args: constructorArgs,
@@ -26,16 +32,8 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deterministicDeployment: false,
     skipIfAlreadyDeployed: false,
   });
-
-  // verify the contract
-  if (result.newlyDeployed && network.live) {
-    await run('verify:verify', {
-      address: result.address,
-      constructorArgs,
-    });
-  }
 };
 
-deploy.tags = ['OhDaiCurve3PoolStrategy'];
+deploy.tags = ['OhDaiAaveV2Strategy'];
 deploy.dependencies = ['OhRegistry', 'OhProxyAdmin', 'OhStrategy', 'OhDaiBank'];
 export default deploy;

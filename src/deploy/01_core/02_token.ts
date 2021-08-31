@@ -6,7 +6,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('2 - Token');
+  log('Core - Token');
 
   const registry = await ethers.getContract('OhRegistry');
 
@@ -18,6 +18,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 
-deploy.tags = ['OhToken'];
+deploy.tags = ['Core', 'OhToken'];
 deploy.dependencies = ['OhRegistry'];
 export default deploy;

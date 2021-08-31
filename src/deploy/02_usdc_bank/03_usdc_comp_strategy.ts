@@ -13,7 +13,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const registry = await ethers.getContract('OhRegistry');
   const ohUsdcBank = await ethers.getContract('OhUsdcBank');
   const proxyAdmin = await ethers.getContract('OhProxyAdmin');
-  const aaveV2Logic = await ethers.getContract('OhCompoundStrategy');
+  const compLogic = await ethers.getContract('OhCompoundStrategy');
 
   const data = await getInitializeCompoundStrategyData(
     registry.address,
@@ -21,7 +21,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     usdc,
     compUsdcToken
   );
-  const constructorArgs = [aaveV2Logic.address, proxyAdmin.address, data];
+  const constructorArgs = [compLogic.address, proxyAdmin.address, data];
 
   const result = await deploy('OhUsdcCompoundStrategy', {
     from: deployer,

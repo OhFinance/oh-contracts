@@ -30,7 +30,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 //   }
 // };
 
-deploy.id = '1';
+deploy.id = 'InitializeGovernance'; // id to only perform once
 deploy.tags = ['OhGovernance'];
 deploy.dependencies = ['OhRegistry', 'OhProxyAdmin', 'OhGovernor'];
 export default deploy;

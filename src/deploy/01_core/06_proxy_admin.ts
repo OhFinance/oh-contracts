@@ -18,6 +18,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 
-deploy.tags = ['OhProxyAdmin'];
+deploy.tags = ['Core', 'OhProxyAdmin'];
 deploy.dependencies = ['OhRegistry'];
 export default deploy;

@@ -25,7 +25,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   log('5 - Liquidator');
 
   const registry = await ethers.getContract('OhRegistry');
-  const liquidator = (await ethers.getContract('OhLiquidator')) as OhLiquidator;
 
   const result = await deploy('OhLiquidator', {
     from: deployer,
@@ -41,12 +40,12 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await setSushiswapRoutes(crv, usdc, [crv, weth, usdc]);
 
     log('Adding to Manager');
-    await setLiquidator(liquidator.address, aave, usdc);
-    await setLiquidator(liquidator.address, comp, usdc);
-    await setLiquidator(liquidator.address, crv, usdc);
+    await setLiquidator(result.address, aave, usdc);
+    await setLiquidator(result.address, comp, usdc);
+    await setLiquidator(result.address, crv, usdc);
   }
 };
 
-deploy.tags = ['OhLiquidator'];
+deploy.tags = ['Core', 'OhLiquidator'];
 deploy.dependencies = ['OhRegistry', 'OhManager'];
 export default deploy;

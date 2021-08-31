@@ -33,7 +33,7 @@ describe('OhForum', () => {
   });
 
   describe('post-governance', () => {
-    let fixture: BankFixture;
+    let fixture: GovernanceFixture;
 
     before(async () => {
       fixture = await setupVotingTest();
