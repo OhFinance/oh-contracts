@@ -27,14 +27,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deterministicDeployment: false,
     skipIfAlreadyDeployed: false,
   });
-
-  // verify the contract
-  if (ohUsdcBank.newlyDeployed && network.live) {
-    await run('verify:verify', {
-      address: ohUsdcBank.address,
-      constructorArguments,
-    });
-  }
 };
 
 deploy.tags = ['OhUsdcBank'];

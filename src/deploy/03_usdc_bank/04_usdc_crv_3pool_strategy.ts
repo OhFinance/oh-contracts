@@ -15,7 +15,12 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const proxyAdmin = await ethers.getContract('OhProxyAdmin');
   const crv3PoolLogic = await ethers.getContract('OhCurve3PoolStrategy');
 
-  const data = await getInitializeCurve3PoolStrategyData(registry.address, ohUsdcBank.address, usdc, '1');
+  const data = await getInitializeCurve3PoolStrategyData(
+    registry.address,
+    ohUsdcBank.address,
+    usdc,
+    '1'
+  );
   const constructorArgs = [crv3PoolLogic.address, proxyAdmin.address, data];
 
   const result = await deploy('OhUsdcCurve3PoolStrategy', {
@@ -26,14 +31,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deterministicDeployment: false,
     skipIfAlreadyDeployed: false,
   });
-
-  // verify the contract
-  if (result.newlyDeployed && network.live) {
-    await run('verify:verify', {
-      address: result.address,
-      constructorArgs,
-    });
-  }
 };
 
 deploy.tags = ['OhUsdcCurve3PoolStrategy'];

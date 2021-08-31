@@ -56,13 +56,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       deterministicDeployment: false,
       skipIfAlreadyDeployed: false,
     });
-
-    if (network.live) {
-      await run('verify:verify', {
-        address: result.address,
-        constructorArguments,
-      });
-    }
   }
 
   return hre.network.live;
