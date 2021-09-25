@@ -6,15 +6,27 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('9 - Bank Logic');
+  log('10 - Strategy Logic');
 
-  await deploy('OhBank', {
+  await deploy('OhAaveV2Strategy', {
+    from: deployer,
+    log: true,
+    deterministicDeployment: false,
+  });
+
+  await deploy('OhCompoundStrategy', {
+    from: deployer,
+    log: true,
+    deterministicDeployment: false,
+  });
+
+  await deploy('OhCurve3PoolStrategy', {
     from: deployer,
     log: true,
     deterministicDeployment: false,
   });
 };
 
-deploy.tags = ['OhBank'];
-deploy.dependencies = ['OhManager', 'OhLiquidator'];
+deploy.tags = ['Core', 'OhStrategy'];
+deploy.dependencies = ['OhBank'];
 export default deploy;

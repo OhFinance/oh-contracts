@@ -44,7 +44,7 @@ const config: HardhatUserConfig = {
     runOnCompile: true,
   },
   mocha: {
-    timeout: 1200000,
+    timeout: 12000000,
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY || '',
@@ -128,7 +128,7 @@ const config: HardhatUserConfig = {
     crv3Token: '0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490', // 3CRV
     crvMintr: '0xd061D61a4d941c39E5453435B6345Dc261C2fcE0', // reward contract
     dai: {
-      1: '0x6b175474e89094c44da98b954eedeac495271d0f',  // DAI
+      1: '0x6b175474e89094c44da98b954eedeac495271d0f', // DAI
       42: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643', // DAI Coumpound
     },
     usdc: {
@@ -137,7 +137,7 @@ const config: HardhatUserConfig = {
       // 42: '0xe22da380ee6B445bb8273C81944ADEB6E8450422' // USDC AAVE
     },
     usdt: {
-      1: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+      1: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
       42: '0xf3e0d7bf58c5d455d31ef1c2d5375904df525105',
     },
     sushiswapV2: {
@@ -161,7 +161,7 @@ const config: HardhatUserConfig = {
       chainId: 1,
       forking: {
         // enabled: false,
-        blockNumber: 12495621,
+        blockNumber: 13100000,
         url: process.env.MAINNET_NODE_URL || '',
       },
     },

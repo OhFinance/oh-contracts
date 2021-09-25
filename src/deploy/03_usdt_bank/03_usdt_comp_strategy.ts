@@ -13,10 +13,15 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const registry = await ethers.getContract('OhRegistry');
   const ohUsdtBank = await ethers.getContract('OhUsdtBank');
   const proxyAdmin = await ethers.getContract('OhProxyAdmin');
-  const aaveV2Logic = await ethers.getContract('OhCompoundStrategy');
+  const compLogic = await ethers.getContract('OhCompoundStrategy');
 
-  const data = await getInitializeCompoundStrategyData(registry.address, ohUsdtBank.address, usdt, compUsdtToken);
-  const constructorArgs = [aaveV2Logic.address, proxyAdmin.address, data];
+  const data = await getInitializeCompoundStrategyData(
+    registry.address,
+    ohUsdtBank.address,
+    usdt,
+    compUsdtToken
+  );
+  const constructorArgs = [compLogic.address, proxyAdmin.address, data];
 
   const result = await deploy('OhUsdtCompoundStrategy', {
     from: deployer,
@@ -26,14 +31,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deterministicDeployment: false,
     skipIfAlreadyDeployed: false,
   });
-
-  // verify the contract
-  if (result.newlyDeployed && network.live) {
-    await run('verify:verify', {
-      address: result.address,
-      constructorArgs,
-    });
-  }
 };
 
 deploy.tags = ['OhUsdtCompoundStrategy'];

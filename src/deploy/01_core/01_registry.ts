@@ -6,7 +6,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('1 - Registry');
+  log('Core - Registry');
 
   await deploy('OhRegistry', {
     from: deployer,
@@ -16,5 +16,5 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 
-deploy.tags = ['OhRegistry'];
+deploy.tags = ['Core', 'OhRegistry'];
 export default deploy;

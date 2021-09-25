@@ -33,12 +33,7 @@ export interface ManagementAccount extends BaseAccount {
   proxyAdmin: OhProxyAdmin;
 }
 
-export interface GovernanceAccount extends ManagementAccount {
-  forum: OhForum;
-  governor: OhGovernor;
-}
-
-export interface BankAccount extends GovernanceAccount {
+export interface BankAccount extends ManagementAccount {
   bankLogic: OhBank;
   aaveV2StrategyLogic: OhAaveV2Strategy;
   compStrategyLogic: OhCompoundStrategy;
@@ -55,6 +50,11 @@ export interface BankAccount extends GovernanceAccount {
 
 export interface LpFarmerAccount extends GovernanceAccount {
 
+}
+
+export interface GovernanceAccount extends BankAccount {
+  forum: OhForum;
+  governor: OhGovernor;
 }
 
 export interface BaseFixture {

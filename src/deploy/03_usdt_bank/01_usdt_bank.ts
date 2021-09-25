@@ -2,24 +2,24 @@ import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {getInitializeBankData} from 'lib';
 
-// deploy the Oh! USDC Bank Proxies
+// deploy the Oh! USDT Bank Proxies
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, ethers, getNamedAccounts, network, run} = hre;
-  const {deployer, usdc} = await getNamedAccounts();
+  const {deployer, usdt} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('15 - Oh! USDC Bank');
+  log('19 - Oh! USDT Bank');
 
   const registry = await ethers.getContract('OhRegistry');
   const proxyAdmin = await ethers.getContract('OhProxyAdmin');
   const bankLogic = await ethers.getContract('OhBank');
 
-  // get Oh! USDC Bank initializer bytecode
-  const data = getInitializeBankData('Oh! USDC', 'OH-USDC', registry.address, usdc);
+  // get Oh! USDT Bank initializer bytecode
+  const data = getInitializeBankData('Oh! USDT', 'OH-USDT', registry.address, usdt);
   const constructorArguments = [bankLogic.address, proxyAdmin.address, data];
 
-  // deploy the Oh! USDC Bank Proxy
-  const ohUsdcBank = await deploy('OhUsdcBank', {
+  // deploy the Oh! USDT Bank Proxy
+  const result = await deploy('OhUsdtBank', {
     from: deployer,
     contract: 'OhUpgradeableProxy',
     args: constructorArguments,
@@ -27,16 +27,8 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deterministicDeployment: false,
     skipIfAlreadyDeployed: false,
   });
-
-  // verify the contract
-  if (ohUsdcBank.newlyDeployed && network.live) {
-    await run('verify:verify', {
-      address: ohUsdcBank.address,
-      constructorArguments,
-    });
-  }
 };
 
-deploy.tags = ['OhUsdcBank'];
+deploy.tags = ['OhUsdtBank'];
 deploy.dependencies = ['OhRegistry', 'OhBank', 'OhProxyAdmin'];
 export default deploy;

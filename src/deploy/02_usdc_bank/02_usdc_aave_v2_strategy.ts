@@ -16,7 +16,12 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const aaveV2Logic = await ethers.getContract('OhAaveV2Strategy');
 
   // build the data's for the strategies
-  const data = await getInitializeAaveV2StrategyData(registry.address, ohUsdcBank.address, usdc, aaveUsdcToken);
+  const data = await getInitializeAaveV2StrategyData(
+    registry.address,
+    ohUsdcBank.address,
+    usdc,
+    aaveUsdcToken
+  );
   const constructorArgs = [aaveV2Logic.address, proxyAdmin.address, data];
 
   const result = await deploy('OhUsdcAaveV2Strategy', {
@@ -27,20 +32,12 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deterministicDeployment: false,
     skipIfAlreadyDeployed: false,
   });
-
-  // verify the contract
-  if (result.newlyDeployed && network.live) {
-    await run('verify:verify', {
-      address: result.address,
-      constructorArgs,
-    });
-  }
 };
 
-// Skip the deployment if we are on 
+// Skip the deployment if we are on
 deploy.skip = async (hre: HardhatRuntimeEnvironment) => {
-  return hre.network.name === 'kovan'
-}
+  return hre.network.name === 'kovan';
+};
 
 deploy.tags = ['OhUsdcAaveV2Strategy'];
 deploy.dependencies = ['OhRegistry', 'OhProxyAdmin', 'OhStrategy', 'OhUsdcBank'];

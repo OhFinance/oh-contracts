@@ -77,7 +77,7 @@ describe('Oh! DAI', () => {
     const {bank, manager} = worker;
 
     const balance = await dai.balanceOf(worker.address);
-    console.log('Starting Balance is:', formatUnits(balance.toString(), 6));
+    console.log('Starting Balance is:', formatUnits(balance.toString()));
     await dai.approve(bank.address, balance);
 
     const amount = balance.div(3);
@@ -101,13 +101,13 @@ describe('Oh! DAI', () => {
     const virtualBalance = await bank.virtualBalance();
     const virtualPrice = await bank.virtualPrice();
 
-    console.log('Virtual Balance is:', formatUnits(virtualBalance.toString(), 6));
-    console.log('Virtual Price is:', formatUnits(virtualPrice.toString(), 6));
+    console.log('Virtual Balance is:', formatUnits(virtualBalance.toString()));
+    console.log('Virtual Price is:', formatUnits(virtualPrice.toString()));
 
     const shares = await bank.balanceOf(worker.address);
     await bank.withdraw(shares.toString());
 
     const endBalance = await dai.balanceOf(worker.address);
-    console.log('Ending Balance is:', formatUnits(endBalance.toString(), 6));
+    console.log('Ending Balance is:', formatUnits(endBalance.toString()));
   });
 });

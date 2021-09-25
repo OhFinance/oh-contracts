@@ -14,7 +14,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('3 - Timelock');
+  log('Core - Timelock');
 
   const registry = await ethers.getContract('OhRegistry');
   const token = await ethers.getContract('OhToken');
@@ -39,8 +39,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   ];
 
   for (let timelock of timelocks) {
-    log(`${timelock.name} Timelock`);
-
     const constructorArguments = [
       registry.address,
       token.address,
@@ -56,19 +54,12 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       deterministicDeployment: false,
       skipIfAlreadyDeployed: false,
     });
-
-    if (network.live) {
-      await run('verify:verify', {
-        address: result.address,
-        constructorArguments,
-      });
-    }
   }
 
   return hre.network.live;
 };
 
-deploy.id = '1';
-deploy.tags = ['OhTimelock'];
+deploy.id = 'CoreTimelock'; // add so this is not redeployed
+deploy.tags = ['Core', 'OhTimelock'];
 deploy.dependencies = ['OhRegistry', 'OhToken'];
 export default deploy;

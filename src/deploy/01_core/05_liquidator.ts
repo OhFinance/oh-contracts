@@ -5,7 +5,22 @@ import {OhLiquidator, OhManager} from 'types';
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, ethers, getNamedAccounts} = hre;
   const {deployer, aave, comp, crv, weth, usdc, uniswapV2, sushiswapV2} = await getNamedAccounts();
-  const {deploy, log} = deployments;
+  const {deploy, execute, log} = deployments;
+
+  const setSushiswapRoutes = async (from: string, to: string, path: string[]) => {
+    await execute(
+      'OhLiquidator',
+      {from: deployer, log: true},
+      'setSushiswapRoutes',
+      from,
+      to,
+      path
+    );
+  };
+
+  const setLiquidator = async (liquidator: string, from: string, to: string) => {
+    await execute('OhManager', {from: deployer, log: true}, 'setLiquidator', liquidator, from, to);
+  };
 
   log('5 - Liquidator');
 
@@ -20,19 +35,17 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   if (result.newlyDeployed) {
     log('Setting up Liquidator');
-    const liquidator = (await ethers.getContract('OhLiquidator')) as OhLiquidator;
-    await liquidator.setSushiswapRoutes(aave, usdc, [aave, weth, usdc]);
-    await liquidator.setSushiswapRoutes(comp, usdc, [comp, weth, usdc]);
-    await liquidator.setSushiswapRoutes(crv, usdc, [crv, weth, usdc]);
+    await setSushiswapRoutes(aave, usdc, [aave, weth, usdc]);
+    await setSushiswapRoutes(comp, usdc, [comp, weth, usdc]);
+    await setSushiswapRoutes(crv, usdc, [crv, weth, usdc]);
 
     log('Adding to Manager');
-    const manager = (await ethers.getContract('OhManager')) as OhManager;
-    await manager.setLiquidator(liquidator.address, aave, usdc);
-    await manager.setLiquidator(liquidator.address, comp, usdc);
-    await manager.setLiquidator(liquidator.address, crv, usdc);
+    await setLiquidator(result.address, aave, usdc);
+    await setLiquidator(result.address, comp, usdc);
+    await setLiquidator(result.address, crv, usdc);
   }
 };
 
-deploy.tags = ['OhLiquidator'];
+deploy.tags = ['Core', 'OhLiquidator'];
 deploy.dependencies = ['OhRegistry', 'OhManager'];
 export default deploy;
