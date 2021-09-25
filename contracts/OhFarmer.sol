@@ -4,11 +4,12 @@ pragma solidity 0.7.6;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {Ownable} from "./libraries/access/Ownable.sol";
 import {OhToken} from "./OhToken.sol";
 
 /// @title Oh! Finance Token
 /// @notice Protocol Governance and Profit-Share ERC-20 Token
-contract OhFarmer {
+contract OhFarmer is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -70,6 +71,32 @@ contract OhFarmer {
         startBlock = _startBlock;
     }
 
+    // Add a new lp to the pool. Can only be called by the owner.
+    // XXX DO NOT add the same LP token more than once. Rewards will be messed up if you do.
+    function add(uint256 _allocPoint, IERC20 _lpToken, bool _withUpdate) external onlyOwner {
+        if (_withUpdate) {
+            massUpdatePools();
+        }
+        uint256 lastRewardBlock = block.number > startBlock ? block.number : startBlock;
+        totalAllocPoint = totalAllocPoint.add(_allocPoint);
+        poolInfo.push(PoolInfo({
+            
+            lpToken: _lpToken,
+            allocPoint: _allocPoint,
+            lastRewardBlock: lastRewardBlock,
+            accOhPerShare: 0
+        }));
+    }
+
+    // Update the given pool's OH allocation point. Can only be called by the owner.
+    function set(uint256 _pid, uint256 _allocPoint, bool _withUpdate) external onlyOwner {
+        if (_withUpdate) {
+            massUpdatePools();
+        }
+        totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(_allocPoint);
+        poolInfo[_pid].allocPoint = _allocPoint;
+    }
+
     // Update reward variables of the given pool to be up-to-date.
     function updatePool(uint256 _pid) public {
         PoolInfo storage pool = poolInfo[_pid];
@@ -97,7 +124,7 @@ contract OhFarmer {
     }
 
     // Safe OH transfer function, just in case if rounding error causes pool to not have enough OHs.
-    function safeOHTransfer(address _to, uint256 _amount) internal {
+    function safeOhTransfer(address _to, uint256 _amount) internal {
         uint256 OHBal = OH.balanceOf(address(this));
         if (_amount > OHBal) {
             OH.transfer(_to, OHBal);
@@ -119,6 +146,45 @@ contract OhFarmer {
         }
     }
 
+    // Stake OH tokens
+    function enterStaking(uint256 _amount) public {
+        PoolInfo storage pool = poolInfo[0];
+        UserInfo storage user = userInfo[0][msg.sender];
+        updatePool(0);
+        if (user.amount > 0) {
+            uint256 pending = user.amount.mul(pool.accOhPerShare).div(1e12).sub(user.rewardDebt);
+            if(pending > 0) {
+                safeOhTransfer(msg.sender, pending);
+            }
+        }
+        if(_amount > 0) {
+            pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
+            user.amount = user.amount.add(_amount);
+        }
+        user.rewardDebt = user.amount.mul(pool.accOhPerShare).div(1e12);
+
+        emit Deposit(msg.sender, 0, _amount);
+    }
+
+    // Unstake OH tokens.
+    function exitStaking(uint256 _amount) public {
+        PoolInfo storage pool = poolInfo[0];
+        UserInfo storage user = userInfo[0][msg.sender];
+        require(user.amount >= _amount, "withdraw: amount too large");
+        updatePool(0);
+        uint256 pending = user.amount.mul(pool.accOhPerShare).div(1e12).sub(user.rewardDebt);
+        if(pending > 0) {
+            safeOhTransfer(msg.sender, pending);
+        }
+        if(_amount > 0) {
+            user.amount = user.amount.sub(_amount);
+            pool.lpToken.safeTransfer(address(msg.sender), _amount);
+        }
+        user.rewardDebt = user.amount.mul(pool.accOhPerShare).div(1e12);
+
+        emit Withdraw(msg.sender, 0, _amount);
+    }
+
     // Deposit LP tokens to OhFarmer for OH allocation.
     function deposit(uint256 _pid, uint256 _amount) public {
         require (_pid != 0, 'deposit OH by staking');
@@ -127,7 +193,7 @@ contract OhFarmer {
         updatePool(_pid);
         if (user.amount > 0) {
             uint256 pending = user.amount.mul(pool.accOhPerShare).div(1e12).sub(user.rewardDebt);
-            safeOHTransfer(msg.sender, pending);
+            safeOhTransfer(msg.sender, pending);
         }
         if (_amount > 0) {
             pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
@@ -146,7 +212,7 @@ contract OhFarmer {
         updatePool(_pid);
         uint256 pending = user.amount.mul(pool.accOhPerShare).div(1e12).sub(user.rewardDebt);
         if (pending > 0) {
-            safeOHTransfer(msg.sender, pending);
+            safeOhTransfer(msg.sender, pending);
         }
         if (_amount > 0) {
             user.amount = user.amount.sub(_amount);
