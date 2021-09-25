@@ -53,6 +53,10 @@ export interface BankAccount extends GovernanceAccount {
   crv3PoolStrategy: OhCurve3PoolStrategy;
 }
 
+export interface LpFarmerAccount extends GovernanceAccount {
+
+}
+
 export interface BaseFixture {
   deployer: BaseAccount;
   worker: BaseAccount;
@@ -76,6 +80,11 @@ export interface GovernanceFixture {
 export interface BankFixture {
   deployer: BankAccount;
   worker: BankAccount;
+}
+
+export interface LpFarmerFixture {
+  deployer: LpFarmerAccount;
+  worker:  LpFarmerAccount;
 }
 
 // export interface CoreFixture {
