@@ -100,21 +100,25 @@ const config: HardhatUserConfig = {
     comp: {
       // COMP ERC-20
       1: '0xc00e94Cb662C3520282E6f5717214004A7f26888',
+      4: '0x0000000000000000000000000000000000000000',
       42: '0x61460874a7196d6a22D1eE4922473664b3E95270',
     },
     compComptroller: {
       // Compound Comptroller (Block-Based Rewards)
       1: '0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B',
+      4: '0x2eaa9d77ae4d8f9cdd9faacd44016e746485bddb',
       42: '0x5eAe89DC1C671724A672ff0630122ee834098657',
     },
     compDaiToken: {
       // Compound cDAI
       1: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
-      42: '0xf0d0eb522cfa50b716b3b1604c4f0fa6f04376ad', // Kovan
+      4: '0x6d7f0754ffeb405d23c51ce938289d4835be3b14',
+      42: '0xf0d0eb522cfa50b716b3b1604c4f0fa6f04376ad',
     },
     compUsdcToken: {
       // Compound cUSDC
       1: '0x39AA39c021dfbaE8faC545936693aC917d5E7563',
+      4: '0x5b281a6dda0b271e91ae35de655ad301c976edb1',
       42: '0x4a92e71227d294f041bd82dd8f78591b75140d63',
     },
     compUsdtToken: {
@@ -128,12 +132,16 @@ const config: HardhatUserConfig = {
     crv3Token: '0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490', // 3CRV
     crvMintr: '0xd061D61a4d941c39E5453435B6345Dc261C2fcE0', // reward contract
     dai: {
-      1: '0x6b175474e89094c44da98b954eedeac495271d0f', // DAI
-      42: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643', // DAI Coumpound
+      1: '0x6b175474e89094c44da98b954eedeac495271d0f',
+      // Compound DAI Faucet Token
+      4: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      42: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
     },
     usdc: {
-      1: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // USDC
-      42: '0xb7a4F3E9097C08dA09517b5aB877F7a917224ede', // USDC Compound
+      1: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+      // Compound USDC Faucet Token
+      4: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
+      42: '0xb7a4F3E9097C08dA09517b5aB877F7a917224ede',
       // 42: '0xe22da380ee6B445bb8273C81944ADEB6E8450422' // USDC AAVE
     },
     usdt: {
@@ -143,11 +151,13 @@ const config: HardhatUserConfig = {
     sushiswapV2: {
       // Sushiswap Router V2
       1: '0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F',
+      4: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506',
       42: '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506',
     },
     uniswapV2: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', /// uni router
     weth: {
       1: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+      4: '0xc778417e063141139fce010982780140aa0cd5ab',
       42: '0xd0A1E359811322d97991E03f863a0C30C2cF029C',
     },
     zero: '0x0000000000000000000000000000000000000000',
