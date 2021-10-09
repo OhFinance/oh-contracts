@@ -22,8 +22,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   if (result.newlyDeployed) {
     log('Setting Farmer');
-
-    await registry.setManager(result.address);
   }
 };
 

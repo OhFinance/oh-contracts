@@ -5,7 +5,7 @@ import {
   getDaiBankContracts,
   getGovernanceContracts,
   getManagementContracts,
-  getTestContracts,
+  getBaseContracts,
   getVestingContracts,
 } from './contracts';
 
@@ -14,8 +14,8 @@ export const setupTest = deployments.createFixture(async ({deployments, getNamed
   const {deployer, worker} = await getNamedAccounts();
 
   return {
-    deployer: await getTestContracts(deployer),
-    worker: await getTestContracts(worker),
+    deployer: await getBaseContracts(deployer),
+    worker: await getBaseContracts(worker),
   };
 });
 

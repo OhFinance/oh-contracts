@@ -15,7 +15,7 @@ import {
   OhUpgradeableProxy,
 } from 'types';
 
-export const getTestContracts = async (signer: string) => {
+export const getBaseContracts = async (signer: string) => {
   const registry = (await ethers.getContract('OhRegistry', signer)) as OhRegistry;
   const token = (await ethers.getContract('OhToken', signer)) as OhToken;
 
@@ -27,7 +27,7 @@ export const getTestContracts = async (signer: string) => {
 };
 
 export const getVestingContracts = async (signer: string) => {
-  const contracts = await getTestContracts(signer);
+  const contracts = await getBaseContracts(signer);
   const vesting = (await ethers.getContract('OhVestingTimelock', signer)) as OhTimelock;
   const foundation = (await ethers.getContract('OhFoundationTimelock', signer)) as OhTimelock;
   const growth = (await ethers.getContract('OhGrowthTimelock', signer)) as OhTimelock;
@@ -43,7 +43,7 @@ export const getVestingContracts = async (signer: string) => {
 };
 
 export const getManagementContracts = async (signer: string) => {
-  const contracts = await getTestContracts(signer);
+  const contracts = await getBaseContracts(signer);
   const liquidator = (await ethers.getContract('OhLiquidator', signer)) as OhLiquidator;
   const manager = (await ethers.getContract('OhManager', signer)) as OhManager;
   const proxyAdmin = (await ethers.getContract('OhProxyAdmin', signer)) as OhProxyAdmin;
