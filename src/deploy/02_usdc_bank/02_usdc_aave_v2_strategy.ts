@@ -34,9 +34,8 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 
-// Skip the deployment if we are on
 deploy.skip = async (hre: HardhatRuntimeEnvironment) => {
-  return hre.network.name === 'kovan';
+  return hre.network.name === 'kovan' || hre.network.name === 'rinkeby';
 };
 
 deploy.tags = ['OhUsdcAaveV2Strategy'];

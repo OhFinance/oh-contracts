@@ -33,6 +33,10 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 
+deploy.skip = async (hre: HardhatRuntimeEnvironment) => {
+  return hre.network.name === 'kovan' || hre.network.name === 'rinkeby';
+};
+
 deploy.tags = ['OhUsdcCurve3PoolStrategy'];
 deploy.dependencies = ['OhRegistry', 'OhProxyAdmin', 'OhStrategy', 'OhUsdcBank'];
 export default deploy;
