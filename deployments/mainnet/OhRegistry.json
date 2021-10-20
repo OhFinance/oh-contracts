@@ -1,0 +1,186 @@
+{
+  "address": "0xb60406a48693c06142085f860Cee9C14D72B217E",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "oldGovernance",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newGovernance",
+          "type": "address"
+        }
+      ],
+      "name": "GovernanceUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "oldManager",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newManager",
+          "type": "address"
+        }
+      ],
+      "name": "ManagerUpdated",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "governance",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "manager",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_governance",
+          "type": "address"
+        }
+      ],
+      "name": "setGovernance",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_manager",
+          "type": "address"
+        }
+      ],
+      "name": "setManager",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x956b3f1e39c966972b97bbc0d70fdcd4132fbcc52e2e68eb4a0d48c4f6cfee55",
+  "receipt": {
+    "to": null,
+    "from": "0x000000010b5AFA32AB82B72625D68571B11EAE13",
+    "contractAddress": "0xb60406a48693c06142085f860Cee9C14D72B217E",
+    "transactionIndex": 47,
+    "gasUsed": "260493",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x291d2666bfcbadaef528d0cab4f0b29333adc9e4c143fc8a33d7635b7affe202",
+    "transactionHash": "0x956b3f1e39c966972b97bbc0d70fdcd4132fbcc52e2e68eb4a0d48c4f6cfee55",
+    "logs": [],
+    "blockNumber": 13406770,
+    "cumulativeGasUsed": "3952250",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "solcInputHash": "c029f0aa65e9de4be775e65679cfa07f",
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"oldGovernance\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newGovernance\",\"type\":\"address\"}],\"name\":\"GovernanceUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"oldManager\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newManager\",\"type\":\"address\"}],\"name\":\"ManagerUpdated\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"governance\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"manager\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_governance\",\"type\":\"address\"}],\"name\":\"setGovernance\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_manager\",\"type\":\"address\"}],\"name\":\"setManager\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Contract that contains references to the all core contracts for Oh! FinanceIdeally, we should never need to replace this contract. Only update references.\",\"kind\":\"dev\",\"methods\":{\"setGovernance(address)\":{\"details\":\"Only Governance can call this function\",\"params\":{\"_governance\":\"the new governance address\"}},\"setManager(address)\":{\"details\":\"Only Governance can call this function\",\"params\":{\"_manager\":\"the new manager address\"}}},\"title\":\"Oh! Finance Registry\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"governance()\":{\"notice\":\"address of governance contract\"},\"manager()\":{\"notice\":\"address of the management contract\"},\"setGovernance(address)\":{\"notice\":\"Sets the Governance address\"},\"setManager(address)\":{\"notice\":\"Sets the Manager address\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/registry/OhRegistry.sol\":\"OhRegistry\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/utils/Address.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity >=0.6.2 <0.8.0;\\n\\n/**\\n * @dev Collection of functions related to the address type\\n */\\nlibrary Address {\\n    /**\\n     * @dev Returns true if `account` is a contract.\\n     *\\n     * [IMPORTANT]\\n     * ====\\n     * It is unsafe to assume that an address for which this function returns\\n     * false is an externally-owned account (EOA) and not a contract.\\n     *\\n     * Among others, `isContract` will return false for the following\\n     * types of addresses:\\n     *\\n     *  - an externally-owned account\\n     *  - a contract in construction\\n     *  - an address where a contract will be created\\n     *  - an address where a contract lived, but was destroyed\\n     * ====\\n     */\\n    function isContract(address account) internal view returns (bool) {\\n        // This method relies on extcodesize, which returns 0 for contracts in\\n        // construction, since the code is only stored at the end of the\\n        // constructor execution.\\n\\n        uint256 size;\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly { size := extcodesize(account) }\\n        return size > 0;\\n    }\\n\\n    /**\\n     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to\\n     * `recipient`, forwarding all available gas and reverting on errors.\\n     *\\n     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost\\n     * of certain opcodes, possibly making contracts go over the 2300 gas limit\\n     * imposed by `transfer`, making them unable to receive funds via\\n     * `transfer`. {sendValue} removes this limitation.\\n     *\\n     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].\\n     *\\n     * IMPORTANT: because control is transferred to `recipient`, care must be\\n     * taken to not create reentrancy vulnerabilities. Consider using\\n     * {ReentrancyGuard} or the\\n     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].\\n     */\\n    function sendValue(address payable recipient, uint256 amount) internal {\\n        require(address(this).balance >= amount, \\\"Address: insufficient balance\\\");\\n\\n        // solhint-disable-next-line avoid-low-level-calls, avoid-call-value\\n        (bool success, ) = recipient.call{ value: amount }(\\\"\\\");\\n        require(success, \\\"Address: unable to send value, recipient may have reverted\\\");\\n    }\\n\\n    /**\\n     * @dev Performs a Solidity function call using a low level `call`. A\\n     * plain`call` is an unsafe replacement for a function call: use this\\n     * function instead.\\n     *\\n     * If `target` reverts with a revert reason, it is bubbled up by this\\n     * function (like regular Solidity function calls).\\n     *\\n     * Returns the raw returned data. To convert to the expected return value,\\n     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].\\n     *\\n     * Requirements:\\n     *\\n     * - `target` must be a contract.\\n     * - calling `target` with `data` must not revert.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCall(address target, bytes memory data) internal returns (bytes memory) {\\n      return functionCall(target, data, \\\"Address: low-level call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with\\n     * `errorMessage` as a fallback revert reason when `target` reverts.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, 0, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but also transferring `value` wei to `target`.\\n     *\\n     * Requirements:\\n     *\\n     * - the calling contract must have an ETH balance of at least `value`.\\n     * - the called Solidity function must be `payable`.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCallWithValue(address target, bytes memory data, uint256 value) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, value, \\\"Address: low-level call with value failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but\\n     * with `errorMessage` as a fallback revert reason when `target` reverts.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage) internal returns (bytes memory) {\\n        require(address(this).balance >= value, \\\"Address: insufficient balance for call\\\");\\n        require(isContract(target), \\\"Address: call to non-contract\\\");\\n\\n        // solhint-disable-next-line avoid-low-level-calls\\n        (bool success, bytes memory returndata) = target.call{ value: value }(data);\\n        return _verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a static call.\\n     *\\n     * _Available since v3.3._\\n     */\\n    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {\\n        return functionStaticCall(target, data, \\\"Address: low-level static call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],\\n     * but performing a static call.\\n     *\\n     * _Available since v3.3._\\n     */\\n    function functionStaticCall(address target, bytes memory data, string memory errorMessage) internal view returns (bytes memory) {\\n        require(isContract(target), \\\"Address: static call to non-contract\\\");\\n\\n        // solhint-disable-next-line avoid-low-level-calls\\n        (bool success, bytes memory returndata) = target.staticcall(data);\\n        return _verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a delegate call.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {\\n        return functionDelegateCall(target, data, \\\"Address: low-level delegate call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],\\n     * but performing a delegate call.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function functionDelegateCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {\\n        require(isContract(target), \\\"Address: delegate call to non-contract\\\");\\n\\n        // solhint-disable-next-line avoid-low-level-calls\\n        (bool success, bytes memory returndata) = target.delegatecall(data);\\n        return _verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage) private pure returns(bytes memory) {\\n        if (success) {\\n            return returndata;\\n        } else {\\n            // Look for revert reason and bubble it up if present\\n            if (returndata.length > 0) {\\n                // The easiest way to bubble the revert reason is using memory via assembly\\n\\n                // solhint-disable-next-line no-inline-assembly\\n                assembly {\\n                    let returndata_size := mload(returndata)\\n                    revert(add(32, returndata), returndata_size)\\n                }\\n            } else {\\n                revert(errorMessage);\\n            }\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x28911e614500ae7c607a432a709d35da25f3bc5ddc8bd12b278b66358070c0ea\",\"license\":\"MIT\"},\"contracts/interfaces/IRegistry.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\r\\n\\r\\npragma solidity 0.7.6;\\r\\n\\r\\ninterface IRegistry {\\r\\n    function governance() external view returns (address);\\r\\n\\r\\n    function manager() external view returns (address);\\r\\n}\\r\\n\",\"keccak256\":\"0x0de5594a9448d7ee99418c702cd627b88f4700319d6c8b5810463a5ccdd214d0\",\"license\":\"MIT\"},\"contracts/registry/OhRegistry.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\r\\n\\r\\npragma solidity 0.7.6;\\r\\n\\r\\nimport {Address} from \\\"@openzeppelin/contracts/utils/Address.sol\\\";\\r\\nimport {IRegistry} from \\\"../interfaces/IRegistry.sol\\\";\\r\\n\\r\\n/// @title Oh! Finance Registry\\r\\n/// @dev Contract that contains references to the all core contracts for Oh! Finance\\r\\n/// @dev Ideally, we should never need to replace this contract. Only update references.\\r\\ncontract OhRegistry is IRegistry {\\r\\n    using Address for address;\\r\\n\\r\\n    /// @notice address of governance contract\\r\\n    address public override governance;\\r\\n    /// @notice address of the management contract\\r\\n    address public override manager;\\r\\n\\r\\n    event GovernanceUpdated(address indexed oldGovernance, address indexed newGovernance);\\r\\n    event ManagerUpdated(address indexed oldManager, address indexed newManager);\\r\\n\\r\\n    modifier onlyGovernance {\\r\\n        require(msg.sender == governance, \\\"Registry: Only Governance\\\");\\r\\n        _;\\r\\n    }\\r\\n\\r\\n    constructor() {\\r\\n        governance = msg.sender;\\r\\n    }\\r\\n\\r\\n    /// @notice Sets the Governance address\\r\\n    /// @param _governance the new governance address\\r\\n    /// @dev Only Governance can call this function\\r\\n    function setGovernance(address _governance) external onlyGovernance {\\r\\n        require(_governance.isContract(), \\\"Registry: Invalid Governance\\\");\\r\\n        emit GovernanceUpdated(governance, _governance);\\r\\n        governance = _governance;\\r\\n    }\\r\\n\\r\\n    /// @notice Sets the Manager address\\r\\n    /// @param _manager the new manager address\\r\\n    /// @dev Only Governance can call this function\\r\\n    function setManager(address _manager) external onlyGovernance {\\r\\n        require(_manager.isContract(), \\\"Registry: Invalid Manager\\\");\\r\\n        emit ManagerUpdated(manager, _manager);\\r\\n        manager = _manager;\\r\\n    }\\r\\n}\\r\\n\",\"keccak256\":\"0xce4b20d160aa3efe26fdee45d65cdfdce06303557b0cf7d21f3124ce94f50a04\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50600080546001600160a01b03191633179055610358806100326000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c8063481c6a75146100515780635aa6e67514610075578063ab033ea91461007d578063d0ebdbe7146100a5575b600080fd5b6100596100cb565b604080516001600160a01b039092168252519081900360200190f35b6100596100da565b6100a36004803603602081101561009357600080fd5b50356001600160a01b03166100e9565b005b6100a3600480360360208110156100bb57600080fd5b50356001600160a01b0316610202565b6001546001600160a01b031681565b6000546001600160a01b031681565b6000546001600160a01b03163314610144576040805162461bcd60e51b815260206004820152601960248201527852656769737472793a204f6e6c7920476f7665726e616e636560381b604482015290519081900360640190fd5b610156816001600160a01b031661031c565b6101a7576040805162461bcd60e51b815260206004820152601c60248201527f52656769737472793a20496e76616c696420476f7665726e616e636500000000604482015290519081900360640190fd5b600080546040516001600160a01b03808516939216917f434a2db650703b36c824e745330d6397cdaa9ee2cc891a4938ae853e1c50b68d91a3600080546001600160a01b0319166001600160a01b0392909216919091179055565b6000546001600160a01b0316331461025d576040805162461bcd60e51b815260206004820152601960248201527852656769737472793a204f6e6c7920476f7665726e616e636560381b604482015290519081900360640190fd5b61026f816001600160a01b031661031c565b6102c0576040805162461bcd60e51b815260206004820152601960248201527f52656769737472793a20496e76616c6964204d616e6167657200000000000000604482015290519081900360640190fd5b6001546040516001600160a01b038084169216907fdac3632743b879638fd2d51c4d3c1dd796615b4758a55b50b0c19b971ba9fbc790600090a3600180546001600160a01b0319166001600160a01b0392909216919091179055565b3b15159056fea26469706673582212205886e344bace162ca3096b0534626e29a8f5864b8cb444dec559633df0e59d2e64736f6c63430007060033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c8063481c6a75146100515780635aa6e67514610075578063ab033ea91461007d578063d0ebdbe7146100a5575b600080fd5b6100596100cb565b604080516001600160a01b039092168252519081900360200190f35b6100596100da565b6100a36004803603602081101561009357600080fd5b50356001600160a01b03166100e9565b005b6100a3600480360360208110156100bb57600080fd5b50356001600160a01b0316610202565b6001546001600160a01b031681565b6000546001600160a01b031681565b6000546001600160a01b03163314610144576040805162461bcd60e51b815260206004820152601960248201527852656769737472793a204f6e6c7920476f7665726e616e636560381b604482015290519081900360640190fd5b610156816001600160a01b031661031c565b6101a7576040805162461bcd60e51b815260206004820152601c60248201527f52656769737472793a20496e76616c696420476f7665726e616e636500000000604482015290519081900360640190fd5b600080546040516001600160a01b03808516939216917f434a2db650703b36c824e745330d6397cdaa9ee2cc891a4938ae853e1c50b68d91a3600080546001600160a01b0319166001600160a01b0392909216919091179055565b6000546001600160a01b0316331461025d576040805162461bcd60e51b815260206004820152601960248201527852656769737472793a204f6e6c7920476f7665726e616e636560381b604482015290519081900360640190fd5b61026f816001600160a01b031661031c565b6102c0576040805162461bcd60e51b815260206004820152601960248201527f52656769737472793a20496e76616c6964204d616e6167657200000000000000604482015290519081900360640190fd5b6001546040516001600160a01b038084169216907fdac3632743b879638fd2d51c4d3c1dd796615b4758a55b50b0c19b971ba9fbc790600090a3600180546001600160a01b0319166001600160a01b0392909216919091179055565b3b15159056fea26469706673582212205886e344bace162ca3096b0534626e29a8f5864b8cb444dec559633df0e59d2e64736f6c63430007060033",
+  "devdoc": {
+    "details": "Contract that contains references to the all core contracts for Oh! FinanceIdeally, we should never need to replace this contract. Only update references.",
+    "kind": "dev",
+    "methods": {
+      "setGovernance(address)": {
+        "details": "Only Governance can call this function",
+        "params": {
+          "_governance": "the new governance address"
+        }
+      },
+      "setManager(address)": {
+        "details": "Only Governance can call this function",
+        "params": {
+          "_manager": "the new manager address"
+        }
+      }
+    },
+    "title": "Oh! Finance Registry",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "governance()": {
+        "notice": "address of governance contract"
+      },
+      "manager()": {
+        "notice": "address of the management contract"
+      },
+      "setGovernance(address)": {
+        "notice": "Sets the Governance address"
+      },
+      "setManager(address)": {
+        "notice": "Sets the Manager address"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 13044,
+        "contract": "contracts/registry/OhRegistry.sol:OhRegistry",
+        "label": "governance",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_address"
+      },
+      {
+        "astId": 13048,
+        "contract": "contracts/registry/OhRegistry.sol:OhRegistry",
+        "label": "manager",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_address"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      }
+    }
+  }
+}
