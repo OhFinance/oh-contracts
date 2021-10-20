@@ -2,11 +2,12 @@ import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 
 // time periods in seconds
-const ONE_MONTH = 2592000; // 30 days
-const FIVE_MONTHS = 12960000; // 150 days
-const EIGHT_MONTHS = 20736000; // 240 days
-const ONE_YEAR = 31104000; // 360 days
-const FOUR_YEARS = 124416000; // 1440 days
+const ONE_DAY = 24 * 60 * 60;
+const ONE_MONTH = 30 * ONE_DAY; // 30 days
+const FIVE_MONTHS = 150 * ONE_DAY; // 150 days
+const EIGHT_MONTHS = 240 * ONE_DAY; // 240 days
+const ONE_YEAR = 360 * ONE_DAY; // 360 days
+const FOUR_YEARS = 4 * ONE_YEAR; // 1440 days
 
 // deploy the vesting contracts
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {

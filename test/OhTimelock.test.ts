@@ -66,7 +66,21 @@ describe('OhTimelock', () => {
     // expect(strategic.toString()).eq(ethers.utils.parseEther('4000000').toString()); // 4m tokens
   });
 
-  it('legal timelock was deployed correctly');
+  it('legal timelock was deployed correctly', async () => {
+    const {deployer} = fixture;
+    const {legal, registry, token} = deployer;
+
+    const timestamp = (await getLatestBlock()).timestamp;
+    const registryAddress = await legal.registry();
+    const tokenAddress = await legal.token();
+    const start = await legal.timelockStart();
+    const length = await legal.timelockLength();
+
+    expect(registryAddress).eq(registry.address);
+    expect(tokenAddress).eq(token.address);
+    expect(start.toNumber()).closeTo(timestamp + 2592000, 100); // test block timestamp + 1 month in seconds, 100s leeway
+    expect(length.toNumber()).eq(12960000); // 5 months
+  });
 
   it('allows users to claim tokens correctly', async () => {
     const {deployer, worker} = fixture;
