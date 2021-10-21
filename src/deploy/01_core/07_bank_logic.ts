@@ -12,6 +12,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     from: deployer,
     log: true,
     deterministicDeployment: false,
+    skipIfAlreadyDeployed: true,
   });
 };
 

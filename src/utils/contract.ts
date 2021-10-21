@@ -8,6 +8,7 @@ import {
   OhManager,
   OhProxyAdmin,
   OhRegistry,
+  OhTimelock,
   OhToken,
   OhUpgradeableProxy,
 } from 'types';
@@ -37,6 +38,10 @@ export const getManagerContract = async (signer: string) => {
 export const getProxyAdminContract = async (signer: string) => {
   return (await ethers.getContract('OhProxyAdmin', signer)) as OhProxyAdmin;
 };
+
+export const getTimelockContract = async (name:string, signer: string) => {
+  return (await ethers.getContract(name, signer)) as OhTimelock
+}
 
 // bank
 

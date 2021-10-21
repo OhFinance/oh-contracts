@@ -18,6 +18,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [registry.address, token.address],
     log: true,
     deterministicDeployment: false,
+    skipIfAlreadyDeployed: true,
   });
 
   if (result.newlyDeployed) {

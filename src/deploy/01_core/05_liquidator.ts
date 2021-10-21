@@ -31,6 +31,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [registry.address, uniswapV2, sushiswapV2],
     log: true,
     deterministicDeployment: false,
+    skipIfAlreadyDeployed: true,
   });
 
   if (result.newlyDeployed) {
