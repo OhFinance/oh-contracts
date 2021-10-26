@@ -5,6 +5,7 @@ import {
   OhCompoundStrategy,
   OhCurve3PoolStrategy,
   OhLiquidator,
+  OhLiquidatorV2,
   OhManager,
   OhProxyAdmin,
   OhRegistry,
@@ -28,7 +29,7 @@ export const getTokenContract = async (signer: string) => {
 };
 
 export const getLiquidatorContract = async (signer: string) => {
-  return (await ethers.getContract('OhLiquidator', signer)) as OhLiquidator;
+  return (await ethers.getContract('OhLiquidatorV2', signer)) as OhLiquidatorV2;
 };
 
 export const getManagerContract = async (signer: string) => {
@@ -39,9 +40,9 @@ export const getProxyAdminContract = async (signer: string) => {
   return (await ethers.getContract('OhProxyAdmin', signer)) as OhProxyAdmin;
 };
 
-export const getTimelockContract = async (name:string, signer: string) => {
-  return (await ethers.getContract(name, signer)) as OhTimelock
-}
+export const getTimelockContract = async (name: string, signer: string) => {
+  return (await ethers.getContract(name, signer)) as OhTimelock;
+};
 
 // bank
 
@@ -87,8 +88,8 @@ export const getUsdcCompoundStrategyProxyContract = async (signer: string) => {
   return await getUpgradeableProxy(signer, 'OhUsdcCompoundStrategy');
 };
 
-export const getCurve3PoolStrategyProxyContract = async (signer: string) => {
-  return await getUpgradeableProxy(signer, 'OhCurve3PoolStrategy');
+export const getUsdcCurve3PoolStrategyProxyContract = async (signer: string) => {
+  return await getUpgradeableProxy(signer, 'OhUsdcCurve3PoolStrategy');
 };
 
 export const getUdscBankContract = async (signer: string) => {
@@ -107,6 +108,6 @@ export const getUsdcCompoundStrategyContract = async (signer: string) => {
 };
 
 export const getUsdcCurve3PoolStrategyContract = async (signer: string) => {
-  const proxy = await getCurve3PoolStrategyProxyContract(signer);
+  const proxy = await getUsdcCurve3PoolStrategyProxyContract(signer);
   return await getCurve3PoolStrategyContract(signer, proxy.address);
 };
