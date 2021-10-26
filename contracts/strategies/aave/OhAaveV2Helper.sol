@@ -68,6 +68,10 @@ abstract contract OhAaveV2Helper {
     /// @param stakedToken The address of stkAAVE
     /// @param amount The amount of stkAAVE to redeem
     function redeem(address stakedToken, uint256 amount) internal {
+        if (amount == 0) {
+            return;
+        }
+
         IStakedToken(stakedToken).redeem(address(this), amount);
     }
 
@@ -95,6 +99,10 @@ abstract contract OhAaveV2Helper {
         address underlying,
         uint256 amount
     ) internal {
+        if (amount == 0) {
+            return;
+        }
+
         IERC20(underlying).safeIncreaseAllowance(pool, amount);
         ILendingPoolV2(pool).deposit(
             underlying,
@@ -113,6 +121,10 @@ abstract contract OhAaveV2Helper {
         address token,
         uint256 amount
     ) internal returns (uint256) {
+        if (amount == 0) {
+            return 0;
+        }
+
         uint256 balance = IERC20(token).balanceOf(address(this));
         IERC20(token).safeIncreaseAllowance(pool, amount);
         uint256 withdrawn = ILendingPoolV2(pool).withdraw(token, amount, address(this));

@@ -12,21 +12,21 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     from: deployer,
     log: true,
     deterministicDeployment: false,
-    skipIfAlreadyDeployed: true,
+    // skipIfAlreadyDeployed: true,
   });
 
   await deploy('OhCompoundStrategy', {
     from: deployer,
     log: true,
     deterministicDeployment: false,
-    skipIfAlreadyDeployed: true,
+    // skipIfAlreadyDeployed: true,
   });
 
   await deploy('OhCurve3PoolStrategy', {
     from: deployer,
     log: true,
     deterministicDeployment: false,
-    skipIfAlreadyDeployed: true,
+    // skipIfAlreadyDeployed: true,
   });
 };
 

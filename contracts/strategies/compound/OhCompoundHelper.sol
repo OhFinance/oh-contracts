@@ -41,6 +41,10 @@ abstract contract OhCompoundHelper {
         address cToken,
         uint256 amount
     ) internal {
+        if (amount == 0) {
+            return;
+        }
+        
         IERC20(underlying).safeIncreaseAllowance(cToken, amount);
         uint256 result = ICToken(cToken).mint(amount);
         require(result == 0, "Compound: Borrow failed");
@@ -50,6 +54,10 @@ abstract contract OhCompoundHelper {
     /// @param cToken The cToken corresponding the underlying we want to borrow
     /// @param amount The amount of underlying to borrow
     function borrow(address cToken, uint256 amount) internal {
+        if (amount == 0) {
+            return;
+        }
+
         uint256 result = ICToken(cToken).borrow(amount);
         require(result == 0, "Compound: Borrow failed");
     }
@@ -63,6 +71,10 @@ abstract contract OhCompoundHelper {
         address cToken,
         uint256 amount
     ) internal {
+        if (amount == 0) {
+            return;
+        }
+
         IERC20(underlying).safeIncreaseAllowance(cToken, amount);
         uint256 result = ICToken(cToken).repayBorrow(amount);
         require(result == 0, "Compound: Repay failed");
@@ -78,6 +90,10 @@ abstract contract OhCompoundHelper {
         address cToken,
         uint256 amount
     ) internal {
+        if (amount == 0) {
+            return;
+        }
+
         IWETH(weth).withdraw(amount); // Unwrapping
         ICEther(cToken).repayBorrow{value: amount}();
     }
@@ -116,10 +132,12 @@ abstract contract OhCompoundHelper {
         address cToken,
         uint256 amount
     ) internal {
-        if (amount > 0) {
-            redeemUnderlying(cToken, amount);
-            IWETH(weth).deposit{value: address(this).balance}();
+        if (amount == 0) {
+            return;
         }
+
+        redeemUnderlying(cToken, amount);
+        IWETH(weth).deposit{value: address(this).balance}();
     }
 
     /// @notice Claim COMP rewards from Comptroller for this address

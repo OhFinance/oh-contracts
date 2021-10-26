@@ -26,6 +26,10 @@ abstract contract OhCurve3PoolHelper {
         uint256 amount,
         uint256 minMint
     ) internal {
+        if (amount == 0) {
+            return;
+        }
+        
         uint256[3] memory amounts = [uint256(0), uint256(0), uint256(0)];
         amounts[index] = amount;
         IERC20(underlying).safeIncreaseAllowance(pool, amount);
@@ -43,6 +47,10 @@ abstract contract OhCurve3PoolHelper {
         uint256 amount,
         uint256 maxBurn
     ) internal {
+        if (amount == 0) {
+            return;
+        }
+
         uint256[3] memory amounts = [uint256(0), uint256(0), uint256(0)];
         amounts[index] = amount;
         ICurve3Pool(pool).remove_liquidity_imbalance(amounts, maxBurn);
@@ -64,6 +72,10 @@ abstract contract OhCurve3PoolHelper {
         uint256 amount,
         int128 index
     ) internal view returns (uint256) {
+        if (amount == 0) {
+            return 0;
+        }
+
         return ICurve3Pool(pool).calc_withdraw_one_coin(amount, index);
     }
 
@@ -82,6 +94,10 @@ abstract contract OhCurve3PoolHelper {
         address crvUnderlying,
         uint256 amount
     ) internal {
+        if (amount == 0) {
+            return;
+        }
+
         IERC20(crvUnderlying).safeIncreaseAllowance(gauge, amount);
         IGauge(gauge).deposit(amount);
     }
@@ -90,6 +106,10 @@ abstract contract OhCurve3PoolHelper {
     /// @param gauge The Curve Gauge to unstake from
     /// @param amount The amount of LP Tokens to withdraw
     function unstake(address gauge, uint256 amount) internal {
+        if (amount == 0) {
+            return;
+        }
+
         IGauge(gauge).withdraw(amount);
     }
 }
