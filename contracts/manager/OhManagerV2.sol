@@ -14,10 +14,10 @@ import {IToken} from "../interfaces/IToken.sol";
 import {TransferHelper} from "../libraries/TransferHelper.sol";
 import {OhSubscriber} from "../registry/OhSubscriber.sol";
 
-/// @title Oh! Finance Manager
+/// @title Oh! Finance Manager V2
 /// @notice The Manager contains references to all active banks, strategies, and liquidation contracts.
-/// @dev This contract is used as the main control point for executing strategies
-contract OhManager is OhSubscriber, IManager {
+/// @dev This contract is used as the main control point for executing strategies. This version adds a minimum 24h delay to bank investing
+contract OhManagerV2 is OhSubscriber, IManager {
     using Address for address;
     using EnumerableSet for EnumerableSet.AddressSet;
     using SafeMath for uint256;
@@ -63,6 +63,9 @@ contract OhManager is OhSubscriber, IManager {
 
     /// @dev The mapping of Banks to next Strategy index it will withdraw from
     mapping(address => uint8) internal _withdrawQueue;
+
+    /// @dev The mapping of Banks to delay status
+    mapping(address => uint256) public delays;
 
     /// @notice Emitted when a Bank's capital is rebalanced
     event Rebalance(address indexed bank);
@@ -178,6 +181,7 @@ contract OhManager is OhSubscriber, IManager {
     function finance(address bank) external override defense onlyBank(bank) {
         uint256 length = _strategies[bank].length();
         require(length > 0, "Manager: No Strategies");
+        require(block.timestamp > delays[bank], "Manager: Delay Not Satisfied");
 
         // get the next Strategy, reset if current index out of bounds
         uint8 i;
@@ -192,6 +196,7 @@ contract OhManager is OhSubscriber, IManager {
         // finance the strategy, increment index and update delay (+24h)
         IBank(bank).investAll(strategy);
         _depositQueue[bank] = i + 1;
+        delays[bank] = block.timestamp + 86400;
 
         emit Finance(bank, strategy);
     }
@@ -203,12 +208,14 @@ contract OhManager is OhSubscriber, IManager {
     function financeAll(address bank) external override defense onlyBank(bank) {
         uint256 length = _strategies[bank].length();
         require(length > 0, "Manager: No Strategies");
+        require(block.timestamp > delays[bank], "Manager: Delay Not Satisfied");
 
         uint256 toInvest = IBank(bank).underlyingBalance();
         for (uint256 i; i < length; i++) {
             uint256 amount = toInvest / length;
             IBank(bank).invest(_strategies[bank].at(i), amount);
         }
+        delays[bank] = block.timestamp + 86400;
 
         emit FinanceAll(bank);
     }

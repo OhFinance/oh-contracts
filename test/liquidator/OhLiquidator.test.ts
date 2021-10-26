@@ -15,13 +15,13 @@ describe('OhLiquidator', () => {
     const {uniswapV2, sushiswapV2, weth} = await getNamedAccounts();
 
     const registryAddress = await liquidator.registry();
-    const uniswap = await liquidator.uniswapRouter();
-    const sushiswap = await liquidator.sushiswapRouter();
+    // const uniswap = await liquidator.uniswapRouter();
+    // const sushiswap = await liquidator.sushiswapRouter();
     const wethAddress = await liquidator.weth();
 
     expect(registryAddress).eq(registry.address);
-    expect(uniswap).eq(uniswapV2);
-    expect(sushiswap).eq(sushiswapV2);
+    // expect(uniswap).eq(uniswapV2);
+    // expect(sushiswap).eq(sushiswapV2);
     expect(wethAddress).eq(weth);
   });
 

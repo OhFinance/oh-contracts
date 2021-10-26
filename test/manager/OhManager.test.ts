@@ -53,21 +53,13 @@ describe('OhManager', () => {
       await bank.deposit(balance);
 
       // add liquidity to uniswap
-      await token.approve(addresses.uniswapV2, parseEther('1000000'));
+      await token.approve(addresses.sushiswapV2, parseEther('1000000'));
       await addLiquidityEth(
         deployer.address,
         token.address,
         parseEther('1000000'),
         parseEther('100')
       );
-
-      // add liquidation routes and set liquidator
-      await liquidator.setUniswapRoutes(usdc.address, token.address, [
-        usdc.address,
-        addresses.weth,
-        token.address,
-      ]);
-      await manager.setLiquidator(liquidator.address, usdc.address, token.address);
     });
 
     it('finances a single strategy, then rebalances to all strategies', async () => {

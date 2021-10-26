@@ -6,6 +6,7 @@ import {
   OhForum,
   OhGovernor,
   OhLiquidator,
+  OhLiquidatorV2,
   OhManager,
   OhProxyAdmin,
   OhRegistry,
@@ -29,7 +30,7 @@ export interface VestingAccount extends BaseAccount {
 
 export interface ManagementAccount extends BaseAccount {
   manager: OhManager;
-  liquidator: OhLiquidator;
+  liquidator: OhLiquidatorV2;
   proxyAdmin: OhProxyAdmin;
 }
 

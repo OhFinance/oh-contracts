@@ -7,6 +7,7 @@ import {
   OhForum,
   OhGovernor,
   OhLiquidator,
+  OhLiquidatorV2,
   OhManager,
   OhProxyAdmin,
   OhRegistry,
@@ -44,7 +45,7 @@ export const getVestingContracts = async (signer: string) => {
 
 export const getManagementContracts = async (signer: string) => {
   const contracts = await getBaseContracts(signer);
-  const liquidator = (await ethers.getContract('OhLiquidator', signer)) as OhLiquidator;
+  const liquidator = (await ethers.getContract('OhLiquidatorV2', signer)) as OhLiquidatorV2;
   const manager = (await ethers.getContract('OhManager', signer)) as OhManager;
   const proxyAdmin = (await ethers.getContract('OhProxyAdmin', signer)) as OhProxyAdmin;
 

@@ -7,11 +7,13 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer, aave, comp, crv, weth, usdc, uniswapV2, sushiswapV2} = await getNamedAccounts();
   const {deploy, execute, log} = deployments;
 
-  const setSushiswapRoutes = async (from: string, to: string, path: string[]) => {
+  // set the swap routes for tokens, use sushiswap
+  const setSwapRoutes = async (from: string, to: string, path: string[]) => {
     await execute(
-      'OhLiquidator',
+      'OhLiquidatorV2',
       {from: deployer, log: true},
-      'setSushiswapRoutes',
+      'setSwapRoutes',
+      sushiswapV2,
       from,
       to,
       path
@@ -25,10 +27,11 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   log('5 - Liquidator');
 
   const registry = await ethers.getContract('OhRegistry');
+  const token = await ethers.getContract('OhToken');
 
-  const result = await deploy('OhLiquidator', {
+  const result = await deploy('OhLiquidatorV2', {
     from: deployer,
-    args: [registry.address, uniswapV2, sushiswapV2],
+    args: [registry.address, weth],
     log: true,
     deterministicDeployment: false,
     skipIfAlreadyDeployed: true,
@@ -36,14 +39,22 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   if (result.newlyDeployed) {
     log('Setting up Liquidator');
-    await setSushiswapRoutes(aave, usdc, [aave, weth, usdc]);
-    await setSushiswapRoutes(comp, usdc, [comp, weth, usdc]);
-    await setSushiswapRoutes(crv, usdc, [crv, weth, usdc]);
+    // set the routes for reward tokens
+    await setSwapRoutes(aave, usdc, [aave, weth, usdc]);
+    await setSwapRoutes(comp, usdc, [comp, weth, usdc]);
+    await setSwapRoutes(crv, usdc, [crv, weth, usdc]);
+
+    // set the routes for buyback
+    await setSwapRoutes(usdc, token.address, [usdc, weth, token.address]);
 
     log('Adding to Manager');
+    // set liquidator for reward tokens
     await setLiquidator(result.address, aave, usdc);
     await setLiquidator(result.address, comp, usdc);
     await setLiquidator(result.address, crv, usdc);
+
+    // set liquidator for buyback
+    await setLiquidator(result.address, usdc, token.address);
   }
 };
 

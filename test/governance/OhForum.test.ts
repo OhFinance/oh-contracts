@@ -81,19 +81,19 @@ describe('OhForum', () => {
     it('accepts proposal to add strategy and set liquidator', async () => {
       const {deployer} = fixture;
       const {forum, manager, liquidator, token, bank, aaveV2Strategy} = deployer;
-      const {aave, weth, usdc} = await getNamedAccounts();
+      const {aave, weth, usdc, sushiswapV2} = await getNamedAccounts();
 
       const setStrategyData = getCallData(
         ['address', 'address', 'bool'],
         [bank.address, aaveV2Strategy.address, true]
       );
       const aaveRoutesData = getCallData(
-        ['address', 'address', 'address[]'],
-        [aave, usdc, [aave, weth, usdc]]
+        ['address', 'address', 'address', 'address[]'],
+        [sushiswapV2, aave, usdc, [aave, weth, usdc]]
       );
       const buybackRoutesData = getCallData(
-        ['address', 'address', 'address[]'],
-        [usdc, token.address, [usdc, weth, token.address]]
+        ['address', 'address', 'address', 'address[]'],
+        [sushiswapV2, usdc, token.address, [usdc, weth, token.address]]
       );
       const aaveLiquidatorData = getCallData(
         ['address', 'address', 'address'],
@@ -110,8 +110,8 @@ describe('OhForum', () => {
         [0, 0, 0, 0, 0],
         [
           'setStrategy(address,address,bool)',
-          'setSushiswapRoutes(address,address,address[])',
-          'setSushiswapRoutes(address,address,address[])',
+          'setSwapRoutes(address,address,address,address[])',
+          'setSwapRoutes(address,address,address,address[])',
           'setLiquidator(address,address,address)',
           'setLiquidator(address,address,address)',
         ],
