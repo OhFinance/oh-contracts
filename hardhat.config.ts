@@ -200,8 +200,11 @@ const config: HardhatUserConfig = {
     mainnet: {
       url: process.env.MAINNET_NODE_URL || '',
       chainId: 1,
-      accounts: process.env.DEPLOYER_KEY ? [`0x${process.env.DEPLOYER_KEY}`] : [],
-      gasPrice: 120000000000,
+      accounts:
+        process.env.DEPLOYER_KEY && process.env.WORKER_KEY
+          ? [`0x${process.env.DEPLOYER_KEY}`, `0x${process.env.WORKER_KEY}`]
+          : [],
+      gasPrice: 200000000000,
     },
   },
 };
