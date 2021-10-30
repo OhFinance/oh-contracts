@@ -75,7 +75,7 @@ describe('Oh! USDC', () => {
     expect(shares).to.be.eq(balance);
   });
 
-  it('allows users to deposit and withdraw from the Oh! USDC Bank', async () => {
+  it('allows one user to deposit and withdraw from the Oh! USDC Bank', async () => {
     const {worker} = fixture;
     const {bank} = worker;
 
@@ -129,7 +129,16 @@ describe('Oh! USDC', () => {
     console.log('Virtual Price is:', formatUnits(virtualPrice.toString(), 6));
 
     const shares = await bank.balanceOf(worker.address);
-    await bank.withdraw(shares.toString());
+
+    let batch = shares.div(10);
+    const withdrawCount = 6;
+    for (let i = 0; i < withdrawCount; i++) {
+      await bank.withdraw(batch.toString());
+    }
+
+    let remainingShares = await bank.balanceOf(worker.address);
+
+    await bank.withdraw(remainingShares.toString());
 
     const endBalance = await usdc.balanceOf(worker.address);
     console.log('Ending Balance is:', formatUnits(endBalance.toString(), 6));

@@ -148,7 +148,7 @@ contract OhManager is OhSubscriber, IManager {
     }
 
     /// @notice Set the withdrawal index
-    /// @param i The 
+    /// @param i The index value
     function setWithdrawIndex(uint256 i) external override onlyBank(msg.sender) {
         _withdrawQueue[msg.sender] = uint8(i);
     }

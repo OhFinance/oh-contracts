@@ -28,6 +28,12 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deterministicDeployment: false,
     // skipIfAlreadyDeployed: true,
   });
+
+  await deploy('OhVoidStrategy', {
+    from: deployer,
+    log: true,
+    deterministicDeployment: false,
+  });
 };
 
 deploy.tags = ['Core', 'OhStrategy'];

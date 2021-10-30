@@ -292,7 +292,7 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
             i = i + 1;
 
             // increment Strategy index or restart
-            if (index - 1 == length) {
+            if (index == length - 1) {
                 index = 0;
             } else {
                 index = index + 1;

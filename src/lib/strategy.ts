@@ -2,6 +2,7 @@ import {ethers, getNamedAccounts} from 'hardhat';
 import OhAaveV2Strategy from 'abi/OhAaveV2Strategy.json';
 import OhCompoundStrategy from 'abi/OhCompoundStrategy.json';
 import OhCurve3PoolStrategy from 'abi/OhCurve3PoolStrategy.json';
+import OhVoidStrategy from 'abi/OhVoidStrategy.json';
 
 export const getInitializeAaveV2StrategyData = async (registry: string, bank: string, underlying: string, derivative: string) => {
   const {aave, aaveStakedToken, aaveLendingPool, aaveIncentivesController} = await getNamedAccounts();
@@ -29,6 +30,15 @@ export const getInitializeCurve3PoolStrategyData = async (registry: string, bank
   const initializeData = strategyInterface.encodeFunctionData(
     'initializeCurve3PoolStrategy(address,address,address,address,address,address,address,address,uint256)',
     [registry, bank, underlying, crv3Token, crv, crv3Pool, crv3Gauge, crvMintr, index]
+  );
+  return initializeData;
+};
+
+export const getInitializeVoidStrategyData = async (registry: string, bank: string) => {
+  const strategyInterface = new ethers.utils.Interface(OhVoidStrategy);
+  const initializeData = strategyInterface.encodeFunctionData(
+    'initializeVoidStrategy(address,address,address)',
+    [registry, bank]
   );
   return initializeData;
 };
