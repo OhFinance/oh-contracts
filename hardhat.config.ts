@@ -68,8 +68,9 @@ const config: HardhatUserConfig = {
     deployer: 0,
     worker: 1,
     treasury: 2,
-    // community: 3,
-    // strategic: 4
+    foundation: '0xc8a5DF8c703139a0e4DFfd0bC21f67f20DD49Ae9',
+    community: '0x3F62aC1a5d25f7c1F94C293D6421A91badF74681',
+    strategic: '0x34e5b09E4da536e9e90af96fCb178C78c2671460',
     aave: {
       // AAVE ERC-20
       1: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
