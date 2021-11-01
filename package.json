@@ -15,7 +15,6 @@
   ],
   "scripts": {
     "compile": "hardhat compile",
-    "postinstall": "yarn compile",
     "build": "yarn clean && yarn compile && tsc",
     "clean": "hardhat clean",
     "clean:all": "rm -rf dist && rm -rf types && hardhat clean",
@@ -79,8 +78,5 @@
     "tsconfig-paths": "^3.9.0",
     "typechain": "^5.0.0",
     "typescript": "^4.1.3"
-  },
-  "dependencies": {
-    "yarn": "^1.22.11"
   }
 }

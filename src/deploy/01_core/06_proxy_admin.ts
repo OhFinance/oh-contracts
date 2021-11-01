@@ -6,7 +6,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer} = await getNamedAccounts();
   const {deploy, log} = deployments;
 
-  log('6 - Proxy Admin');
+  log('Core - Proxy Admin');
 
   const registry = await ethers.getContract('OhRegistry');
 

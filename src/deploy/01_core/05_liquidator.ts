@@ -24,7 +24,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await execute('OhManager', {from: deployer, log: true}, 'setLiquidator', liquidator, from, to);
   };
 
-  log('5 - Liquidator');
+  log('Core - Liquidator');
 
   const registry = await ethers.getContract('OhRegistry');
   const token = await ethers.getContract('OhToken');
