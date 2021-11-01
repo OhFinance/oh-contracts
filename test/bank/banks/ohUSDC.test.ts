@@ -133,7 +133,6 @@ describe('Oh! USDC', () => {
     let batch = shares.div(10);
     const withdrawCount = 6;
     for (let i = 0; i < withdrawCount; i++) {
-      console.log('w', i);
       await bank.withdraw(batch.toString());
     }
 
