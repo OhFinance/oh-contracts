@@ -5,7 +5,6 @@ import {
   getUsdcAaveV2StrategyContract,
   getUsdcCompoundStrategyContract,
   getUsdcCurve3PoolStrategyContract,
-  getUsdcVoidStrategyContract,
 } from 'utils';
 
 async function run() {
@@ -25,15 +24,10 @@ async function run() {
       const aaveV2Strategy = await getUsdcAaveV2StrategyContract(deployer);
       const compStrategy = await getUsdcCompoundStrategyContract(deployer);
       const crv3PoolStrategy = await getUsdcCurve3PoolStrategyContract(deployer);
-      const voidStrategy = await getUsdcVoidStrategyContract(deployer);
 
       await manager.setStrategy(bank.address, aaveV2Strategy.address, true);
       await manager.setStrategy(bank.address, compStrategy.address, true);
       await manager.setStrategy(bank.address, crv3PoolStrategy.address, true);
-      await manager.setStrategy(bank.address, voidStrategy.address, true);
-
-      // Remove Void Strategy
-      await manager.setStrategy(bank.address, voidStrategy.address, true);
     }
   } catch (err) {
     console.error(err);

@@ -46,7 +46,7 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
 
     /// @notice Protocol defense modifier
     /// @dev Only allow user-facing functions to be called by EOA or be whitelisted
-    modifier defense() {
+    modifier defense {
         require(msg.sender == tx.origin || IManager(manager()).whitelisted(msg.sender), "Bank: Only EOA or whitelisted");
         _;
     }
@@ -282,13 +282,13 @@ contract OhBank is ERC20Upgradeable, ERC20PermitUpgradeable, OhSubscriberUpgrade
         uint256 length = totalStrategies();
         uint256 i = 0;
 
-        // reset the index if out of bounds
-        if (index > length) {
-            index = 0;
-        }
-
         // while we haven't withdrawn from each Strategy and we haven't withdrawn the total amount
         while (i < length && amount > 0) {
+            // reset the index if out of bounds
+            if (index >= length) {
+                index = 0;
+            }
+
             // perform the Strategy withdrawal
             uint256 withdrawn = IStrategy(strategies(index)).withdraw(amount);
 
