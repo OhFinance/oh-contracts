@@ -1,7 +1,7 @@
 import {ethers, getNamedAccounts} from 'hardhat';
-import OhAaveV2Strategy from 'abi/OhAaveV2Strategy.json';
-import OhCompoundStrategy from 'abi/OhCompoundStrategy.json';
-import OhCurve3PoolStrategy from 'abi/OhCurve3PoolStrategy.json';
+import OhAaveV2Strategy from '../abi/OhAaveV2Strategy.json';
+import OhCompoundStrategy from '../abi/OhCompoundStrategy.json';
+import OhCurve3PoolStrategy from '../abi/OhCurve3PoolStrategy.json';
 
 export const getInitializeAaveV2StrategyData = async (
   registry: string,

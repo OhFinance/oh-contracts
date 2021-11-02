@@ -1,6 +1,6 @@
 import {BigNumberish} from 'ethers';
 import {ethers, getNamedAccounts} from 'hardhat';
-import {IUniswapV2Router02} from 'types';
+import {IUniswapV2Router02} from '../types';
 
 export const getUniswapV2Router = async (signer: string) => {
   const {uniswapV2} = await getNamedAccounts();

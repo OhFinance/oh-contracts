@@ -12,7 +12,7 @@ import {
   OhTimelock,
   OhToken,
   OhUpgradeableProxy,
-} from 'types';
+} from '../types';
 
 const getUpgradeableProxy = async (signer: string, name: string) => {
   return (await ethers.getContract(name, signer)) as OhUpgradeableProxy;
@@ -28,7 +28,10 @@ export const getTokenContract = async (signer: string) => {
   return (await ethers.getContract('OhToken', signer)) as OhToken;
 };
 
-export const getLiquidatorContract = async (signer: string) => {
+export const getLiquidatorContract = async (signer: string, at?: string) => {
+  if (at) {
+    return (await ethers.getContract('OhLiquidatorV2', signer)) as OhLiquidatorV2;
+  }
   return (await ethers.getContract('OhLiquidatorV2', signer)) as OhLiquidatorV2;
 };
 

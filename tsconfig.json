@@ -8,18 +8,22 @@
     "resolveJsonModule": true,
     "noEmit": true,
     "rootDir": ".",
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "abi/*": ["../abi/*"], // imports are relative to baseUrl
-      "types": ["../types"]
+      // "abi/*": ["../abi/*"], // imports are relative to baseUrl
+      // "types": ["../types"]
     }
   },
   "files": [
     "hardhat.config.ts"
   ],
   "include": [
-    "src",
-    "test"
+    "deploy",
+    "fixture",
+    "lib",
+    "scripts",
+    "test",
+    "utils"
   ],
   "exclude": ["node_modules"]
 }

@@ -11,6 +11,8 @@
     "abi",
     "artifacts",
     "contracts",
+    "lib",
+    "utils",
     "types"
   ],
   "scripts": {

@@ -1,5 +1,5 @@
 import {ethers} from 'hardhat';
-import OhBank from 'abi/OhBank.json';
+import OhBank from '../abi/OhBank.json';
 
 export const getInitializeBankData = (name: string, symbol: string, registry: string, underlying: string) => {
   const bankInterface = new ethers.utils.Interface(OhBank);

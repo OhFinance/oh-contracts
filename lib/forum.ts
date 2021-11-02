@@ -1,11 +1,10 @@
-import {Signer} from 'ethers';
 import {ethers} from 'hardhat';
 import {getForumAt} from './contract';
-import OhManager from 'abi/OhManager.json';
-import {getFunctionData, getFunctionName, getFunctionSignature} from 'utils';
+import OhManager from '../abi/OhManager.json';
+import {getFunctionData, getFunctionName, getFunctionSignature} from '../utils';
 
 export const addBankAndStrategiesProposal = async (
-  proposer: Signer,
+  proposer: string,
   forum: string,
   manager: string,
   bank: string,

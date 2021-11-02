@@ -1,6 +1,6 @@
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
-import {OhLiquidator, OhManager} from 'types';
+import {OhLiquidator, OhManager} from '../../types';
 
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, ethers, getNamedAccounts} = hre;
