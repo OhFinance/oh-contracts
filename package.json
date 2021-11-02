@@ -1,6 +1,6 @@
 {
   "name": "@ohfinance/oh-contracts",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Oh! Finance Ethereum Smart Contracts",
   "homepage": "https://oh.finance",
   "repository": "https://github.com/OhFinance/oh-contracts",
@@ -20,8 +20,8 @@
     "build": "yarn clean && yarn compile && tsc",
     "clean": "hardhat clean",
     "clean:all": "rm -rf dist && rm -rf types && hardhat clean",
-    "bump:minor": "yarn build && yarn test:fast && yarn version --minor",
-    "bump:major": "yarn build && yarn test:fast && yarn version --major",
+    "bump:minor": "yarn build && yarn version --minor",
+    "bump:major": "yarn build && yarn version --major",
     "release:minor": "yarn bump:minor && yarn publish",
     "release:major": "yarn bump:major && yarn publish",
     "lint": "yarn prettier && solhint -c .solhint.json contracts/**/*.sol",
