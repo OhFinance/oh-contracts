@@ -14,7 +14,7 @@ import {
   OhUpgradeableProxy,
 } from '../types';
 
-const getUpgradeableProxy = async (signer: string, name: string) => {
+export const getUpgradeableProxy = async (signer: string, name: string) => {
   return (await ethers.getContract(name, signer)) as OhUpgradeableProxy;
 };
 
