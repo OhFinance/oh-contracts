@@ -216,7 +216,7 @@ contract OhManager is OhSubscriber, IManager {
     /// @notice Perform a token buyback with accrued revenue
     /// @dev Burns all proceeds
     /// @param from The address of the token to liquidate for Oh! Tokens
-    function buyback(address from) external override defense {
+    function buyback(address from) external virtual override defense {
         // get token, liquidator, and liquidation amount
         address _token = token;
         address liquidator = liquidators[from][_token];
