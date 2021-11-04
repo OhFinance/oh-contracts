@@ -8,11 +8,7 @@
     "resolveJsonModule": true,
     "noEmit": true,
     "rootDir": ".",
-    "baseUrl": ".",
-    "paths": {
-      // "abi/*": ["../abi/*"], // imports are relative to baseUrl
-      // "types": ["../types"]
-    }
+    "baseUrl": "."
   },
   "files": [
     "hardhat.config.ts"

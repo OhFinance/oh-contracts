@@ -3,9 +3,9 @@ import {expect} from 'chai';
 import {BigNumber} from 'ethers';
 import {BankFixture, setupBankTest} from 'fixture';
 import {getNamedAccounts} from 'hardhat';
-import {getErc20At} from 'lib';
+import {getERC20Contract, swapEthForTokens} from 'lib';
 import {ERC20} from 'types';
-import {advanceNBlocks, advanceNSeconds, TEN_DAYS, swapEthForTokens} from 'utils';
+import {advanceNBlocks, advanceNSeconds, TEN_DAYS} from 'utils';
 
 describe('Curve3PoolStrategy', () => {
   let fixture: BankFixture;
@@ -18,7 +18,7 @@ describe('Curve3PoolStrategy', () => {
     const {manager, bank, crv3PoolStrategy} = deployer;
 
     const addresses = await getNamedAccounts();
-    usdc = await getErc20At(addresses.usdc, worker.address);
+    usdc = await getERC20Contract(worker.address, addresses.usdc);
 
     await manager.setBank(bank.address, true);
     await manager.setStrategy(bank.address, crv3PoolStrategy.address, true);

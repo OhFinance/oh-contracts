@@ -1,7 +1,7 @@
 import {expect} from 'chai';
-import {advanceNBlocks, advanceNSeconds, ONE_DAY, signMessageData, swapEthForTokens} from 'utils';
+import {advanceNBlocks, advanceNSeconds, ONE_DAY} from 'utils';
 import {BankFixture, setupDaiBankTest} from 'fixture';
-import {getErc20At} from 'lib';
+import {getERC20Contract, swapEthForTokens} from 'lib';
 import {ERC20} from 'types';
 import {formatUnits, parseEther} from '@ethersproject/units';
 import {getNamedAccounts} from 'hardhat';
@@ -15,7 +15,7 @@ describe('Oh! DAI', () => {
     fixture = await setupDaiBankTest();
     const {worker} = fixture;
 
-    dai = await getErc20At(addresses.dai, worker.address);
+    dai = await getERC20Contract(worker.address, addresses.dai);
 
     // buy dai for worker to use in tests
     await swapEthForTokens(worker.address, addresses.dai, parseEther('100'));

@@ -1,7 +1,7 @@
 import {expect} from 'chai';
-import {advanceNBlocks, advanceNSeconds, ONE_DAY, signMessageData, swapEthForTokens} from 'utils';
+import {advanceNBlocks, advanceNSeconds, ONE_DAY, signMessageData} from 'utils';
 import {BankFixture, setupUsdcBankTest} from 'fixture';
-import {getErc20At, getPermitMessageData} from 'lib';
+import {getERC20Contract, getPermitMessageData, swapEthForTokens} from 'lib';
 import {ERC20} from 'types';
 import {formatUnits, parseEther} from '@ethersproject/units';
 import {getNamedAccounts} from 'hardhat';
@@ -15,7 +15,7 @@ describe('Oh! USDC', () => {
     fixture = await setupUsdcBankTest();
     const {worker} = fixture;
 
-    usdc = await getErc20At(addresses.usdc, worker.address);
+    usdc = await getERC20Contract(worker.address, addresses.usdc);
 
     // buy usdc for worker to use in tests
     await swapEthForTokens(worker.address, addresses.usdc, parseEther('100'));

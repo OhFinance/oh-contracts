@@ -9,8 +9,7 @@ import {
   ONE_DAY,
   TEN_DAYS,
 } from 'utils';
-import {getErc20At} from 'lib';
-import {swapEthForTokens} from 'utils';
+import {getERC20Contract, swapEthForTokens} from 'lib';
 import {formatUnits, parseEther} from '@ethersproject/units';
 import {getNamedAccounts} from 'hardhat';
 import {ERC20} from 'types';
@@ -27,7 +26,7 @@ describe('AaveV2Strategy', function () {
     const {manager, bank, aaveV2Strategy} = deployer;
 
     const addresses = await getNamedAccounts();
-    usdc = await getErc20At(addresses.usdc, worker.address);
+    usdc = await getERC20Contract(worker.address, addresses.usdc);
 
     await manager.setBank(bank.address, true);
     await manager.setStrategy(bank.address, aaveV2Strategy.address, true);

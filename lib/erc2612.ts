@@ -1,23 +1,34 @@
-import { getDomain } from "./erc2612";
+import {network} from 'hardhat';
 
-export const getDelegationMessageData = (
+export const getDomain = (name: string, version: string, token: string) => ({
+  name,
+  version,
+  chainId: network.config.chainId,
+  verifyingContract: token,
+});
+
+export const getPermitMessageData = (
+  name: string,
+  version: string,
   token: string,
-  delegator: string,
-  delegatee: string,
+  owner: string,
+  spender: string,
+  value: string,
   nonce: number,
   deadline: number
 ) => {
   const message = {
-    delegator,
-    delegatee,
+    owner,
+    spender,
+    value,
     nonce,
     deadline,
   };
 
   const data = JSON.stringify({
-    domain: getDomain('Oh! Finance', '1', token),
+    domain: getDomain(name, version, token),
     message,
-    primaryType: 'Delegation',
+    primaryType: 'Permit',
     types: {
       EIP712Domain: [
         {
@@ -37,14 +48,18 @@ export const getDelegationMessageData = (
           type: 'address',
         },
       ],
-      Delegation: [
+      Permit: [
         {
-          name: 'delegator',
+          name: 'owner',
           type: 'address',
         },
         {
-          name: 'delegatee',
+          name: 'spender',
           type: 'address',
+        },
+        {
+          name: 'value',
+          type: 'uint256',
         },
         {
           name: 'nonce',

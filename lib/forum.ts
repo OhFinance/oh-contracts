@@ -1,5 +1,5 @@
 import {ethers} from 'hardhat';
-import {getForumAt} from './contract';
+import {getForumContract} from './contract';
 import OhManager from '../abi/OhManager.json';
 import {getFunctionData, getFunctionName, getFunctionSignature} from '../utils';
 
@@ -11,7 +11,7 @@ export const addBankAndStrategiesProposal = async (
   strategies: string[],
   description: string
 ) => {
-  const forumContract = await getForumAt(forum, proposer);
+  const forumContract = await getForumContract(proposer, forum);
 
   const managerInterface = new ethers.utils.Interface(OhManager);
   const setBankFunc = getFunctionName(managerInterface, 'setBank');

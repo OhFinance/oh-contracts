@@ -1,4 +1,6 @@
+import { BigNumberish } from '@ethersproject/bignumber';
 import {ethers} from 'hardhat';
+import { getBankContract } from './contract';
 import OhBank from '../abi/OhBank.json';
 
 export const getInitializeBankData = (name: string, symbol: string, registry: string, underlying: string) => {
@@ -11,3 +13,15 @@ export const getInitializeBankData = (name: string, symbol: string, registry: st
   ]);
   return initializeData;
 };
+
+export const deposit = async (signer:string, bank:string, amount: BigNumberish) => {
+  const bankContract = await getBankContract(signer, bank);
+  const tx = await bankContract.deposit(amount);
+  await tx.wait()
+}
+
+export const withdraw = async (signer:string, bank:string, amount: BigNumberish) => {
+  const bankContract = await getBankContract(signer, bank);
+  const tx = await bankContract.withdraw(amount);
+  await tx.wait()
+}

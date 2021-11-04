@@ -2,8 +2,7 @@ import {parseEther} from '@ethersproject/units';
 import {expect} from 'chai';
 import {BankFixture, ManagementFixture, setupManagementTest, setupUsdcBankTest} from 'fixture';
 import {getNamedAccounts} from 'hardhat';
-import {getErc20At} from 'lib';
-import {addLiquidityEth, swapEthForTokens} from 'utils';
+import {addLiquidityEth, getERC20Contract, swapEthForTokens} from 'lib';
 import {ERC20} from 'types';
 import {advanceNBlocks, advanceNSeconds, TWO_DAYS} from 'utils';
 
@@ -42,7 +41,7 @@ describe('OhManager', () => {
       const {bank} = worker;
 
       const addresses = await getNamedAccounts();
-      usdc = await getErc20At(addresses.usdc, worker.address);
+      usdc = await getERC20Contract(worker.address, addresses.usdc);
 
       // Buy USDC using the worker wallet
       await swapEthForTokens(worker.address, addresses.usdc, parseEther('200'));

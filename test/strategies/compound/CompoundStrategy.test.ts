@@ -3,10 +3,9 @@ import {expect} from 'chai';
 import {BigNumber} from 'ethers';
 import {BankFixture, setupBankTest} from 'fixture';
 import {getNamedAccounts} from 'hardhat';
-import {getErc20At} from 'lib';
-import {ONE_DAY, swapEthForTokens} from 'utils';
+import {getERC20Contract, swapEthForTokens} from 'lib';
 import {ERC20} from 'types';
-import {advanceNBlocks, advanceNSeconds, TEN_DAYS} from 'utils';
+import {advanceNBlocks, advanceNSeconds, ONE_DAY} from 'utils';
 
 describe('CompoundStrategy', () => {
   let fixture: BankFixture;
@@ -19,7 +18,7 @@ describe('CompoundStrategy', () => {
     const {manager, bank, compStrategy} = deployer;
 
     const addresses = await getNamedAccounts();
-    usdc = await getErc20At(addresses.usdc, worker.address);
+    usdc = await getERC20Contract(worker.address, addresses.usdc);
 
     await manager.setBank(bank.address, true);
     await manager.setStrategy(bank.address, compStrategy.address, true);

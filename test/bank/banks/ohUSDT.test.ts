@@ -1,7 +1,7 @@
 import {expect} from 'chai';
-import {advanceNBlocks, advanceNSeconds, ONE_DAY, signMessageData, swapEthForTokens} from 'utils';
+import {advanceNBlocks, advanceNSeconds, ONE_DAY} from 'utils';
 import {BankFixture, setupUsdtBankTest} from 'fixture';
-import {getErc20At} from 'lib';
+import {getERC20Contract, swapEthForTokens} from 'lib';
 import {ERC20} from 'types';
 import {formatUnits, parseEther} from '@ethersproject/units';
 import {getNamedAccounts} from 'hardhat';
@@ -15,7 +15,7 @@ describe('Oh! USDT', () => {
     fixture = await setupUsdtBankTest();
     const {worker} = fixture;
 
-    usdt = await getErc20At(addresses.usdt, worker.address);
+    usdt = await getERC20Contract(worker.address, addresses.usdt);
 
     // buy usdt for worker to use in tests
     await swapEthForTokens(worker.address, addresses.usdt, parseEther('100'));
