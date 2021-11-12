@@ -10,4 +10,6 @@ interface IStrategyBase is IStrategyStorage {
     function derivativeBalance() external view returns (uint256);
 
     function rewardBalance() external view returns (uint256);
+
+    function secondaryRewardBalance() external view returns (uint256);
 }

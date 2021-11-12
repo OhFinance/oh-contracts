@@ -11,6 +11,8 @@ interface IStrategyStorage {
 
     function reward() external view returns (address);
 
+    function secondaryReward() external view returns (address);
+
     // function investedBalance() external view returns (uint256);
 
     // function invest() external;
