@@ -20,7 +20,10 @@ export const getERC20Contract = async (signer: string, at: string) => {
   return (await ethers.getContractAt('ERC20', at, signer)) as ERC20;
 }
 
-export const getUpgradeableProxy = async (signer: string, name: string) => {
+export const getUpgradeableProxy = async (signer: string, name: string, at?: string) => {
+  if (at) {
+    return (await ethers.getContractAt(name, at, signer)) as OhUpgradeableProxy;
+  }
   return (await ethers.getContract(name, signer)) as OhUpgradeableProxy;
 };
 
@@ -58,7 +61,10 @@ export const getManagerContract = async (signer: string, at?: string) => {
   return (await ethers.getContract('OhManager', signer)) as OhManager;
 };
 
-export const getProxyAdminContract = async (signer: string) => {
+export const getProxyAdminContract = async (signer: string, at?: string) => {
+  if (at) {
+    return (await ethers.getContractAt('OhProxyAdmin', at, signer)) as OhProxyAdmin;
+  }
   return (await ethers.getContract('OhProxyAdmin', signer)) as OhProxyAdmin;
 };
 

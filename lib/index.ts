@@ -5,6 +5,7 @@ export * from './erc2612';
 export * from './forum';
 export * from './liquidator'
 export * from './manager';
+export * from './proxyAdmin'
 export * from './registry';
 export * from './strategy';
 export * from './swap';
