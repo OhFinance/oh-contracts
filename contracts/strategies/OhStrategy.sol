@@ -43,25 +43,6 @@ contract OhStrategy is OhSubscriberUpgradeable, OhStrategyStorage, IStrategyBase
         initializeStorage(bank_, underlying_, derivative_, reward_);
     }
 
-    /// @notice Initialize the base Double Reward Strategy
-    /// @param registry_ Address of the Registry
-    /// @param bank_ Address of Bank
-    /// @param underlying_ Underying token that is deposited
-    /// @param derivative_ Derivative token received from protocol, or address(0)
-    /// @param reward_ Reward token received from protocol, or address(0)
-    /// @param secondaryReward_ SecondaryReward token received from protocol, or address(0)
-    function initialize2RewardStrategy(
-        address registry_,
-        address bank_,
-        address underlying_,
-        address derivative_,
-        address reward_,
-        address secondaryReward_
-    ) internal initializer {
-        initializeSubscriber(registry_);
-        initialize2RewardStorage(bank_, underlying_, derivative_, reward_, secondaryReward_);
-    }
-
     /// @dev Balance of underlying awaiting Strategy investment
     function underlyingBalance() public view override returns (uint256) {
         return IERC20(underlying()).balanceOf(address(this));
@@ -82,14 +63,6 @@ contract OhStrategy is OhSubscriberUpgradeable, OhStrategyStorage, IStrategyBase
             return 0;
         }
         return IERC20(reward()).balanceOf(address(this));
-    }
-
-    /// @dev Balance of secondary reward tokens awaiting liquidation, if applicable
-    function secondaryRewardBalance() public view override returns (uint256) {
-        if (secondaryReward() == address(0)) {
-            return 0;
-        }
-        return IERC20(secondaryReward()).balanceOf(address(this));
     }
 
     /// @notice Governance function to sweep any stuck / airdrop tokens to a given recipient

@@ -11,15 +11,12 @@ contract OhStrategyStorage is Initializable, OhUpgradeable, IStrategyStorage {
     bytes32 internal constant _UNDERLYING_SLOT = 0x0fad97fe3ec7d6c1e9191a09a0c4ccb7a831b6605392e57d2fedb8501a4dc812;
     bytes32 internal constant _DERIVATIVE_SLOT = 0x4ff4c9b81c0bf267e01129f4817e03efc0163ee7133b87bd58118a96bbce43d3;
     bytes32 internal constant _REWARD_SLOT = 0xaeb865605058f37eedb4467ee2609ddec592b0c9a6f7f7cb0db3feabe544c71c;
-    bytes32 internal constant _SECONDARY_REWARD_SLOT = 0xed3e99308c555188f4c5710fec09d3c9ca77ec21fb1b315cdfc32f1c6474e57d;
-    
 
     constructor() {
         assert(_BANK_SLOT == bytes32(uint256(keccak256("eip1967.strategy.bank")) - 1));
         assert(_UNDERLYING_SLOT == bytes32(uint256(keccak256("eip1967.strategy.underlying")) - 1));
         assert(_DERIVATIVE_SLOT == bytes32(uint256(keccak256("eip1967.strategy.derivative")) - 1));
         assert(_REWARD_SLOT == bytes32(uint256(keccak256("eip1967.strategy.reward")) - 1));
-        assert(_SECONDARY_REWARD_SLOT == bytes32(uint256(keccak256("eip1967.strategy.secondaryreward")) - 1));
     }
 
     function initializeStorage(
@@ -32,21 +29,6 @@ contract OhStrategyStorage is Initializable, OhUpgradeable, IStrategyStorage {
         _setUnderlying(underlying_);
         _setDerivative(derivative_);
         _setReward(reward_);
-    }
-
-
-    function initialize2RewardStorage(
-        address bank_,
-        address underlying_,
-        address derivative_,
-        address reward_,
-        address secondaryReward_
-    ) internal initializer {
-        _setBank(bank_);
-        _setUnderlying(underlying_);
-        _setDerivative(derivative_);
-        _setReward(reward_);
-        _setSecondaryReward(secondaryReward_);
     }
 
     /// @notice The Bank that the Strategy is associated with
@@ -69,11 +51,6 @@ contract OhStrategyStorage is Initializable, OhUpgradeable, IStrategyStorage {
         return getAddress(_REWARD_SLOT);
     }
 
-    /// @notice The secondary reward received, if any
-    function secondaryReward() public view override returns (address) {
-        return getAddress(_SECONDARY_REWARD_SLOT);
-    }
-
     function _setBank(address _address) internal {
         setAddress(_BANK_SLOT, _address);
     }
@@ -88,9 +65,5 @@ contract OhStrategyStorage is Initializable, OhUpgradeable, IStrategyStorage {
 
     function _setReward(address _address) internal {
         setAddress(_REWARD_SLOT, _address);
-    }
-
-    function _setSecondaryReward(address _address) internal {
-        setAddress(_SECONDARY_REWARD_SLOT, _address);
     }
 }
