@@ -43,4 +43,8 @@ contract OhMultichainManager is OhManager, IMultichainManager {
     function setBurner(address _burner) external override onlyGovernance {
         burner = _burner;
     }
+
+    function setToken(address _token) external override onlyGovernance {
+        token = _token;
+    }
 }
