@@ -8,4 +8,6 @@ interface IMultichainManager {
     function burn() external;
 
     function setBurner(address _burner) external;
+
+    function setToken(address _token) external;
 }
