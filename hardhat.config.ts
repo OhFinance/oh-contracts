@@ -44,7 +44,10 @@ const config: HardhatUserConfig = {
     timeout: 12000000,
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY || '',
+    apiKey: {
+      avalanche: process.env.SNOWTRACE_API_KEY || '',
+      moonriver: process.env.MOONRIVER_MOONSCAN_API_KEY || '',
+    }
   },
   abiExporter: {
     flat: true,
@@ -194,6 +197,14 @@ const config: HardhatUserConfig = {
       url: process.env.KOVAN_NODE_URL || '',
       chainId: 42,
       accounts: process.env.TESTNET_DEPLOYER_KEY ? [`0x${process.env.TESTNET_DEPLOYER_KEY}`] : [],
+    },
+    moonriver: {
+      chainId: 1285,
+      url: 'https://rpc.moonriver.moonbeam.network',
+    },
+    avalanche: {
+      chainId: 43114,
+      url: 'https://api.avax.network/ext/bc/C/rpc',
     },
     mainnet: {
       url: process.env.MAINNET_NODE_URL || '',

@@ -69,7 +69,7 @@ contract OhTimelock is ReentrancyGuard, OhSubscriber, ITimelock {
             uint256 amount = amounts[i];
 
             // update state and total, emit add
-            balances[user] = amount;
+            balances[user] = balances[user].add(amount);
             totalAmount = totalAmount.add(amount);
             emit Add(user, amount);
         }
